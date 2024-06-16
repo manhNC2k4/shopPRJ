@@ -15,6 +15,17 @@
         <link href="filepond/css/filepond.css" rel="stylesheet">
         <link rel="stylesheet" href="css/bootstrap.min.css"/>
         <script src="filepond/js/filepond.js"></script>
+        <style>
+            .form-group-inline {
+                display: flex;
+                flex-wrap: wrap;
+            }
+            .form-group-inline .form-group {
+                flex: 1 1 10%;
+                min-width: 100px;
+                margin-right: 10px;
+            }
+        </style>
     </head>
     <body>
 
@@ -48,18 +59,19 @@
                     <input type="number" step="0.01" class="form-control" id="price" name="price" required>
                 </div>
 
-                <div id="sizes">
+                <div id="sizes" class="form-group-inline">
                     <div class="form-group">
-                        <label for="size">Size:</label>
-                        <input type="number" class="form-control" id="size" name="size[]" required>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="stock">Stock:</label>
-                        <input type="number" class="form-control" id="stock" name="stock[]" required>
+                        <div class="form-group">
+                            <label for="size">Size:</label>
+                            <input type="number" class="form-control" id="size" name="size[]" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="stock">Stock:</label>
+                            <input type="number" class="form-control" id="stock" name="stock[]" required>
+                        </div>
                     </div>
                 </div>
-
+                <button type="button" class="btn btn-secondary" onclick="addSize()">Add Another Size</button><br><br>
                 <div class="form-group">
                     <label for="productImage">Product Image:</label>
                     <input type="file" class="filepond" id="productImage" name="productImage" accept="image/*" required>
@@ -80,12 +92,22 @@
                 var newSizeDiv = document.createElement('div');
                 newSizeDiv.classList.add('form-group');
                 newSizeDiv.innerHTML = `
-                    <label for="size">Size:</label>
-                    <input type="number" class="form-control" id="size" name="size[]" required>
+                    <div class="form-group">
+                        <label for="size">Size:</label>
+                        <input type="number" class="form-control" id="size" name="size[]" required>
+                    </div>
+                <div class="form-group">
                     <label for="stock">Stock:</label>
-                    <input type="number" class="form-control" id="stock" name="stock[]" required>
+                        <input type="number" class="form-control" id="stock" name="stock[]" required>
+           </div>
                 `;
                 sizesDiv.appendChild(newSizeDiv);
+                if (sizeInputs.length >= 20) {
+                    var newRowDiv = document.createElement('div');
+                    newRowDiv.classList.add('form-group-inline');
+                    sizesDiv.appendChild(newRowDiv);
+                    sizesDiv = newRowDiv;
+                }
             }
         </script>
         <script src="js/bootstrap.min.js"></script>

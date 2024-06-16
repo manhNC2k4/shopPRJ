@@ -40,7 +40,6 @@
                     <tr>
                         <th>ID</th>
                         <th>Name</th>
-                        <th>Description</th>
                         <th>Category ID</th>
                         <th>Price</th>
                         <th>Created At</th>
@@ -54,7 +53,6 @@
                         <tr>
                             <td>${p.id}</td>
                             <td>${p.name}</td>
-                            <td>${p.description}</td>
                             <td>${p.categoryId}</td>
                             <td>${p.price}</td>
                             <td>${p.createdAt}</td>
@@ -75,10 +73,10 @@
         <script>
             function checkAdmin() {
                 var isAdmin = <%= session.getAttribute("admin") != null %>;
-                if (!isAdmin) {
-                    alert('Bạn không có quyền thực hiện hành động này.');
-                    return false;
-                }
+        //                if (!isAdmin) {
+        //                    alert('Bạn không có quyền thực hiện hành động này.');
+        //                    return false;
+        //                }
                 return true;
             }
             function confirmDelete() {

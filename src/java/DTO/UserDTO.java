@@ -16,13 +16,13 @@ public class UserDTO {
     private String address;
     private Date created_at;
     private Date updated_at;
-
+    private int role;
     // Constructor không tham số
     public UserDTO() {
     }
 
     // Constructor có tham số
-    public UserDTO(int user_id, String username, String email, String first_name, String last_name, String phone, String address, Date created_at, Date updated_at) {
+    public UserDTO(int user_id, String username, String email, String first_name, String last_name, String phone, String address, Date created_at, Date updated_at, int role) {
         this.user_id = user_id;
         this.username = username;
         this.email = email;
@@ -32,6 +32,7 @@ public class UserDTO {
         this.address = address;
         this.created_at = created_at;
         this.updated_at = updated_at;
+        this.role = role;
     }
 
     // Getter và Setter cho user_id
@@ -114,6 +115,12 @@ public class UserDTO {
     public void setUpdated_at(Date updated_at) {
         this.updated_at = updated_at;
     }
+
+    public int getRole() {
+        return role;
+    }
+    
+    
 
     // Phương thức toString để hiển thị thông tin người dùng
     @Override

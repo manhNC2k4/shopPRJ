@@ -31,8 +31,7 @@ import model.Product;
 @MultipartConfig(
         fileSizeThreshold = 1024 * 1024 * 2, // 2MB
         maxFileSize = 1024 * 1024 * 10, // 10MB
-        maxRequestSize = 1024 * 1024 * 50, // 50MB
-        location = "/tmp" // Thư mục tạm thời
+        maxRequestSize = 1024 * 1024 * 50 // 50MB
 )
 public class UploadProductServlet extends HttpServlet {
 
@@ -54,7 +53,8 @@ public class UploadProductServlet extends HttpServlet {
         String name = request.getParameter("name");
         String description = request.getParameter("description");
         String r_categoryId = request.getParameter("categoryId");
-        BigDecimal price = new BigDecimal(request.getParameter("price"));
+        String priceStr = request.getParameter("price");
+        BigDecimal price;
         String[] sizes = request.getParameterValues("size[]");
         String[] stocks = request.getParameterValues("stock[]");
         InputStream inputStream;
@@ -62,11 +62,12 @@ public class UploadProductServlet extends HttpServlet {
         String message;
         Part filePart = request.getPart("productImage");
         try {
+            price = new BigDecimal(priceStr);
             int categoryId = Integer.parseInt(r_categoryId);
             if (filePart != null) {
                 inputStream = filePart.getInputStream();
                 String fileName = Paths.get(filePart.getSubmittedFileName()).getFileName().toString();
-                String uploadDir = getServletContext().getRealPath("/") + "uploads/images";
+                String uploadDir = "E:/Netbeans17/Shop/web/uploads/images";
                 ProductDAO pd = new ProductDAO();
                 imagePath = pd.saveImageToFileSystem(inputStream, fileName, uploadDir);
                 Product p = new Product(-1, name, description, categoryId, price, null, imagePath, null);

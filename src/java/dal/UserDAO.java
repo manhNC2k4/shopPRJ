@@ -32,7 +32,8 @@ public class UserDAO extends DBContext {
                 + "      ,[phone]\n"
                 + "      ,[address]\n"
                 + "      ,[created_at]\n"
-                + "      ,[updated_at]\n"
+                + "      ,[updated_at]"
+                + "      ,[role]\n"
                 + "  FROM [dbo].[Users]";
         try {
             PreparedStatement st = connection.prepareStatement(sql);
@@ -47,7 +48,8 @@ public class UserDAO extends DBContext {
                         rs.getString("phone"),
                         rs.getString("address"),
                         rs.getTimestamp("created_at"),
-                        rs.getTimestamp("updated_at")
+                        rs.getTimestamp("updated_at"),
+                        rs.getInt("role")
                 );
                 list.add(c);
             }
@@ -94,7 +96,8 @@ public class UserDAO extends DBContext {
                         rs.getString("phone"),
                         rs.getString("address"),
                         rs.getTimestamp("created_at"),
-                        rs.getTimestamp("updated_at")
+                        rs.getTimestamp("updated_at"),
+                        rs.getInt("role")
                 );
                 return c;
             }
@@ -137,7 +140,8 @@ public class UserDAO extends DBContext {
                         rs.getString("phone"),
                         rs.getString("address"),
                         rs.getTimestamp("created_at"),
-                        rs.getTimestamp("updated_at")
+                        rs.getTimestamp("updated_at"),
+                        rs.getInt("role")
                 );
                 return c;
             }

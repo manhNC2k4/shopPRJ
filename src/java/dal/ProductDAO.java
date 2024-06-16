@@ -31,13 +31,13 @@ public class ProductDAO extends DBContext {
                 + "VALUES (?, ?, ?, ?, ?, ?, ?)";
         int productId = -1;
         try {
-            PreparedStatement st = connection.prepareStatement(sql);
+            PreparedStatement st = connection.prepareStatement(sql, PreparedStatement.RETURN_GENERATED_KEYS);
             st.setString(1, p.getName());
             st.setString(2, p.getDescription());
             st.setInt(3, p.getCategoryId());
             st.setBigDecimal(4, p.getPrice());
             st.setTimestamp(5, new java.sql.Timestamp(new Date().getTime()));
-            st.setString(5, p.getImage());
+            st.setString(6, p.getImage());
             st.setTimestamp(7, new java.sql.Timestamp(new Date().getTime()));
 
             int row = st.executeUpdate();
@@ -98,7 +98,7 @@ public class ProductDAO extends DBContext {
                 outputStream.write(buffer, 0, bytesRead);
             }
         }
-        return filePath;
+        return "uploads/images/" + uniqueFileName; // Thay đổi: Trả về đường dẫn tương đối
     }
 
     //get product by category id
@@ -175,7 +175,7 @@ public class ProductDAO extends DBContext {
     //delete product
     public void deleteProduct(int id) {
         String deleteProductSizeSql = "DELETE FROM [dbo].[Product_Size] WHERE product_id = ?";
-        String deleteProductSql = "DELETE FROM [dbo].[Products] WHERE id = ?";
+        String deleteProductSql = "DELETE FROM [dbo].[Products] WHERE product_id = ?";
 
         try {
             connection.setAutoCommit(false);
