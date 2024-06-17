@@ -74,7 +74,10 @@ public class ListUserDTO extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
     throws ServletException, IOException {
-        processRequest(request, response);
+        UserDAO ud = new UserDAO();
+        List<UserDTO> lists = ud.getALl();   
+        request.setAttribute("data", lists);
+        request.getRequestDispatcher("userList.jsp").forward(request, response);
     }
 
     /** 

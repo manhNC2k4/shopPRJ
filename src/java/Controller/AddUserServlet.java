@@ -18,8 +18,8 @@ import model.User;
  *
  * @author LNV
  */
-@WebServlet(name = "Register", urlPatterns = {"/register"})
-public class Register extends HttpServlet {
+@WebServlet(name = "AddUserServlet", urlPatterns = {"/addUser"})
+public class AddUserServlet extends HttpServlet {
 
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
@@ -38,10 +38,10 @@ public class Register extends HttpServlet {
             out.println("<!DOCTYPE html>");
             out.println("<html>");
             out.println("<head>");
-            out.println("<title>Servlet Register</title>");
+            out.println("<title>Servlet AddUserServlet</title>");
             out.println("</head>");
             out.println("<body>");
-            out.println("<h1>Servlet Register at " + request.getContextPath() + "</h1>");
+            out.println("<h1>Servlet AddUserServlet at " + request.getContextPath() + "</h1>");
             out.println("</body>");
             out.println("</html>");
         }
@@ -59,7 +59,7 @@ public class Register extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        request.getRequestDispatcher("register.jsp").forward(request, response);
+        request.getRequestDispatcher("addUser.jsp").forward(request, response);
     }
 
     /**
@@ -96,20 +96,20 @@ public class Register extends HttpServlet {
                 try {
                     String result = rd.insertUser(user);
                     if (result.equals("success")) {
-                        request.getRequestDispatcher("login.jsp").forward(request, response);
+                        request.getRequestDispatcher("listUser").forward(request, response);
                     } else {
                         message = result; // Lấy message lỗi từ hàm insertUser
                         request.setAttribute("error", message);
-                        request.getRequestDispatcher("register.jsp").forward(request, response);
+                        request.getRequestDispatcher("addUser.jsp").forward(request, response);
                     }
                 } catch (IOException e) {
                     message = "Something was wrong!";
                     request.setAttribute("error", message);
-                    request.getRequestDispatcher("register.jsp").forward(request, response);
+                    request.getRequestDispatcher("addUser.jsp").forward(request, response);
                 }
             } else {
                 request.setAttribute("error", message);
-                request.getRequestDispatcher("register.jsp").forward(request, response);
+                request.getRequestDispatcher("addUser.jsp").forward(request, response);
             }
 
         } catch (NumberFormatException e) {

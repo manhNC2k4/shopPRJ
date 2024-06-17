@@ -55,7 +55,6 @@ public class LoginDAO extends DBContext {
             }
             return hexString.toString();
         } catch (NoSuchAlgorithmException e) {
-            e.printStackTrace();
             return null;
         }
     }

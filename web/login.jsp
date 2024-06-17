@@ -64,7 +64,7 @@
                             </form>
 
                             <div class="mt-3 text-center">
-                                <p>Don't have an account? <a class="signuphere" href="register.jsp">Sign up here</a></p>
+                                <p>Don't have an account? <a class="signuphere" href="register">Sign up here</a></p>
                             </div>
                         </div>
                     </div>

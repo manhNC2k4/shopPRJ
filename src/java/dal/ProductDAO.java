@@ -218,16 +218,24 @@ public class ProductDAO extends DBContext {
     public void deleteProduct(int id) {
         String deleteProductSizeSql = "DELETE FROM [dbo].[Product_Size] WHERE product_id = ?";
         String deleteProductSql = "DELETE FROM [dbo].[Products] WHERE product_id = ?";
-
+        String deleteProductImagesSql = "DELETE FROM [dbo].[ProductImages] WHERE product_id = ?";
         try {
             connection.setAutoCommit(false);
-
+            
+            //delete size
             PreparedStatement st1 = connection.prepareStatement(deleteProductSizeSql);
             st1.setInt(1, id);
             st1.executeUpdate();
-            PreparedStatement st2 = connection.prepareStatement(deleteProductSql);
+            //delete image
+            PreparedStatement st2 = connection.prepareStatement(deleteProductImagesSql);
             st2.setInt(1, id);
             st2.executeUpdate();
+            
+            //delete product
+            PreparedStatement st3 = connection.prepareStatement(deleteProductSql);
+            st3.setInt(1, id);
+            st3.executeUpdate();
+            //commit giao dịch
             connection.commit();
         } catch (SQLException e) {
             try {

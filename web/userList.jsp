@@ -12,10 +12,26 @@
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
         <title>JSP Page</title>
         <link rel="stylesheet" href="css/bootstrap.min.css"/>
+        <link rel="stylesheet" href="css/font-awesome/css/all.css">
+        <link rel="stylesheet" href="css/font-awesome/css/all.min.css">
+        <style>
+            
+            .btn-group a {
+                margin-right: 5px;
+            }
+
+            .btn-group a:last-child {
+                margin-right: 0;
+            }
+            .btn i{
+                font-size: 1rem;
+            }
+        </style>
     </head>
     <body>
         <div class="container-fluid">
             <h1 style="padding: 20px">User page</h1>
+            <h4 style="color: red">${requestScope.error}</h4>
         </div>
         <div class="container-fluid">
             <table class="table table-bordered">
@@ -45,9 +61,17 @@
                             <td>${j.address}</td>
                             <td>${j.created_at}</td>
                             <td>${j.updated_at}</td>
-                            <td><a href="updateUser?id=${j.user_id}" class="btn btn-primary btn-sm">Update</a> 
-                                <a href="changePass?id=${j.user_id}" class="btn btn-primary btn-sm">New password</a>
-                                <a href="deleteUser?id=${j.user_id}" class="btn btn-danger btn-sm" onclick="return confirmDelete()">Delete</a></td>
+                            <td class="btn-group">
+                                <a href="updateUser?id=${j.user_id}" class="btn btn-primary btn-sm" title="Update">
+                                    <i class="fa-regular fa-pen-to-square"></i>
+                                </a>
+                                <a href="newPass?id=${j.user_id}" class="btn btn-primary btn-sm" title="New password">
+                                    <i class="fas fa-key"></i>
+                                </a>
+                                <a href="deleteUser?id=${j.user_id}" class="btn btn-danger btn-sm" onclick="return confirmDelete()" title="Delete">
+                                    <i class="fas fa-trash-alt"></i>
+                                </a>
+                            </td>
                         </tr>
                     </c:forEach>
                 </tbody>

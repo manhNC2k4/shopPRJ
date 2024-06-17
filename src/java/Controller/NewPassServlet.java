@@ -4,7 +4,9 @@
  */
 package Controller;
 
-import dal.registerDAO;
+import DTO.UserDTO;
+import dal.LoginDAO;
+import dal.UserDAO;
 import java.io.IOException;
 import java.io.PrintWriter;
 import jakarta.servlet.ServletException;
@@ -18,8 +20,8 @@ import model.User;
  *
  * @author LNV
  */
-@WebServlet(name = "Register", urlPatterns = {"/register"})
-public class Register extends HttpServlet {
+@WebServlet(name = "NewPassServlet", urlPatterns = {"/newPass"})
+public class NewPassServlet extends HttpServlet {
 
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
@@ -38,10 +40,10 @@ public class Register extends HttpServlet {
             out.println("<!DOCTYPE html>");
             out.println("<html>");
             out.println("<head>");
-            out.println("<title>Servlet Register</title>");
+            out.println("<title>Servlet NewPassServlet</title>");
             out.println("</head>");
             out.println("<body>");
-            out.println("<h1>Servlet Register at " + request.getContextPath() + "</h1>");
+            out.println("<h1>Servlet NewPassServlet at " + request.getContextPath() + "</h1>");
             out.println("</body>");
             out.println("</html>");
         }
@@ -58,8 +60,16 @@ public class Register extends HttpServlet {
      */
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
-        request.getRequestDispatcher("register.jsp").forward(request, response);
+            throws ServletException, IOException {       
+        try {
+            String rid = request.getParameter("id");
+            request.setAttribute("userId", rid);
+            request.getRequestDispatcher("newPass.jsp").forward(request, response);
+        } catch (NumberFormatException e) {
+            String mess = "Something was wrong!";
+            request.setAttribute("message", mess);
+            request.getRequestDispatcher("userList.jsp").forward(request, response);
+        }
     }
 
     /**
@@ -73,46 +83,25 @@ public class Register extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        String first_name = request.getParameter("first_name");
-        String last_name = request.getParameter("last_name");
-        String email = request.getParameter("email");
-        String username = request.getParameter("username");
-        String password = request.getParameter("password");
-        String phone = request.getParameter("phone");
-        String address = request.getParameter("address");
-
+        UserDAO ud = new UserDAO();
+        LoginDAO ld = new LoginDAO();
+        String rid = request.getParameter("userId");
+        
+        String newPass = request.getParameter("newPassword");
         try {
-            User user = new User(username, password, email, first_name, last_name, phone, address);
-            registerDAO rd = new registerDAO();
-            String message = "";
-            if (rd.isExistingUsername(username)) {
-                message = "Username is exist!";
-            } else if (rd.isExistingEMail(email)) {
-                message = "Email is exist!";
-            } else if (rd.isExistingPhone(phone)) {
-                message = "Phone is exist!";
-            }
-            if (message.equals("")) {
-                try {
-                    String result = rd.insertUser(user);
-                    if (result.equals("success")) {
-                        request.getRequestDispatcher("login.jsp").forward(request, response);
-                    } else {
-                        message = result; // Lấy message lỗi từ hàm insertUser
-                        request.setAttribute("error", message);
-                        request.getRequestDispatcher("register.jsp").forward(request, response);
-                    }
-                } catch (IOException e) {
-                    message = "Something was wrong!";
-                    request.setAttribute("error", message);
-                    request.getRequestDispatcher("register.jsp").forward(request, response);
-                }
+            int id = Integer.parseInt(rid);
+            UserDTO userDTO = ud.getUserDTOById(id);
+            String hashPass = ld.hashPassword(newPass);
+            User user = new User(userDTO.getUsername(), hashPass, userDTO.getEmail(),
+                    userDTO.getFirst_name(), userDTO.getLast_name(), userDTO.getPhone(), userDTO.getAddress());
+            String result2 = ud.updateUser(user, userDTO.getUser_id());
+            if ("Update successful".equals(result2)) {
+                response.sendRedirect("listUser");
             } else {
-                request.setAttribute("error", message);
-                request.getRequestDispatcher("register.jsp").forward(request, response);
+                request.setAttribute("error", result2);
+                request.getRequestDispatcher("newPass.jsp").forward(request, response);
             }
-
-        } catch (NumberFormatException e) {
+        } catch (ServletException | IOException e) {
         }
     }
 

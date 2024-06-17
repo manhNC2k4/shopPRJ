@@ -12,9 +12,7 @@
         <title>register</title>
         <link rel="stylesheet" href="css/bootstrap.min.css"/>
         <style>
-            body{
-                background-color:  #dbcc8f ;
-            }
+            
             button{
                 background-color: black !important;
                 border-color: black !important;
@@ -31,7 +29,7 @@
                 <div class="col-md-8">
                     <div class="card">
                         <div class="card-header text-center">
-                            <h4>Register</h4>
+                            <h4>Add User</h4>
                         </div>
                         <div class="card-body">
                             <%
@@ -44,7 +42,7 @@
                             <%
                                 }
                             %>
-                            <form action="register" method="post">
+                            <form action="addUser" method="post">
                                 <div class="row">
                                     <div class="col-md-6 mb-3">
                                         <label for="firstName" class="form-label">First Name</label>
@@ -86,10 +84,10 @@
                                     <input type="text" class="form-control"  name="address" id="address"
                                            value="<%= request.getParameter("address") != null ? request.getParameter("address") : "" %>" required>
                                 </div>
-                                <button type="submit" class="btn btn-primary w-100">Register</button>
+                                <button type="submit" class="btn btn-primary w-100">Add user</button>
                             </form>
                             <div class="mt-3 text-center">
-                                <p>Already have an account? <a class="signinhere" href="login">Login here</a></p>
+                                <p>Back to user list <a class="signinhere" href="listUser">Click here</a></p>
                             </div>
                         </div>
                     </div>
