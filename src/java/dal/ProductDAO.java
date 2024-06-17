@@ -17,6 +17,7 @@ import model.Product;
 import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.List;
+import model.Product_Size;
 
 /**
  *
@@ -167,7 +168,7 @@ public class ProductDAO extends DBContext {
         return list;
     }
 
-    //get product by category id
+    //get all product
     public List<Product> getAllProduct() {
         List<Product> list = new ArrayList<>();
         //lenh sql select * from category
@@ -219,9 +220,20 @@ public class ProductDAO extends DBContext {
         String deleteProductSizeSql = "DELETE FROM [dbo].[Product_Size] WHERE product_id = ?";
         String deleteProductSql = "DELETE FROM [dbo].[Products] WHERE product_id = ?";
         String deleteProductImagesSql = "DELETE FROM [dbo].[ProductImages] WHERE product_id = ?";
+        String getProductImagesSql = "SELECT image_url FROM [dbo].[ProductImages] WHERE product_id = ?";
+        List<String> imageUrls = new ArrayList<>();
+
         try {
             connection.setAutoCommit(false);
-            
+
+            //lấy link file ảnh
+            PreparedStatement getImagesStmt = connection.prepareStatement(getProductImagesSql);
+            getImagesStmt.setInt(1, id);
+            ResultSet rs = getImagesStmt.executeQuery();
+            while (rs.next()) {
+                imageUrls.add(rs.getString("image_url"));
+            }
+
             //delete size
             PreparedStatement st1 = connection.prepareStatement(deleteProductSizeSql);
             st1.setInt(1, id);
@@ -230,13 +242,21 @@ public class ProductDAO extends DBContext {
             PreparedStatement st2 = connection.prepareStatement(deleteProductImagesSql);
             st2.setInt(1, id);
             st2.executeUpdate();
-            
+
             //delete product
             PreparedStatement st3 = connection.prepareStatement(deleteProductSql);
             st3.setInt(1, id);
             st3.executeUpdate();
             //commit giao dịch
             connection.commit();
+
+            //xóa file ảnh
+            for (String imageUrl : imageUrls) {
+                File file = new File("E:/Netbeans17/Shop/web/" + imageUrl);
+                if (file.exists()) {
+                    file.delete();
+                }
+            }
         } catch (SQLException e) {
             try {
                 // Hoàn tác giao dịch nếu có lỗi xảy ra
@@ -255,4 +275,57 @@ public class ProductDAO extends DBContext {
         }
     }
 
+    //get product by id
+    public Product getProductById(int productId) {
+        Product product = null;
+        String getProductSql = "SELECT p.product_id, p.name, p.description, p.category_id, p.price, p.created_at, p.updated_at "
+                + "FROM Products p "
+                + "WHERE p.product_id = ?";
+        String getProductImagesSql = "SELECT image_url FROM [dbo].[ProductImages] WHERE product_id = ?";
+        String getProductSizesSql = "SELECT size, stock FROM [dbo].[Product_Size] WHERE product_id = ?";
+
+        try {
+            // Lấy thông tin sản phẩm
+            PreparedStatement getProductStmt = connection.prepareStatement(getProductSql);
+            getProductStmt.setInt(1, productId);
+            ResultSet productRs = getProductStmt.executeQuery();
+            if (productRs.next()) {
+                product = new Product(
+                        productRs.getInt("product_id"),
+                        productRs.getString("name"),
+                        productRs.getString("description"),
+                        productRs.getInt("category_id"),
+                        productRs.getBigDecimal("price"),
+                        productRs.getTimestamp("created_at"),
+                        productRs.getTimestamp("updated_at"),
+                        new ArrayList<>(),
+                        new ArrayList<>()
+                );
+            }
+            if (product != null) {
+                // Lấy danh sách các hình ảnh sản phẩm
+                PreparedStatement getImagesStmt = connection.prepareStatement(getProductImagesSql);
+                getImagesStmt.setInt(1, productId);
+                ResultSet imagesRs = getImagesStmt.executeQuery();
+                while (imagesRs.next()) {
+                    String imageUrl = imagesRs.getString("image_url");
+                    if (imageUrl != null) {
+                        product.getImages().add(imageUrl);
+                    }
+                }
+                // Lấy danh sách các kích thước sản phẩm
+                PreparedStatement getSizesStmt = connection.prepareStatement(getProductSizesSql);
+                getSizesStmt.setInt(1, productId);
+                ResultSet sizesRs = getSizesStmt.executeQuery();
+                while (sizesRs.next()) {
+                    int size = sizesRs.getInt("size");
+                    int stock = sizesRs.getInt("stock");
+                    product.getSizes().add(new Product_Size(size, stock));
+                }
+            }
+        } catch (SQLException e) {
+            System.out.println(e);
+        }
+        return product;
+    }
 }

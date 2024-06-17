@@ -90,7 +90,25 @@ public class AdminShowProduct extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
     throws ServletException, IOException {
-        processRequest(request, response);
+        CategoryDAO cd = new CategoryDAO();
+        List<Category> listCat = cd.getALl();
+        ProductDAO pd = new ProductDAO();
+        if(request.getParameter("cid") != null) {
+            String rid = request.getParameter("cid");
+            try {
+                int id = Integer.parseInt(rid);
+                List<Product> list = pd.getProductsOf(id);
+            request.setAttribute("dataCat", listCat);
+            request.setAttribute("dataPro", list);
+            request.getRequestDispatcher("showProduct.jsp").forward(request, response);
+            } catch (NumberFormatException e) {
+            }
+        }
+        List<Product> listPro = pd.getAllProduct();
+        request.setAttribute("dataPro", listPro);
+        request.setAttribute("dataCat", listCat);
+        request.getRequestDispatcher("showProduct.jsp").forward(request, response);
+   
     }
 
     /** 

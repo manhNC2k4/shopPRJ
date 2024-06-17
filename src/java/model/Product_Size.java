@@ -24,6 +24,11 @@ public class Product_Size {
         this.stock = stock;
     }
 
+    public Product_Size(int size, int stock) {
+        this.size = size;
+        this.stock = stock;
+    }
+
     // Getter và Setter cho productId
     public int getProductId() {
         return productId;

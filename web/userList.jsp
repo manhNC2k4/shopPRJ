@@ -62,9 +62,6 @@
                             <td>${j.created_at}</td>
                             <td>${j.updated_at}</td>
                             <td class="btn-group">
-                                <a href="updateUser?id=${j.user_id}" class="btn btn-primary btn-sm" title="Update">
-                                    <i class="fa-regular fa-pen-to-square"></i>
-                                </a>
                                 <a href="newPass?id=${j.user_id}" class="btn btn-primary btn-sm" title="New password">
                                     <i class="fas fa-key"></i>
                                 </a>

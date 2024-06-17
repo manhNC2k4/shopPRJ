@@ -21,6 +21,8 @@ public class Product {
     private Date createdAt;
     private Date updatedAt;
     private List<String> images;
+    private List<Product_Size> sizes;
+    
     // Constructor không tham số
     public Product() {
     }
@@ -46,8 +48,20 @@ public class Product {
         this.updatedAt = updatedAt;
         this.images = images;
     }
-    
 
+    public Product(int id, String name, String description, int categoryId, BigDecimal price, Date createdAt, Date updatedAt, List<String> images, List<Product_Size> sizes) {
+        this.id = id;
+        this.name = name;
+        this.description = description;
+        this.categoryId = categoryId;
+        this.price = price;
+        this.createdAt = createdAt;
+        this.updatedAt = updatedAt;
+        this.images = images;
+        this.sizes = sizes;
+    }
+    
+    
     // Getter và Setter cho id
     public int getId() {
         return id;
@@ -118,6 +132,16 @@ public class Product {
     public void setImages(List<String> images) {
         this.images = images;
     }
+
+    public List<Product_Size> getSizes() {
+        return sizes;
+    }
+
+    public void setSizes(List<Product_Size> sizes) {
+        this.sizes = sizes;
+    }
+    
+    
     
     // Phương thức toString để hiển thị thông tin sản phẩm
     @Override

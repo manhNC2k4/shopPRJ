@@ -56,7 +56,7 @@
                             <td>${p.categoryId}</td>
                             <td>${p.price}</td>
                             <td>${p.createdAt}</td>
-                            <td><img src="${p.image}" alt="${p.name}" class="img-thumbnail" style="max-width: 100px;"></td>
+                            <td><img src="${p.images[0]}" alt="${p.name}" class="img-thumbnail" style="max-width: 100px;"></td>
                             <td>${p.updatedAt}</td>
                             <td>
                                 <div class="btn-group" role="group">

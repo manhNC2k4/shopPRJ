@@ -14,7 +14,6 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.Part;
-import java.io.File;
 import java.io.InputStream;
 import java.math.BigDecimal;
 import java.nio.file.Paths;
@@ -81,8 +80,7 @@ public class UploadProductServlet extends HttpServlet {
                     pd.insertProductImages(productId, imagePaths);
                     message = pd.insertProductSizes(productId, sizes, stocks);
                     if (message.equals("Product uploaded successfully!")) {
-                        request.setAttribute("message", message);
-                        request.getRequestDispatcher("addProduct.jsp").forward(request, response);
+                        response.sendRedirect("uploadProduct");
                     }
                 } else {
                     message = "Failed to upload product.";
