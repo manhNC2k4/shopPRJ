@@ -28,8 +28,7 @@
         </style>
     </head>
     <body>
-
-        <div class="container mt-5">
+        <div class="container mt-5 mb-5">
             <h1 class="mb-4">Product Upload</h1>
             <h2 style="color: coral">${requestScope.message}</h2>
             <form action="uploadProduct" method="post" enctype="multipart/form-data">
@@ -74,10 +73,15 @@
                 <button type="button" class="btn btn-secondary" onclick="addSize()">Add Another Size</button><br><br>
                 <div class="form-group">
                     <label for="productImage">Product Image:</label>
-                    <input type="file" class="filepond" id="productImage" name="productImage" accept="image/*" required>
+                    <input type="file" class="filepond" id="productImages" name="productImages" accept="image/*" multiple required>                </div>    
+                <div class="row">
+                    <div class="col">
+                        <button type="submit" class="btn btn-primary">Upload Product</button>
+                    </div>
+                    <div class="col text-right">
+                        <button class="btn btn-primary btn-link" onclick="window.location.href = 'showProduct'">Back</button>
+                    </div>
                 </div>
-
-                <button type="submit" class="btn btn-primary">Upload Product</button>
             </form>
         </div>
         <script>
@@ -85,8 +89,9 @@
                 console.error(error);
             });
 
-            FilePond.create(document.querySelector('.filepond'));
-
+            FilePond.create(document.querySelector('.filepond'), {
+                allowMultiple: true // Cho phép chọn nhiều tệp tin
+            });
             function addSize() {
                 var sizesDiv = document.getElementById('sizes');
                 var newSizeDiv = document.createElement('div');

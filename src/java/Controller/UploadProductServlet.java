@@ -19,6 +19,7 @@ import java.io.InputStream;
 import java.math.BigDecimal;
 import java.nio.file.Paths;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 import model.Category;
 import model.Product;
@@ -58,21 +59,26 @@ public class UploadProductServlet extends HttpServlet {
         String[] sizes = request.getParameterValues("size[]");
         String[] stocks = request.getParameterValues("stock[]");
         InputStream inputStream;
-        String imagePath;
+        List<String> imagePaths = new ArrayList<>();
         String message;
-        Part filePart = request.getPart("productImage");
         try {
             price = new BigDecimal(priceStr);
             int categoryId = Integer.parseInt(r_categoryId);
-            if (filePart != null) {
-                inputStream = filePart.getInputStream();
-                String fileName = Paths.get(filePart.getSubmittedFileName()).getFileName().toString();
-                String uploadDir = "E:/Netbeans17/Shop/web/uploads/images";
-                ProductDAO pd = new ProductDAO();
-                imagePath = pd.saveImageToFileSystem(inputStream, fileName, uploadDir);
-                Product p = new Product(-1, name, description, categoryId, price, null, imagePath, null);
+            ProductDAO pd = new ProductDAO();
+            // Get the uploaded files
+            for (Part filePart : request.getParts()) {
+                if (filePart.getName().equals("productImages")) {
+                    inputStream = filePart.getInputStream();
+                    String fileName = Paths.get(filePart.getSubmittedFileName()).getFileName().toString();
+                    String uploadDir = "E:/Netbeans17/Shop/web/uploads/images";           
+                    String imagePath = pd.saveImageToFileSystem(inputStream, fileName, uploadDir);
+                    imagePaths.add(imagePath);
+                }
+            }
+                Product p = new Product(-1, name, description, categoryId, price, null, null);
                 int productId = pd.insertProduct(p);
                 if (productId > 0) {
+                    pd.insertProductImages(productId, imagePaths);
                     message = pd.insertProductSizes(productId, sizes, stocks);
                     if (message.equals("Product uploaded successfully!")) {
                         request.setAttribute("message", message);
@@ -83,7 +89,6 @@ public class UploadProductServlet extends HttpServlet {
                     request.setAttribute("message", message);
                     request.getRequestDispatcher("addProduct.jsp").forward(request, response);
                 }
-            }
         } catch (IOException | NumberFormatException | SQLException e) {
             message = "ERROR: " + e.getMessage();
             request.setAttribute("message", message);

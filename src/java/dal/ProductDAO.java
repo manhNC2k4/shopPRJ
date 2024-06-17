@@ -17,7 +17,6 @@ import model.Product;
 import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.List;
-import model.Product_Size;
 
 /**
  *
@@ -27,8 +26,8 @@ public class ProductDAO extends DBContext {
 
     //insert product
     public int insertProduct(Product p) {
-        String sql = "INSERT INTO Products (name, description, category_id, price, created_at, image, updated_at) "
-                + "VALUES (?, ?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO Products (name, description, category_id, price, created_at, updated_at) "
+                + "VALUES (?, ?, ?, ?, ?, ?)";
         int productId = -1;
         try {
             PreparedStatement st = connection.prepareStatement(sql, PreparedStatement.RETURN_GENERATED_KEYS);
@@ -37,8 +36,7 @@ public class ProductDAO extends DBContext {
             st.setInt(3, p.getCategoryId());
             st.setBigDecimal(4, p.getPrice());
             st.setTimestamp(5, new java.sql.Timestamp(new Date().getTime()));
-            st.setString(6, p.getImage());
-            st.setTimestamp(7, new java.sql.Timestamp(new Date().getTime()));
+            st.setTimestamp(6, new java.sql.Timestamp(new Date().getTime()));
 
             int row = st.executeUpdate();
             if (row > 0) {
@@ -52,6 +50,35 @@ public class ProductDAO extends DBContext {
         }
         return productId;
 
+    }
+
+    //insert product images
+    public void insertProductImages(int productId, List<String> imageUrls) throws SQLException {
+        PreparedStatement statement = null;
+        try {
+            // Insert product images into the database
+            String sql = "INSERT INTO [dbo].[ProductImages]\n"
+                    + "           ([product_id]\n"
+                    + "           ,[image_url])"
+                    + " VALUES (?, ?)";
+            statement = connection.prepareStatement(sql);
+
+            for (String imageUrl : imageUrls) {
+                statement.setInt(1, productId);
+                statement.setString(2, imageUrl);
+                statement.executeUpdate();
+            }
+        } catch (SQLException e) {
+            System.err.println("SQL Exception: " + e.getMessage());
+        } finally {
+            if (statement != null) {
+                try {
+                    statement.close();
+                } catch (SQLException e) {
+                    System.err.println("Failed to close statement: " + e.getMessage());
+                }
+            }
+        }
     }
 
     //insert productsize
@@ -105,31 +132,34 @@ public class ProductDAO extends DBContext {
     public List<Product> getProductsOf(int cid) {
         List<Product> list = new ArrayList<>();
         //lenh sql select * from category
-        String sql = "SELECT [product_id]\n"
-                + "      ,[name]\n"
-                + "      ,[description]\n"
-                + "      ,[category_id]\n"
-                + "      ,[price]\n"
-                + "      ,[created_at]\n"
-                + "      ,[image]\n"
-                + "      ,[updated_at]\n"
-                + "  FROM [dbo].[Products] where category_id = ?";
+        String sql = "SELECT p.product_id, p.name, p.description, p.category_id, p.price, p.created_at, p.updated_at, pi.image_url "
+                + "FROM Products p "
+                + "LEFT JOIN ProductImages pi ON p.product_id = pi.product_id "
+                + "WHERE p.category_id = ?";
         try {
             PreparedStatement st = connection.prepareStatement(sql);
             st.setInt(1, cid);
             ResultSet rs = st.executeQuery();
             while (rs.next()) {
-                Product c = new Product(
-                        rs.getInt("product_id"),
-                        rs.getString("name"),
-                        rs.getString("description"),
-                        rs.getInt("category_id"),
-                        rs.getBigDecimal("price"),
-                        rs.getTimestamp("created_at"),
-                        rs.getString("image"),
-                        rs.getTimestamp("updated_at")
-                );
-                list.add(c);
+                int productId = rs.getInt("product_id");
+                Product product = findProductById(list, productId);
+                if (product == null) {
+                    product = new Product(
+                            productId,
+                            rs.getString("name"),
+                            rs.getString("description"),
+                            rs.getInt("category_id"),
+                            rs.getBigDecimal("price"),
+                            rs.getTimestamp("created_at"),
+                            rs.getTimestamp("updated_at"),
+                            new ArrayList<>()
+                    );
+                    list.add(product);
+                }
+                String imageUrl = rs.getString("image_url");
+                if (imageUrl != null) {
+                    product.getImages().add(imageUrl);
+                }
             }
         } catch (SQLException e) {
             System.out.println(e);
@@ -141,35 +171,47 @@ public class ProductDAO extends DBContext {
     public List<Product> getAllProduct() {
         List<Product> list = new ArrayList<>();
         //lenh sql select * from category
-        String sql = "SELECT [product_id]\n"
-                + "      ,[name]\n"
-                + "      ,[description]\n"
-                + "      ,[category_id]\n"
-                + "      ,[price]\n"
-                + "      ,[created_at]\n"
-                + "      ,[image]\n"
-                + "      ,[updated_at]\n"
-                + "  FROM [dbo].[Products]";
+        String sql = "SELECT p.product_id, p.name, p.description, p.category_id, p.price, p.created_at, p.updated_at, pi.image_url\n"
+                + "   FROM Products p\n"
+                + "   LEFT JOIN ProductImages pi ON p.product_id = pi.product_id";
         try {
             PreparedStatement st = connection.prepareStatement(sql);
             ResultSet rs = st.executeQuery();
             while (rs.next()) {
-                Product c = new Product(
-                        rs.getInt("product_id"),
-                        rs.getString("name"),
-                        rs.getString("description"),
-                        rs.getInt("category_id"),
-                        rs.getBigDecimal("price"),
-                        rs.getTimestamp("created_at"),
-                        rs.getString("image"),
-                        rs.getTimestamp("updated_at")
-                );
-                list.add(c);
+                int productId = rs.getInt("product_id");
+                Product product = findProductById(list, productId);
+                if (product == null) {
+                    product = new Product(
+                            productId,
+                            rs.getString("name"),
+                            rs.getString("description"),
+                            rs.getInt("category_id"),
+                            rs.getBigDecimal("price"),
+                            rs.getTimestamp("created_at"),
+                            rs.getTimestamp("updated_at"),
+                            new ArrayList<>()
+                    );
+                    list.add(product);
+                }
+                String imageUrl = rs.getString("image_url");
+                if (imageUrl != null) {
+                    product.getImages().add(imageUrl);
+                }
             }
         } catch (SQLException e) {
             System.out.println(e);
         }
         return list;
+    }
+
+    //find product in a list by id
+    private Product findProductById(List<Product> list, int productId) {
+        for (Product product : list) {
+            if (product.getId() == productId) {
+                return product;
+            }
+        }
+        return null;
     }
 
     //delete product

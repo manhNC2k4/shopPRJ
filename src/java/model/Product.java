@@ -5,6 +5,7 @@
 package model;
 import java.math.BigDecimal;
 import java.util.Date;
+import java.util.List;
 /**
  *
  * @author LNV
@@ -18,24 +19,34 @@ public class Product {
     private int categoryId;
     private BigDecimal price;
     private Date createdAt;
-    private String image;
     private Date updatedAt;
-
+    private List<String> images;
     // Constructor không tham số
     public Product() {
     }
 
     // Constructor có tham số
-    public Product(int id, String name, String description, int categoryId, BigDecimal price, Date createdAt, String image, Date updatedAt) {
+    public Product(int id, String name, String description, int categoryId, BigDecimal price, Date createdAt,  Date updatedAt) {
         this.id = id;
         this.name = name;
         this.description = description;
         this.categoryId = categoryId;
         this.price = price;
         this.createdAt = createdAt;
-        this.image = image;
         this.updatedAt = updatedAt;
     }
+
+    public Product(int id, String name, String description, int categoryId, BigDecimal price, Date createdAt, Date updatedAt, List<String> images) {
+        this.id = id;
+        this.name = name;
+        this.description = description;
+        this.categoryId = categoryId;
+        this.price = price;
+        this.createdAt = createdAt;
+        this.updatedAt = updatedAt;
+        this.images = images;
+    }
+    
 
     // Getter và Setter cho id
     public int getId() {
@@ -91,15 +102,6 @@ public class Product {
         this.createdAt = createdAt;
     }
 
-    // Getter và Setter cho image
-    public String getImage() {
-        return image;
-    }
-
-    public void setImage(String image) {
-        this.image = image;
-    }
-
     // Getter và Setter cho updatedAt
     public Date getUpdatedAt() {
         return updatedAt;
@@ -109,6 +111,14 @@ public class Product {
         this.updatedAt = updatedAt;
     }
 
+    public List<String> getImages() {
+        return images;
+    }
+
+    public void setImages(List<String> images) {
+        this.images = images;
+    }
+    
     // Phương thức toString để hiển thị thông tin sản phẩm
     @Override
     public String toString() {
@@ -119,7 +129,6 @@ public class Product {
                 ", categoryId=" + categoryId +
                 ", price=" + price +
                 ", createdAt=" + createdAt +
-                ", image='" + image + '\'' +
                 ", updatedAt=" + updatedAt +
                 '}';
     }
