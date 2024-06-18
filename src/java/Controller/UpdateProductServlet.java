@@ -5,6 +5,7 @@
 
 package Controller;
 
+import dal.CategoryDAO;
 import dal.ProductDAO;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -13,6 +14,7 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import model.Category;
 import model.Product;
 
 /**
@@ -58,11 +60,14 @@ public class UpdateProductServlet extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
     throws ServletException, IOException {
         ProductDAO pd = new ProductDAO();
+        CategoryDAO cd = new CategoryDAO();
         String rid = request.getParameter("id");
         try {
             int id = Integer.parseInt(rid);
             Product p = pd.getProductById(id);
+            Category c = cd.getCateById(p.getCategoryId());
             request.setAttribute("product", p);
+            request.setAttribute("cate", c);
             request.getRequestDispatcher("UpdateProduct.jsp").forward(request, response);
         } catch (ServletException | IOException | NumberFormatException e) {
             System.err.println(e);

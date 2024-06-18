@@ -15,7 +15,7 @@
         <link rel="stylesheet" href="css/bootstrap.min.css"/>
         <style>
             .product-images img {
-                max-width: 100%;
+                max-width: 45%;
                 height: auto;
                 margin-bottom: 10px;
             }
@@ -40,10 +40,8 @@
                 <div class="col-md-6">
                     <h2>${product.name}</h2>
                     <p>${product.description}</p>
-                    <p><strong>Category:</strong> ${product.categoryId}</p>
+                    <p><strong>Category:</strong> ${cate.name}</p>
                     <p><strong>Price:</strong> $${product.price}</p>
-                    <p><strong>Created At:</strong> ${product.createdAt}</p>
-                    <p><strong>Updated At:</strong> ${product.updatedAt}</p>
                 </div>
                 <div class="col-md-6 product-images">
                     <h3>Images</h3>

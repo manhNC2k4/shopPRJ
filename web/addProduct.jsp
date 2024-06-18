@@ -13,6 +13,10 @@
         <title>JSP Page</title> 
         <script src="ckeditor/ckeditor.js"></script>
         <link href="filepond/css/filepond.css" rel="stylesheet">
+        <link
+            href="https://unpkg.com/filepond-plugin-image-preview/dist/filepond-plugin-image-preview.css"
+            rel="stylesheet"
+            />
         <link rel="stylesheet" href="css/bootstrap.min.css"/>
         <script src="filepond/js/filepond.js"></script>
         <style>
@@ -25,9 +29,15 @@
                 min-width: 100px;
                 margin-right: 10px;
             }
+            .image-preview img {
+                margin-right: 10px;
+            }
         </style>
     </head>
     <body>
+        <script src="https://unpkg.com/filepond-plugin-image-preview/dist/filepond-plugin-image-preview.js"></script>
+        <script src="js/bootstrap.min.js"></script>
+        <script src="filepond/js/filepond.js"></script>
         <div class="container mt-5 mb-5">
             <h1 class="mb-4">Product Upload</h1>
             <h2 style="color: coral">${requestScope.message}</h2>
@@ -73,7 +83,10 @@
                 <button type="button" class="btn btn-secondary" onclick="addSize()">Add Another Size</button><br><br>
                 <div class="form-group">
                     <label for="productImage">Product Image:</label>
-                    <input type="file" class="filepond" id="productImages" name="productImages" accept="image/*" multiple required>                </div>    
+                    <input type="file" class="filepond" id="productImages" name="productImages" accept="image/*" multiple required>                
+                </div>    
+                <div id="image-preview" class="image-preview"></div>
+
                 <div class="row">
                     <div class="col">
                         <button type="submit" class="btn btn-primary">Upload Product</button>
@@ -85,12 +98,13 @@
             </form>
         </div>
         <script>
-            ClassicEditor.create(document.querySelector('#productDescription')).catch(error => {
-                console.error(error);
-            });
 
+            // Register the plugin
+            FilePond.registerPlugin(FilePondPluginImagePreview);
+            
             FilePond.create(document.querySelector('.filepond'), {
-                allowMultiple: true // Cho phép chọn nhiều tệp tin
+                allowMultiple: true, // Cho phép chọn nhiều tệp tin
+                allowImagePreview: true
             });
             function addSize() {
                 var sizesDiv = document.getElementById('sizes');
@@ -115,6 +129,8 @@
                 }
             }
         </script>
-        <script src="js/bootstrap.min.js"></script>
+        <!--        <script src="https://unpkg.com/filepond-plugin-image-preview/dist/filepond-plugin-image-preview.js"></script>
+                <script src="js/bootstrap.min.js"></script>
+                <script src="filepond/js/filepond.js"></script>-->
     </body>
 </html>
