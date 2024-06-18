@@ -67,26 +67,33 @@ public class UploadProductServlet extends HttpServlet {
             // Get the uploaded files
             for (Part filePart : request.getParts()) {
                 if (filePart.getName().equals("productImages")) {
-                    inputStream = filePart.getInputStream();
-                    String fileName = Paths.get(filePart.getSubmittedFileName()).getFileName().toString();
-                    String uploadDir = "E:/Netbeans17/Shop/web/uploads/images";           
-                    String imagePath = pd.saveImageToFileSystem(inputStream, fileName, uploadDir);
-                    imagePaths.add(imagePath);
+                    if (filePart.getSize() > 0) {
+                        inputStream = filePart.getInputStream();
+                        String fileName = Paths.get(filePart.getSubmittedFileName()).getFileName().toString();
+                        String uploadDir = "E:/Netbeans17/Shop/web/uploads/images";
+                        String imagePath = pd.saveImageToFileSystem(inputStream, fileName, uploadDir);
+                        imagePaths.add(imagePath);
+                    } else {
+                        message = "Lỗi: Không có file ảnh được chọn.";
+                        request.setAttribute("message", message);
+                        request.getRequestDispatcher("addProduct.jsp").forward(request, response);
+                        return; // Thoát khỏi vòng lặp và xử lý lỗi
+                    }
                 }
             }
-                Product p = new Product(-1, name, description, categoryId, price, null, null);
-                int productId = pd.insertProduct(p);
-                if (productId > 0) {
-                    pd.insertProductImages(productId, imagePaths);
-                    message = pd.insertProductSizes(productId, sizes, stocks);
-                    if (message.equals("Product uploaded successfully!")) {
-                        response.sendRedirect("uploadProduct");
-                    }
-                } else {
-                    message = "Failed to upload product.";
-                    request.setAttribute("message", message);
-                    request.getRequestDispatcher("addProduct.jsp").forward(request, response);
+            Product p = new Product(-1, name, description, categoryId, price, null, null);
+            int productId = pd.insertProduct(p);
+            if (productId > 0) {
+                pd.insertProductImages(productId, imagePaths);
+                message = pd.insertProductSizes(productId, sizes, stocks);
+                if (message.equals("Product uploaded successfully!")) {
+                    response.sendRedirect("uploadProduct");
                 }
+            } else {
+                message = "Failed to upload product.";
+                request.setAttribute("message", message);
+                request.getRequestDispatcher("addProduct.jsp").forward(request, response);
+            }
         } catch (IOException | NumberFormatException | SQLException e) {
             message = "ERROR: " + e.getMessage();
             request.setAttribute("message", message);

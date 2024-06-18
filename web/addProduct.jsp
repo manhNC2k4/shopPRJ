@@ -29,9 +29,6 @@
                 min-width: 100px;
                 margin-right: 10px;
             }
-            .image-preview img {
-                margin-right: 10px;
-            }
         </style>
     </head>
     <body>
@@ -85,8 +82,6 @@
                     <label for="productImage">Product Image:</label>
                     <input type="file" class="filepond" id="productImages" name="productImages" accept="image/*" multiple required>                
                 </div>    
-                <div id="image-preview" class="image-preview"></div>
-
                 <div class="row">
                     <div class="col">
                         <button type="submit" class="btn btn-primary">Upload Product</button>
@@ -98,14 +93,25 @@
             </form>
         </div>
         <script>
-
-            // Register the plugin
-            FilePond.registerPlugin(FilePondPluginImagePreview);
-            
-            FilePond.create(document.querySelector('.filepond'), {
-                allowMultiple: true, // Cho phép chọn nhiều tệp tin
-                allowImagePreview: true
+//            // Register the plugin
+//            FilePond.registerPlugin(FilePondPluginImagePreview);
+            ClassicEditor.create(document.querySelector('#productDescription')).catch(error => {
+                console.error(error);
             });
+//            
+//            FilePond.parse(inputEl);
+//
+//            FilePond.create(document.querySelector('.filepond'), {
+//                allowMultiple: true,
+//                // Cho phép chọn nhiều tệp tin
+//                allowImagePreview: true,
+//                required: true, // Yêu cầu chọn ít nhất một file
+//                fileValidateSize: {// Cấu hình validate kích thước
+//                    minFileSize: 1, // Kích thước tối thiểu (1 byte)
+//                    maxFileSize: 5 * 1024 * 1024 // Kích thước tối đa (5MB)
+//                }
+//            });
+            
             function addSize() {
                 var sizesDiv = document.getElementById('sizes');
                 var newSizeDiv = document.createElement('div');
@@ -129,8 +135,8 @@
                 }
             }
         </script>
-        <!--        <script src="https://unpkg.com/filepond-plugin-image-preview/dist/filepond-plugin-image-preview.js"></script>
-                <script src="js/bootstrap.min.js"></script>
-                <script src="filepond/js/filepond.js"></script>-->
+        <script src="https://unpkg.com/filepond-plugin-image-preview/dist/filepond-plugin-image-preview.js"></script>
+        <script src="js/bootstrap.min.js"></script>
+        <script src="filepond/js/filepond.js"></script>
     </body>
 </html>

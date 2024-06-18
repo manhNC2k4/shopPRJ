@@ -8,6 +8,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.math.BigDecimal;
 import java.nio.file.Paths;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
@@ -17,6 +18,7 @@ import model.Product;
 import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.List;
+import model.Image;
 import model.Product_Size;
 
 /**
@@ -50,7 +52,6 @@ public class ProductDAO extends DBContext {
             System.err.println(ex);
         }
         return productId;
-
     }
 
     //insert product images
@@ -328,4 +329,171 @@ public class ProductDAO extends DBContext {
         }
         return product;
     }
+
+    //update product
+    public String updateProduct(int id, String name, String descrip, int cid, BigDecimal price) {
+        String message = null;
+        String updateProductSql = "UPDATE [dbo].[Products]\n"
+                + "   SET [name] = ?\n"
+                + "      ,[description] = ?\n"
+                + "      ,[category_id] = ?\n"
+                + "      ,[price] = ?\n"
+                + " WHERE product_id = ?";
+        try {
+            PreparedStatement st = connection.prepareStatement(updateProductSql);
+            st.setString(1, name);
+            st.setString(2, descrip);
+            st.setInt(3, cid);
+            st.setBigDecimal(4, price);
+            st.setInt(5, id);
+            
+            int rowsAffected = st.executeUpdate();
+            if (rowsAffected > 0) {
+                message = "Update successfull!";
+            } else {
+                message = "Error execute";
+            }
+        } catch (SQLException e) {
+            message = "Error: " + e.getMessage();
+        }
+
+        return message;
+    }
+
+    //update product size
+    public String updateProductSize(int stock, int product_id, int size) {
+        String message = null;
+        String updateSizeSQL = "UPDATE [dbo].[Product_Size]\n"
+                + "   SET [stock] = ?\n"
+                + " WHERE product_id = ? AND size = ?";
+        try {
+            PreparedStatement st = connection.prepareStatement(updateSizeSQL);
+            st.setInt(1, stock);
+            st.setInt(2, product_id);
+            st.setInt(3, size);
+
+            int rowsAffected = st.executeUpdate();
+            if (rowsAffected > 0) {
+                message = "Update successfull!";
+            } else {
+                message = "Error execute";
+            }
+        } catch (SQLException e) {
+            message = "Error: " + e.getMessage();
+        }
+        return message;
+    }
+
+    //delete product size
+    public String deleteSize(int product_id, int size) {
+        String message = null;
+        String deleteSQL = "DELETE FROM [dbo].[Product_Size]\n"
+                + "     WHERE product_id = ? AND size = ?";
+        try {
+            PreparedStatement st = connection.prepareStatement(deleteSQL);
+            st.setInt(1, product_id);
+            st.setInt(2, size);
+
+            int rowsAffected = st.executeUpdate();
+            if (rowsAffected > 0) {
+                message = "Delete successfull!";
+            } else {
+                message = "Error execute!";
+            }
+        } catch (SQLException e) {
+            message = "Error: " + e.getMessage();
+        }
+        return message;
+    }
+
+    //add product size
+    public String addSize(int product_id, int size, int stock) {
+        String message = null;
+        String sql = "INSERT INTO [dbo].[Product_Size]\n"
+                + "           ([product_id]\n"
+                + "           ,[size]\n"
+                + "           ,[stock]) VALUES (?, ?, ?)";
+        try {
+            PreparedStatement st = connection.prepareStatement(sql);
+            st.setInt(1, product_id);
+            st.setInt(2, size);
+            st.setInt(3, stock);
+            int rowsAffected = st.executeUpdate();
+            if (rowsAffected > 0) {
+                message = "Insert successfull!";
+            } else {
+                message = "Error execute!";
+            }
+        } catch (SQLException e) {
+            message = "Error: " + e.getMessage();
+        }
+        return message;
+    }
+
+    //get all size of a product
+    public List<Product_Size> getAllSize(int product_id) {
+        List<Product_Size> sizes = new ArrayList<>();
+        String getProductSizesSql = "SELECT size, stock FROM [dbo].[Product_Size] WHERE product_id = ?";
+
+        try {
+            PreparedStatement getSizesStmt = connection.prepareStatement(getProductSizesSql);
+            getSizesStmt.setInt(1, product_id);
+            ResultSet sizesRs = getSizesStmt.executeQuery();
+            while (sizesRs.next()) {
+                Product_Size ps = new Product_Size(product_id, sizesRs.getInt("size"),
+                        sizesRs.getInt("stock"));
+                sizes.add(ps);
+            }
+        } catch (SQLException e) {
+            System.out.println(e);
+        }
+        return sizes;
+    }
+
+    //get all image of a product
+    public List<Image> getAllImage(int product_id) {
+        List<Image> images = new ArrayList<>();
+        String sql = "SELECT [image_id]\n"
+                + "      ,[product_id]\n"
+                + "      ,[image_url]\n"
+                + "  FROM [dbo].[ProductImages]"
+                + "     WHERE product_id = ?";
+        try {
+            PreparedStatement st = connection.prepareStatement(sql);
+            st.setInt(1, product_id);
+            ResultSet imgs = st.executeQuery();
+            while (imgs.next()) {
+                Image ps = new Image(product_id, imgs.getInt("product_id"),
+                        imgs.getString("image_url"));
+                images.add(ps);
+            }
+        } catch (SQLException e) {
+            System.out.println(e);
+        }
+        return images;
+    }
+
+    //delete images
+    public String deleteImage(int image_id) {
+        String message = null;
+        String deleteSQL = "DELETE FROM [dbo].[ProductImages]\n"
+                + "      WHERE image_id = ?";
+        try {
+            PreparedStatement st = connection.prepareStatement(deleteSQL);
+            st.setInt(1, image_id);
+
+            int rowsAffected = st.executeUpdate();
+            if (rowsAffected > 0) {
+                message = "Delete successfull!";
+            } else {
+                message = "Error execute!";
+            }
+        } catch (SQLException e) {
+            message = "Error: " + e.getMessage();
+        }
+        return message;
+    }
+
+    
+   
 }

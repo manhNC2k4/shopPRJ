@@ -34,26 +34,30 @@
         </style>
     </head>
     <body>
-        <div class="container mt-5">
+        <div class="container mt-5 mb-5">
             <h1 class="text-center">Product Details</h1>
+            <h2 style="color: coral">${requestScope.message}</h2>
+            <a href="showProduct" class="btn btn-primary btn-outline-info">Back to list</a>
             <div class="row product-details">
                 <div class="col-md-6">
                     <h2>${product.name}</h2>
                     <p>${product.description}</p>
                     <p><strong>Category:</strong> ${cate.name}</p>
                     <p><strong>Price:</strong> $${product.price}</p>
+                    <a href="editProductInfo?id=${product.id}" class="btn btn-block btn-primary">Edit</a>
                 </div>
                 <div class="col-md-6 product-images">
                     <h3>Images</h3>
                     <c:forEach var="image" items="${product.images}">
                         <img src="${image}" alt="Product Image" class="img-thumbnail">
                     </c:forEach>
+                    <a href="#" class="btn btn-block btn-primary">Edit</a>
                 </div>
             </div>
             <div class="row product-sizes">
                 <div class="col-md-12">
                     <h3>Sizes</h3>
-                    <table class="table table-bordered">
+                    <table class="table table-bordered table-striped">
                         <thead>
                             <tr>
                                 <th>Size</th>
@@ -69,9 +73,10 @@
                             </c:forEach>
                         </tbody>
                     </table>
+                    <a href="#" class="btn btn-block btn-primary">Edit</a>
                 </div>
             </div>
         </div>
-     <script src="js/bootstrap.min.js"></script> 
+        <script src="js/bootstrap.min.js"></script> 
     </body>
 </html>
