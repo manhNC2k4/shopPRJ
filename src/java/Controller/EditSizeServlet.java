@@ -4,7 +4,6 @@
  */
 package Controller;
 
-import dal.CategoryDAO;
 import dal.ProductDAO;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -13,17 +12,13 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import java.math.BigDecimal;
-import java.util.List;
-import model.Category;
-import model.Product;
 
 /**
  *
  * @author LNV
  */
-@WebServlet(name = "EditProductInfoServlet", urlPatterns = {"/editProductInfo"})
-public class EditProductInfoServlet extends HttpServlet {
+@WebServlet(name = "EditSizeServlet", urlPatterns = {"/editSize"})
+public class EditSizeServlet extends HttpServlet {
 
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
@@ -42,10 +37,10 @@ public class EditProductInfoServlet extends HttpServlet {
             out.println("<!DOCTYPE html>");
             out.println("<html>");
             out.println("<head>");
-            out.println("<title>Servlet EditProductInfoServlet</title>");
+            out.println("<title>Servlet EditSizeServlet</title>");
             out.println("</head>");
             out.println("<body>");
-            out.println("<h1>Servlet EditProductInfoServlet at " + request.getContextPath() + "</h1>");
+            out.println("<h1>Servlet EditSizeServlet at " + request.getContextPath() + "</h1>");
             out.println("</body>");
             out.println("</html>");
         }
@@ -63,19 +58,7 @@ public class EditProductInfoServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        CategoryDAO cd = new CategoryDAO();
-        ProductDAO pd = new ProductDAO();
-        List<Category> lists = cd.getALl();
-        String rid = request.getParameter("id");
-        try {
-            int id = Integer.parseInt(rid);
-            Product p = pd.getProductById(id);
-            request.setAttribute("listCat", lists);
-            request.setAttribute("product", p);
-            request.getRequestDispatcher("editProductInfo.jsp").forward(request, response);
-        } catch (NumberFormatException e) {
-            System.out.println(e);
-        }
+        processRequest(request, response);
     }
 
     /**
@@ -89,37 +72,20 @@ public class EditProductInfoServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        String rid = request.getParameter("id");
-        String name = request.getParameter("name");
-        String description = request.getParameter("description");
-        String r_categoryId = request.getParameter("categoryId");
-        String priceStr = request.getParameter("price");
-        BigDecimal price;
-        String message;
+        String productId = request.getParameter("productId");
+        String sizeStr = request.getParameter("size");
+        String stockStr = request.getParameter("stock");
         try {
-            int categoryId = Integer.parseInt(r_categoryId);
-            int id = Integer.parseInt(rid);
-            if (priceStr != null && !priceStr.isEmpty()) { // Check if priceStr is not null and not empty
-                price = new BigDecimal(priceStr);
-                ProductDAO pd = new ProductDAO();
-                CategoryDAO cd = new CategoryDAO();
-                message = pd.updateProduct(id, name, description, categoryId, price);
-                Product p = pd.getProductById(id);
-                Category c = cd.getCateById(p.getCategoryId());
-                request.setAttribute("message", message);
-                request.setAttribute("product", p);
-                request.setAttribute("cate", c);
-                request.getRequestDispatcher("UpdateProduct.jsp").forward(request, response);
-            } else {
-                message = "Price string is invalid or empty";
-                request.setAttribute("message", message);
-                request.getRequestDispatcher("editProductInfo.jsp").forward(request, response);
-            }
-        } catch (NumberFormatException e) {
-            message = "Error: " + e.getMessage();
+            int id = Integer.parseInt(productId);
+            int size = Integer.parseInt(sizeStr);
+            int stock = Integer.parseInt(stockStr);
+            ProductDAO pd = new ProductDAO();
+            String message = pd.updateStock(id, size, stock);
+            request.setAttribute("id", id);
             request.setAttribute("message", message);
-            request.getRequestDispatcher("editProductInfo.jsp").forward(request, response);
-
+            request.getRequestDispatcher("updateProduct").forward(request, response);
+        } catch (NumberFormatException e) {
+            System.out.println(e.getMessage());
         }
     }
 

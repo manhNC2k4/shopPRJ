@@ -17,7 +17,9 @@ import java.util.UUID;
 import model.Product;
 import java.sql.ResultSet;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import model.Image;
 import model.Product_Size;
 
@@ -87,18 +89,36 @@ public class ProductDAO extends DBContext {
     public String insertProductSizes(int productId, String[] sizes, String[] stocks) throws SQLException {
         String message;
         try {
+            // Create a map to store size and stock
+            Map<Integer, Integer> sizeStockMap = new HashMap<>();
+            // Iterate through sizes and stocks arrays
+            for (int i = 0; i < sizes.length; i++) {
+                // Get size and stock
+                int size = Integer.parseInt(sizes[i]);
+                int stock = Integer.parseInt(stocks[i]);
+
+                // If size already exists, add stock
+                if (sizeStockMap.containsKey(size)) {
+                    sizeStockMap.put(size, sizeStockMap.get(size) + stock);
+                } else {
+                    // Add size and stock to the map
+                    sizeStockMap.put(size, stock);
+                }
+            }
+
             String sql = "INSERT INTO [dbo].[Product_Size]\n"
                     + "           ([product_id]\n"
                     + "           ,[size]\n"
                     + "           ,[stock]) VALUES (?, ?, ?)";
             PreparedStatement statement = connection.prepareStatement(sql);
-
-            for (int i = 0; i < sizes.length; i++) {
+            // Insert each size and stock into the database
+            for (Map.Entry<Integer, Integer> entry : sizeStockMap.entrySet()) {
                 statement.setInt(1, productId);
-                statement.setInt(2, Integer.parseInt(sizes[i]));
-                statement.setInt(3, Integer.parseInt(stocks[i]));
+                statement.setInt(2, entry.getKey());
+                statement.setInt(3, entry.getValue());
                 statement.executeUpdate();
             }
+
             message = "Product uploaded successfully!";
             return message;
         } catch (NumberFormatException | SQLException ex) {
@@ -338,6 +358,7 @@ public class ProductDAO extends DBContext {
                 + "      ,[description] = ?\n"
                 + "      ,[category_id] = ?\n"
                 + "      ,[price] = ?\n"
+                + ",[updated_at] = ?\n"
                 + " WHERE product_id = ?";
         try {
             PreparedStatement st = connection.prepareStatement(updateProductSql);
@@ -345,8 +366,9 @@ public class ProductDAO extends DBContext {
             st.setString(2, descrip);
             st.setInt(3, cid);
             st.setBigDecimal(4, price);
-            st.setInt(5, id);
-            
+            st.setTimestamp(5, new java.sql.Timestamp(new Date().getTime()));
+            st.setInt(6, id);
+
             int rowsAffected = st.executeUpdate();
             if (rowsAffected > 0) {
                 message = "Update successfull!";
@@ -408,24 +430,57 @@ public class ProductDAO extends DBContext {
 
     //add product size
     public String addSize(int product_id, int size, int stock) {
-        String message = null;
+        String message = "";
         String sql = "INSERT INTO [dbo].[Product_Size]\n"
                 + "           ([product_id]\n"
                 + "           ,[size]\n"
                 + "           ,[stock]) VALUES (?, ?, ?)";
         try {
-            PreparedStatement st = connection.prepareStatement(sql);
-            st.setInt(1, product_id);
-            st.setInt(2, size);
-            st.setInt(3, stock);
-            int rowsAffected = st.executeUpdate();
-            if (rowsAffected > 0) {
-                message = "Insert successfull!";
+            // Check if the size already exists
+            String checkSql = "SELECT * FROM [dbo].[Product_Size] WHERE [product_id] = ? AND [size] = ?";
+            PreparedStatement checkStatement = connection.prepareStatement(checkSql);
+            checkStatement.setInt(1, product_id);
+            checkStatement.setInt(2, size);
+            ResultSet resultSet = checkStatement.executeQuery();
+            if (resultSet.next()) {
+                // Size already exists
+                message = "Size already exists!";
             } else {
-                message = "Error execute!";
+                PreparedStatement st = connection.prepareStatement(sql);
+                st.setInt(1, product_id);
+                st.setInt(2, size);
+                st.setInt(3, stock);
+                int rowsAffected = st.executeUpdate();
+                if (rowsAffected > 0) {
+                    message = "Insert successfull!";
+                } else {
+                    message = "Error execute!";
+                }
             }
         } catch (SQLException e) {
             message = "Error: " + e.getMessage();
+        }
+        return message;
+    }
+
+    //update stock 
+    public String updateStock(int productId, int size, int stock) {
+        String message = "";
+        String sql = "UPDATE [dbo].[Product_Size] SET [stock] = ? WHERE [product_id] = ? AND [size] = ?";
+        try {
+            PreparedStatement st = connection.prepareStatement(sql);
+            st.setInt(1, stock);
+            st.setInt(2, productId);
+            st.setInt(3, size);
+
+            int rowsAffected = st.executeUpdate();
+            if (rowsAffected > 0) {
+                message = "Stock updated successfully!";
+            } else {
+                message = "No size found to update!";
+            }
+        } catch (SQLException e) {
+            message = "Error updating stock: " + e.getMessage();
         }
         return message;
     }
@@ -463,7 +518,7 @@ public class ProductDAO extends DBContext {
             st.setInt(1, product_id);
             ResultSet imgs = st.executeQuery();
             while (imgs.next()) {
-                Image ps = new Image(product_id, imgs.getInt("product_id"),
+                Image ps = new Image(imgs.getInt("image_id"), product_id,
                         imgs.getString("image_url"));
                 images.add(ps);
             }
@@ -477,11 +532,10 @@ public class ProductDAO extends DBContext {
     public String deleteImage(int image_id) {
         String message = null;
         String deleteSQL = "DELETE FROM [dbo].[ProductImages]\n"
-                + "      WHERE image_id = ?";
+                + "      WHERE [image_id] = ?";
         try {
             PreparedStatement st = connection.prepareStatement(deleteSQL);
             st.setInt(1, image_id);
-
             int rowsAffected = st.executeUpdate();
             if (rowsAffected > 0) {
                 message = "Delete successfull!";
@@ -494,6 +548,4 @@ public class ProductDAO extends DBContext {
         return message;
     }
 
-    
-   
 }

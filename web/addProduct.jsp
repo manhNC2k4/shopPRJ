@@ -12,13 +12,7 @@
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
         <title>JSP Page</title> 
         <script src="ckeditor/ckeditor.js"></script>
-        <link href="filepond/css/filepond.css" rel="stylesheet">
-        <link
-            href="https://unpkg.com/filepond-plugin-image-preview/dist/filepond-plugin-image-preview.css"
-            rel="stylesheet"
-            />
         <link rel="stylesheet" href="css/bootstrap.min.css"/>
-        <script src="filepond/js/filepond.js"></script>
         <style>
             .form-group-inline {
                 display: flex;
@@ -29,12 +23,15 @@
                 min-width: 100px;
                 margin-right: 10px;
             }
+            #image-preview img{
+                max-width: 100px;                
+                max-height:  100px;
+                margin: 20px;
+            }
         </style>
     </head>
     <body>
-        <script src="https://unpkg.com/filepond-plugin-image-preview/dist/filepond-plugin-image-preview.js"></script>
         <script src="js/bootstrap.min.js"></script>
-        <script src="filepond/js/filepond.js"></script>
         <div class="container mt-5 mb-5">
             <h1 class="mb-4">Product Upload</h1>
             <h2 style="color: coral">${requestScope.message}</h2>
@@ -80,8 +77,9 @@
                 <button type="button" class="btn btn-secondary" onclick="addSize()">Add Another Size</button><br><br>
                 <div class="form-group">
                     <label for="productImage">Product Image:</label>
-                    <input type="file" class="filepond" id="productImages" name="productImages" accept="image/*" multiple required>                
-                </div>    
+                    <input type="file" class="filepond" onchange="previewImages()" id="productImages" name="productImages" accept="image/*" multiple required>                
+                </div>  
+                <div id="image-preview"></div>
                 <div class="row">
                     <div class="col">
                         <button type="submit" class="btn btn-primary">Upload Product</button>
@@ -92,31 +90,36 @@
                 </div>
             </form>
         </div>
+        <script src="js/bootstrap.min.js"></script>
+
         <script>
-//            // Register the plugin
-//            FilePond.registerPlugin(FilePondPluginImagePreview);
-            ClassicEditor.create(document.querySelector('#productDescription')).catch(error => {
-                console.error(error);
-            });
-//            
-//            FilePond.parse(inputEl);
-//
-//            FilePond.create(document.querySelector('.filepond'), {
-//                allowMultiple: true,
-//                // Cho phép chọn nhiều tệp tin
-//                allowImagePreview: true,
-//                required: true, // Yêu cầu chọn ít nhất một file
-//                fileValidateSize: {// Cấu hình validate kích thước
-//                    minFileSize: 1, // Kích thước tối thiểu (1 byte)
-//                    maxFileSize: 5 * 1024 * 1024 // Kích thước tối đa (5MB)
-//                }
-//            });
-            
-            function addSize() {
-                var sizesDiv = document.getElementById('sizes');
-                var newSizeDiv = document.createElement('div');
-                newSizeDiv.classList.add('form-group');
-                newSizeDiv.innerHTML = `
+                            function previewImages() {
+                                var preview = document.getElementById('image-preview');
+                                preview.innerHTML = '';
+                                var files = document.getElementById('productImages').files;
+
+                                for (var i = 0; i < files.length; i++) {
+                                    var file = files[i];
+                                    var reader = new FileReader();
+
+                                    reader.onload = function (e) {
+                                        var img = new Image();
+                                        img.src = e.target.result;
+                                        preview.appendChild(img);
+                                    }
+
+                                    reader.readAsDataURL(file);
+                                }
+                            }
+                            ClassicEditor.create(document.querySelector('#productDescription')).catch(error => {
+                                console.error(error);
+                            });
+
+                            function addSize() {
+                                var sizesDiv = document.getElementById('sizes');
+                                var newSizeDiv = document.createElement('div');
+                                newSizeDiv.classList.add('form-group');
+                                newSizeDiv.innerHTML = `
                     <div class="form-group">
                         <label for="size">Size:</label>
                         <input type="number" class="form-control" id="size" name="size[]" required>
@@ -126,17 +129,15 @@
                         <input type="number" class="form-control" id="stock" name="stock[]" required>
            </div>
                 `;
-                sizesDiv.appendChild(newSizeDiv);
-                if (sizeInputs.length >= 20) {
-                    var newRowDiv = document.createElement('div');
-                    newRowDiv.classList.add('form-group-inline');
-                    sizesDiv.appendChild(newRowDiv);
-                    sizesDiv = newRowDiv;
-                }
-            }
+                                sizesDiv.appendChild(newSizeDiv);
+                                if (sizeInputs.length >= 20) {
+                                    var newRowDiv = document.createElement('div');
+                                    newRowDiv.classList.add('form-group-inline');
+                                    sizesDiv.appendChild(newRowDiv);
+                                    sizesDiv = newRowDiv;
+                                }
+                            }
         </script>
-        <script src="https://unpkg.com/filepond-plugin-image-preview/dist/filepond-plugin-image-preview.js"></script>
-        <script src="js/bootstrap.min.js"></script>
-        <script src="filepond/js/filepond.js"></script>
+
     </body>
 </html>
