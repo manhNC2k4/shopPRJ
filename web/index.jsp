@@ -9,7 +9,7 @@
 <!DOCTYPE html>
 <html lang="en">
     <head>
-        <title>MayJaShop - Free Bootstrap 4 Template by Colorlib</title>
+        <title>MayJaShop</title>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
@@ -79,10 +79,10 @@
                         <li class="nav-item"><a href="blog.html" class="nav-link">Blog</a></li>
                         <li class="nav-item"><a href="contact.html" class="nav-link">Contact</a></li>
                         <li class="nav-item cta cta-colored"><a href="cart.html" class="nav-link"><span class="icon-shopping_cart"></span>[0]</a></li>
-                        <c:if test="${sessionScope.account == null}">
+                            <c:if test="${sessionScope.account == null}">
                             <li class="nav-item"><a href="login.jsp" class="nav-link">Login</a></li>
-                        </c:if>
-                        <c:if test="${sessionScope.account != null}">
+                            </c:if>
+                            <c:if test="${sessionScope.account != null}">
                             <li class="nav-item dropdown">
                                 <a class="nav-link dropdown-toggle" href="#" id="dropdown04" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">${sessionScope.account.username}</a>
                                 <div class="dropdown-menu" aria-labelledby="dropdown04">
@@ -109,7 +109,7 @@
                                 <div class="text">
                                     <span class="subheading">#New Arrival</span>
                                     <div class="horizontal">
-                                        <h1 class="mb-4 mt-3">Shoes Collection 2019</h1>
+                                        <h1 class="mb-4 mt-3">Shoes Collection 2024</h1>
                                         <p class="mb-4">A small river named Duden flows by their place and supplies it with the necessary regelialia. It is a paradisematic country.</p>
 
                                         <p><a href="#" class="btn-custom">Discover Now</a></p>
@@ -129,7 +129,7 @@
                                 <div class="text">
                                     <span class="subheading">#New Arrival</span>
                                     <div class="horizontal">
-                                        <h1 class="mb-4 mt-3">New Shoes Winter Collection</h1>
+                                        <h1 class="mb-4 mt-3">New Shoes Summer Collection</h1>
                                         <p class="mb-4">A small river named Duden flows by their place and supplies it with the necessary regelialia. It is a paradisematic country.</p>
 
                                         <p><a href="#" class="btn-custom">Discover Now</a></p>
@@ -193,7 +193,47 @@
             </div>
             <div class="container">
                 <div class="row">
-                    <div class="col-sm-12 col-md-6 col-lg-3 ftco-animate d-flex">
+                    <c:choose>
+                        <c:when test="${not empty requestScope.dataPro}">
+                            <c:forEach var="p" items="${dataPro}">
+                                <div class="col-sm-12 col-md-6 col-lg-3 ftco-animate d-flex">
+                                    <div class="product d-flex flex-column">
+                                        <a href="#" class="img-prod"><img class="img-fluid" src="${p.images[0]}" alt="${p.name}">
+                                            <div class="overlay"></div>
+                                        </a>
+                                        <div class="text py-3 pb-4 px-3">
+                                            <div class="d-flex">
+                                                <div class="cat">
+                                                    <span>${categoryMap[p.categoryId]}</span>
+                                                </div>
+                                                <div class="rating">
+                                                    <p class="text-right mb-0">
+                                                        <a href="#"><span class="ion-ios-star-outline"></span></a>
+                                                        <a href="#"><span class="ion-ios-star-outline"></span></a>
+                                                        <a href="#"><span class="ion-ios-star-outline"></span></a>
+                                                        <a href="#"><span class="ion-ios-star-outline"></span></a>
+                                                        <a href="#"><span class="ion-ios-star-outline"></span></a>
+                                                    </p>
+                                                </div>
+                                            </div>
+                                            <h3><a href="#">${p.name}</a></h3>
+                                            <div class="pricing">
+                                                <p class="price"><span>$${p.price}</span></p>
+                                            </div>
+                                            <p class="bottom-area d-flex px-3">
+                                                <a href="#" class="add-to-cart text-center py-2 mr-1"><span>Add to cart <i class="ion-ios-add ml-1"></i></span></a>
+                                                <a href="#" class="buy-now text-center py-2">Buy now<span><i class="ion-ios-cart ml-1"></i></span></a>
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </c:forEach>
+                        </c:when>
+                        <c:otherwise>
+                            <p>No products available.</p>
+                        </c:otherwise>
+                    </c:choose>
+<!--                    <div class="col-sm-12 col-md-6 col-lg-3 ftco-animate d-flex">
                         <div class="product d-flex flex-column">
                             <a href="#" class="img-prod"><img class="img-fluid" src="images/product-1.png" alt="Colorlib Template">
                                 <div class="overlay"></div>
@@ -443,7 +483,7 @@
                                 </p>
                             </div>
                         </div>
-                    </div>
+                    </div>-->
                 </div>
             </div>
         </section>

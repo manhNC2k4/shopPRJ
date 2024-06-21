@@ -50,14 +50,14 @@
         </div>
         <nav class="navbar navbar-expand-lg navbar-dark ftco_navbar bg-dark ftco-navbar-light" id="ftco-navbar">
             <div class="container">
-                <a class="navbar-brand" href="index.html">MayJaShop</a>
+                <a class="navbar-brand" href="index">MayJaShop</a>
                 <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#ftco-nav" aria-controls="ftco-nav" aria-expanded="false" aria-label="Toggle navigation">
                     <span class="oi oi-menu"></span> Menu
                 </button>
 
                 <div class="collapse navbar-collapse" id="ftco-nav">
                     <ul class="navbar-nav ml-auto">
-                        <li class="nav-item"><a href="index.html" class="nav-link">Home</a></li>
+                        <li class="nav-item"><a href="index" class="nav-link">Home</a></li>
                         <li class="nav-item dropdown active">
                             <a class="nav-link dropdown-toggle" href="#" id="dropdown04" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Catalog</a>
                             <div class="dropdown-menu" aria-labelledby="dropdown04">
@@ -78,11 +78,11 @@
         </nav>
         <!-- END nav -->
 
-        <div class="hero-wrap hero-bread" style="background-image: url('images/bg_6.jpg');">
+        <div class="hero-wrap hero-bread" style="background-image: url('images/bg_6.jpg'); padding: 8em 0">
             <div class="container">
                 <div class="row no-gutters slider-text align-items-center justify-content-center">
                     <div class="col-md-9 ftco-animate text-center">
-                        <p class="breadcrumbs"><span class="mr-2"><a href="index.html">Home</a></span> <span>Shop</span></p>
+                        <p class="breadcrumbs"><span class="mr-2"><a href="index">Home</a></span> <span>Shop</span></p>
                         <h1 class="mb-0 bread">Shop</h1>
                     </div>
                 </div>
@@ -362,17 +362,16 @@
                             </div>
                         </div>
                     </div>
-
                     <div class="col-md-4 col-lg-2">
                         <div class="sidebar">
                             <div class="sidebar-box-2">
-                                <h2 class="heading">Categories</h2>
+                                <h2 class="heading">Filter</h2>
                                 <div class="fancy-collapse-panel">
                                     <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
                                         <div class="panel panel-default">
                                             <div class="panel-heading" role="tab" id="headingOne">
                                                 <h4 class="panel-title">
-                                                    <a data-toggle="collapse" data-parent="#accordion" href="#collapseOne" aria-expanded="true" aria-controls="collapseOne">Men's Shoes
+                                                    <a data-toggle="collapse" data-parent="#accordion" href="#collapseOne" aria-expanded="true" aria-controls="collapseOne">Categories
                                                     </a>
                                                 </h4>
                                             </div>
@@ -393,20 +392,18 @@
                                         <div class="panel panel-default">
                                             <div class="panel-heading" role="tab" id="headingTwo">
                                                 <h4 class="panel-title">
-                                                    <a class="collapsed" data-toggle="collapse" data-parent="#accordion" href="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">Women's Shoes
+                                                    <a class="collapsed" data-toggle="collapse" data-parent="#accordion" href="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">Sort
                                                     </a>
                                                 </h4>
                                             </div>
                                             <div id="collapseTwo" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingTwo">
                                                 <div class="panel-body">
                                                     <ul>
-                                                        <li><a href="#">Sport</a></li>
-                                                        <li><a href="#">Casual</a></li>
-                                                        <li><a href="#">Running</a></li>
-                                                        <li><a href="#">Jordan</a></li>
-                                                        <li><a href="#">Soccer</a></li>
-                                                        <li><a href="#">Football</a></li>
-                                                        <li><a href="#">Lifestyle</a></li>
+                                                        <li><a href="#">Newest</a></li>
+                                                        <li><a href="#">Oldest</a></li>
+                                                        <li><a href="#">Top Seller</a></li>
+                                                        <li><a href="#">Price(High - Low)</a></li>
+                                                        <li><a href="#">Price(Low - High)</a></li>
                                                     </ul>
                                                 </div>
                                             </div>
@@ -414,39 +411,67 @@
                                         <div class="panel panel-default">
                                             <div class="panel-heading" role="tab" id="headingThree">
                                                 <h4 class="panel-title">
-                                                    <a class="collapsed" data-toggle="collapse" data-parent="#accordion" href="#collapseThree" aria-expanded="false" aria-controls="collapseThree">Accessories
+                                                    <a class="collapsed" data-toggle="collapse" data-parent="#accordion" href="#collapseThree" aria-expanded="false" aria-controls="collapseThree">Size
                                                     </a>
                                                 </h4>
                                             </div>
                                             <div id="collapseThree" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingThree">
                                                 <div class="panel-body">
-                                                    <ul>
-                                                        <li><a href="#">Jeans</a></li>
-                                                        <li><a href="#">T-Shirt</a></li>
-                                                        <li><a href="#">Jacket</a></li>
-                                                        <li><a href="#">Shoes</a></li>
+
+                                                    <ul style="list-style: none; display: flex; flex-wrap: wrap; width: 100%; margin: 0; padding: 0;">
+                                                        <li style="border: 1px solid #ccc; padding: 10px; margin: 5px; width: 25%; text-align: center; border-radius: 5px;">
+                                                            <a href="#">3</a>
+                                                        </li>
+                                                        <li style="border: 1px solid #ccc; padding: 10px; margin: 5px; width: 25%; text-align: center; border-radius: 5px;">
+                                                            <a href="#">4</a>
+                                                        </li>
+                                                        <li style="border: 1px solid #ccc; padding: 10px; margin: 5px; width: 25%; text-align: center; border-radius: 5px;">
+                                                            <a href="#">5</a>
+                                                        </li>
+                                                        <li style="border: 1px solid #ccc; padding: 10px; margin: 5px; width: 25%; text-align: center; border-radius: 5px;">
+                                                            <a href="#">6</a>
+                                                        </li>
+                                                        <li style="border: 1px solid #ccc; padding: 10px; margin: 5px; width: 25%; text-align: center; border-radius: 5px;">
+                                                            <a href="#">7</a>
+                                                        </li>
+                                                        <li style="border: 1px solid #ccc; padding: 10px; margin: 5px; width: 25%; text-align: center; border-radius: 5px;">
+                                                            <a href="#">8</a>
+                                                        </li>
+                                                        <li style="border: 1px solid #ccc; padding: 10px; margin: 5px; width: 25%; text-align: center; border-radius: 5px;">
+                                                            <a href="#">9</a>
+                                                        </li>
+                                                        <li style="border: 1px solid #ccc; padding: 10px; margin: 5px; width: 25%; text-align: center; border-radius: 5px;">
+                                                            <a href="#">10</a>
+                                                        </li>
+                                                        <li style="border: 1px solid #ccc; padding: 10px; margin: 5px; width: 25%; text-align: center; border-radius: 5px;">
+                                                            <a href="#">11</a>
+                                                        </li>
+                                                        <li style="border: 1px solid #ccc; padding: 10px; margin: 5px; width: 25%; text-align: center; border-radius: 5px;">
+                                                            <a href="#">12</a>
+                                                        </li>
+                                                        <li style="border: 1px solid #ccc; padding: 10px; margin: 5px; width: 25%; text-align: center; border-radius: 5px;">
+                                                            <a href="#">13</a>
+                                                        </li>
+                                                        <li style="border: 1px solid #ccc; padding: 10px; margin: 5px; width: 25%; text-align: center; border-radius: 5px;">
+                                                            <a href="#">14</a>
+                                                        </li>
+                                                        <li style="border: 1px solid #ccc; padding: 10px; margin: 5px; width: 25%; text-align: center; border-radius: 5px;">
+                                                            <a href="#">15</a>
+                                                        </li>
+                                                        <li style="border: 1px solid #ccc; padding: 10px; margin: 5px; width: 25%; text-align: center; border-radius: 5px;">
+                                                            <a href="#">16</a>
+                                                        </li>
+                                                        <li style="border: 1px solid #ccc; padding: 10px; margin: 5px; width: 25%; text-align: center; border-radius: 5px;">
+                                                            <a href="#">17</a>
+                                                        </li>
+                                                        <li style="border: 1px solid #ccc; padding: 10px; margin: 5px; width: 25%; text-align: center; border-radius: 5px;">
+                                                            <a href="#">18</a>
+                                                        </li>
                                                     </ul>
                                                 </div>
                                             </div>
                                         </div>
-                                        <div class="panel panel-default">
-                                            <div class="panel-heading" role="tab" id="headingFour">
-                                                <h4 class="panel-title">
-                                                    <a class="collapsed" data-toggle="collapse" data-parent="#accordion" href="#collapseFour" aria-expanded="false" aria-controls="collapseThree">Clothing
-                                                    </a>
-                                                </h4>
-                                            </div>
-                                            <div id="collapseFour" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingFour">
-                                                <div class="panel-body">
-                                                    <ul>
-                                                        <li><a href="#">Jeans</a></li>
-                                                        <li><a href="#">T-Shirt</a></li>
-                                                        <li><a href="#">Jacket</a></li>
-                                                        <li><a href="#">Shoes</a></li>
-                                                    </ul>
-                                                </div>
-                                            </div>
-                                        </div>
+                                        
                                     </div>
                                 </div>
                             </div>
@@ -459,13 +484,14 @@
                                                 <label for="guests">Price from:</label>
                                                 <div class="form-field">
                                                     <i class="icon icon-arrow-down3"></i>
-                                                    <select name="people" id="people" class="form-control">
+                                                    <input type="number" name="people" id="people" class="form-control" style="padding-right: 10px">
+<!--                                                    <select name="people" id="people" class="form-control">
                                                         <option value="#">1</option>
                                                         <option value="#">200</option>
                                                         <option value="#">300</option>
                                                         <option value="#">400</option>
                                                         <option value="#">1000</option>
-                                                    </select>
+                                                    </select>-->
                                                 </div>
                                             </div>
                                         </div>
@@ -474,13 +500,14 @@
                                                 <label for="guests">Price to:</label>
                                                 <div class="form-field">
                                                     <i class="icon icon-arrow-down3"></i>
-                                                    <select name="people" id="people" class="form-control">
+                                                    <input type="number" name="people" id="people" class="form-control" style="padding-right: 10px">
+<!--                                                    <select name="people" id="people" class="form-control">
                                                         <option value="#">2000</option>
                                                         <option value="#">4000</option>
                                                         <option value="#">6000</option>
                                                         <option value="#">8000</option>
                                                         <option value="#">10000</option>
-                                                    </select>
+                                                    </select>-->
                                                 </div>
                                             </div>
                                         </div>
