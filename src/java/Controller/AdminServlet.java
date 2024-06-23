@@ -55,7 +55,7 @@ public class AdminServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
     throws ServletException, IOException {
-        request.getRequestDispatcher("admin.jsp").forward(request, response);
+        request.getRequestDispatcher("index1.html").forward(request, response);
     } 
 
     /** 
@@ -68,7 +68,7 @@ public class AdminServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
     throws ServletException, IOException {
-        request.getRequestDispatcher("admin.jsp").forward(request, response);
+        request.getRequestDispatcher("index1.html").forward(request, response);
     }
 
     /** 

@@ -14,7 +14,9 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import model.Category;
 import model.Product;
 
@@ -63,21 +65,27 @@ public class AdminShowProduct extends HttpServlet {
         CategoryDAO cd = new CategoryDAO();
         List<Category> listCat = cd.getALl();
         ProductDAO pd = new ProductDAO();
+        Map<Integer, String> categoryMap = new HashMap<>();
+        for (Category category : listCat) {
+            categoryMap.put(category.getCategory_id(), category.getName());
+        }
         if(request.getParameter("cid") != null) {
             String rid = request.getParameter("cid");
             try {
                 int id = Integer.parseInt(rid);
                 List<Product> list = pd.getProductsOf(id);
+            request.setAttribute("categoryMap", categoryMap);
             request.setAttribute("dataCat", listCat);
             request.setAttribute("dataPro", list);
-            request.getRequestDispatcher("showProduct.jsp").forward(request, response);
+            request.getRequestDispatcher("listProducts.jsp").forward(request, response);
             } catch (NumberFormatException e) {
             }
         }
+        request.setAttribute("categoryMap", categoryMap);
         List<Product> listPro = pd.getAllProduct();
         request.setAttribute("dataPro", listPro);
         request.setAttribute("dataCat", listCat);
-        request.getRequestDispatcher("showProduct.jsp").forward(request, response);
+        request.getRequestDispatcher("listProducts.jsp").forward(request, response);
     } 
 
     /** 
@@ -93,21 +101,28 @@ public class AdminShowProduct extends HttpServlet {
         CategoryDAO cd = new CategoryDAO();
         List<Category> listCat = cd.getALl();
         ProductDAO pd = new ProductDAO();
+        Map<Integer, String> categoryMap = new HashMap<>();
+        for (Category category : listCat) {
+            categoryMap.put(category.getCategory_id(), category.getName());
+        }
         if(request.getParameter("cid") != null) {
             String rid = request.getParameter("cid");
             try {
                 int id = Integer.parseInt(rid);
                 List<Product> list = pd.getProductsOf(id);
+            request.setAttribute("categoryMap", categoryMap);
             request.setAttribute("dataCat", listCat);
             request.setAttribute("dataPro", list);
-            request.getRequestDispatcher("showProduct.jsp").forward(request, response);
+            request.getRequestDispatcher("listProducts.jsp").forward(request, response);
             } catch (NumberFormatException e) {
             }
         }
+        
         List<Product> listPro = pd.getAllProduct();
+        request.setAttribute("categoryMap", categoryMap);
         request.setAttribute("dataPro", listPro);
         request.setAttribute("dataCat", listCat);
-        request.getRequestDispatcher("showProduct.jsp").forward(request, response);
+        request.getRequestDispatcher("listProducts.jsp").forward(request, response);
    
     }
 

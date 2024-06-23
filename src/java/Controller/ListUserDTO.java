@@ -61,7 +61,7 @@ public class ListUserDTO extends HttpServlet {
         UserDAO ud = new UserDAO();
         List<UserDTO> lists = ud.getALl();   
         request.setAttribute("data", lists);
-        request.getRequestDispatcher("userList.jsp").forward(request, response);
+        request.getRequestDispatcher("listUser.jsp").forward(request, response);
     } 
 
     /** 
@@ -77,7 +77,7 @@ public class ListUserDTO extends HttpServlet {
         UserDAO ud = new UserDAO();
         List<UserDTO> lists = ud.getALl();   
         request.setAttribute("data", lists);
-        request.getRequestDispatcher("userList.jsp").forward(request, response);
+        request.getRequestDispatcher("listUser.jsp").forward(request, response);
     }
 
     /** 

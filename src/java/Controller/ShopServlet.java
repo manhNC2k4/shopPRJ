@@ -33,40 +33,45 @@ public class ShopServlet extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         // init size
-        int size = 0;
-        if (request.getParameter("size") != null) {
-            size = Integer.parseInt(request.getParameter("size"));
-        }
+//        int size = 0;
+//        if (request.getParameter("size")!= null) {
+//            size = Integer.parseInt(request.getParameter("size"));
+//        }
         //init cid
         int cid = 0;
         if (request.getParameter("cid") != null) {
             cid = Integer.parseInt(request.getParameter("cid"));
         }
-        System.out.println(cid);
-        //init sort name
-        String sort = "";
-        if (request.getParameter("sort") != null) {
-            sort = request.getParameter("sort");
-        }
-        // init price from
-        int priceFrom = 0;
-        if (request.getParameter("priceFrom") != null) {
-            priceFrom = Integer.parseInt(request.getParameter("priceFrom"));
-        }
-        // init price to
-        int priceTo = 0;
-        if (request.getParameter("priceTo") != null) {
-            priceTo = Integer.parseInt(request.getParameter("priceTo"));
-        }
+//        //init sort name
+//        String sort = "";
+//        if (request.getParameter("sort") != null) {
+//            sort = request.getParameter("sort");
+//        }
+//        // init price from
+//        int priceFrom = 0;
+//        if (request.getParameter("priceFrom") != null) {
+//            priceFrom = Integer.parseInt(request.getParameter("priceFrom"));
+//        }
+//        // init price to
+//        int priceTo = 0;
+//        if (request.getParameter("priceTo") != null) {
+//            priceTo = Integer.parseInt(request.getParameter("priceTo"));
+//        }
+
         //init page
         int page = 1;
         if (request.getParameter("page") != null) {
             page = Integer.parseInt(request.getParameter("page"));
         }
+        List<Product> products;
         GetProductDAO gpd = new GetProductDAO();
-        List<Product> products = gpd.getProductsPerPage(page, PRODUCTS_PER_PAGE);
+        if (cid != 0) {
+            products = gpd.getProductsPerPageByCate(page, PRODUCTS_PER_PAGE,cid);
+        } else {
+            products = gpd.getProductsPerPage(page, PRODUCTS_PER_PAGE);
+        }
         gpd.fetchImagesForProducts(products);
-        
+
         int totalProducts = gpd.getTotalProducts();
         int totalPages = (int) Math.ceil((double) totalProducts / PRODUCTS_PER_PAGE);
         CategoryDAO cd = new CategoryDAO();
@@ -75,15 +80,15 @@ public class ShopServlet extends HttpServlet {
         for (Category category : listCat) {
             categoryMap.put(category.getCategory_id(), category.getName());
         }
-               
+
         request.setAttribute("categoryMap", categoryMap);
         request.setAttribute("dataPro", products);
         request.setAttribute("currentPage", page);
-        request.setAttribute("size", size);
+//        request.setAttribute("size", size);
         request.setAttribute("cid", cid);
-        request.setAttribute("sort", sort);
-        request.setAttribute("priceFrom", priceFrom);
-        request.setAttribute("priceTo", priceTo);
+//        request.setAttribute("sort", sort);
+//        request.setAttribute("priceFrom", priceFrom);
+//        request.setAttribute("priceTo", priceTo);
         request.setAttribute("totalPages", totalPages);
         request.getRequestDispatcher("shop.jsp").forward(request, response);
 

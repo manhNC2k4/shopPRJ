@@ -88,13 +88,13 @@
         </nav>
         <!-- END nav -->
 
-        <div class="hero-wrap hero-bread" style="background-image: url('images/bg_6.jpg'); padding: 8em 0">
+        <div class="hero-wrap hero-bread" style="background-color:#fff; padding: 2em 0">
             <div class="container">
                 <div class="row no-gutters slider-text align-items-center justify-content-center">
-                    <div class="col-md-9 ftco-animate text-center">
+<!--                    <div class="col-md-9 ftco-animate text-center">
                         <p class="breadcrumbs"><span class="mr-2"><a href="index">Home</a></span> <span>Shop</span></p>
                         <h1 class="mb-0 bread">Shop</h1>
-                    </div>
+                    </div>-->
                 </div>
             </div>
         </div>
@@ -154,11 +154,11 @@
                                         </li>
                                         <c:forEach var="i" begin="1" end="${totalPages}">
                                             <li class="${i == currentPage ? 'active' : ''}">
-                                                <a href="shop?page=${i}">${i}</a>
+                                                <a href="shop?page=${i}&cid=${param.cid != null ? param.cid : 0}">${i}</a>
                                             </li>
                                         </c:forEach>
-                                        <li>
-                                            <a href="shop?page=${currentPage < totalPages ? currentPage + 1 : totalPages}">&gt;</a>
+                                        <li>        
+                                            <a href="shop?page=${currentPage < totalPages ? currentPage + 1 : totalPages}&cid=${param.cid != null ? param.cid : 0}">&gt;</a>
                                         </li>
                                     </ul>
 
@@ -169,7 +169,7 @@
                     <div class="col-md-4 col-lg-2">
                         <div class="sidebar">
                             <div class="sidebar-box-2">
-                                <h2 class="heading">Filter</h2>
+                                <h2 class="heading" >All Shoes</h2>
                                 <div class="fancy-collapse-panel">
                                     <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
                                         <div class="panel panel-default">
@@ -184,7 +184,7 @@
                                                     <ul>
                                                         <c:forEach var="entry" items="${categoryMap}">
                                                             <li>
-                                                                <a href="shop?cid=${entry.key}&sort=${sort}&size=${size}&priceFrom=${priceFrom}&priceTo=${priceTo}"
+                                                                <a href="shop?cid=${entry.key}"
                                                                    class="${param.cid == entry.key ? 'clicked-category' : ''}">${entry.value}</a>
                                                             </li>
                                                         </c:forEach>
