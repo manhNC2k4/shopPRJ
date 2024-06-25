@@ -72,6 +72,20 @@
                     </div>
                 </li>
                 <li class="nav-item">
+                    <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseCate" aria-expanded="true"
+                       aria-controls="collapseCate">
+                        <i class="fab fa-fw fa-wpforms"></i>
+                        <span>Category</span>
+                    </a>
+                    <div id="collapseCate" class="collapse" aria-labelledby="headingCate" data-parent="#accordionSidebar">
+                        <div class="bg-white py-2 collapse-inner rounded">
+                            <h6 class="collapse-header">Category</h6>
+                            <a class="collapse-item" href="listCategory">List Category</a>
+                            <a class="collapse-item" href="addCategory">Add Category</a>
+                        </div>
+                    </div>
+                </li>
+                <li class="nav-item">
                     <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseBootstrap"
                        aria-expanded="true" aria-controls="collapseBootstrap">
                         <i class="far fa-fw fa-window-maximize"></i>
@@ -358,12 +372,12 @@
                             <div class="col-lg-12">
                                 <div class="card mb-4">
                                     <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-                                         <h6 class="m-0 font-weight-bold text-primary">
-                                                            <a href="uploadProduct" class="text-primary" style="text-decoration: none;">Add Product</a>
-                                         </h6>
+                                        <h6 class="m-0 font-weight-bold text-primary">
+                                            <a href="uploadProduct" class="text-primary" style="text-decoration: none;">Add Product</a>
+                                        </h6>
                                     </div>
                                     <div class="table-responsive p-3">
-                                        
+
                                         <table class="table align-items-center table-flush table-hover" id="dataTableHover">
                                             <thead class="thead-light">
                                                 <tr>
@@ -399,7 +413,6 @@
                                                                 <a href="deleteProduct?id=${p.id}" class="btn btn-danger btn-sm" onclick="return checkAdmin() && confirmDelete()">Delete</a>
                                                             </div>
                                                         </td>
-                                                    </tr>
                                                     </tr>
                                                 </c:forEach>
                                             </tbody>

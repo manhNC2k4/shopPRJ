@@ -67,14 +67,14 @@ public class GetProductDAO extends DBContext {
             sql += "?";
         }
         sql += ")";
-         boolean imagesFetched = false;
-        try{
+        boolean imagesFetched = false;
+        try {
             PreparedStatement st = connection.prepareStatement(sql);
             for (int i = 0; i < products.size(); i++) {
                 st.setInt(i + 1, products.get(i).getId());
             }
             // In ra câu lệnh SQL cuối cùng và các tham số
-        System.out.println("Executing SQL: " + st.toString());
+            System.out.println("Executing SQL: " + st.toString());
 
             ResultSet rs = st.executeQuery();
             while (rs.next()) {
@@ -108,6 +108,25 @@ public class GetProductDAO extends DBContext {
         return null;
     }
 
+    //count product by category
+    public int getTotalProductsByCate(int id) {
+        int totalProducts = 0;
+
+        try {
+            String sql = "SELECT COUNT(*) FROM products\n"
+                    + "where category_id = ?";
+            PreparedStatement statement = connection.prepareStatement(sql);
+            statement.setInt(1, id);
+            ResultSet resultSet = statement.executeQuery();
+            if (resultSet.next()) {
+                totalProducts = resultSet.getInt(1);
+            }
+        } catch (SQLException e) {
+            System.out.println(e);
+        }
+        return totalProducts;
+    }
+
     //count product
     public int getTotalProducts() {
         int totalProducts = 0;
@@ -120,7 +139,6 @@ public class GetProductDAO extends DBContext {
                 totalProducts = resultSet.getInt(1);
             }
 
-            connection.close();
         } catch (SQLException e) {
             System.out.println(e);
         }
@@ -142,9 +160,9 @@ public class GetProductDAO extends DBContext {
             statement.setInt(1, start);
             statement.setInt(2, productsPerPage);
             ResultSet rs = statement.executeQuery();
-            
+
             while (rs.next()) {
-                Product product = new Product( 
+                Product product = new Product(
                         rs.getInt("product_id"),
                         rs.getString("name"),
                         rs.getString("description"),
@@ -165,6 +183,158 @@ public class GetProductDAO extends DBContext {
         return list;
     }
 
+    //get list product per page newest
+    public List<Product> getProductsPerPageNewest(int page, int productsPerPage) {
+        List<Product> list = new ArrayList<>();
+        int start = (page - 1) * productsPerPage;
+
+        try {
+            String sql = "SELECT p.product_id, p.name, p.description, p.category_id, p.price, p.created_at, p.updated_at"
+                    + " FROM Products p\n"
+                    + "ORDER BY p.created_at DESC\n"
+                    + "OFFSET ? ROWS\n"
+                    + "FETCH NEXT ? ROWS ONLY;";
+            PreparedStatement statement = connection.prepareStatement(sql);
+            statement.setInt(1, start);
+            statement.setInt(2, productsPerPage);
+            ResultSet rs = statement.executeQuery();
+
+            while (rs.next()) {
+                Product product = new Product(
+                        rs.getInt("product_id"),
+                        rs.getString("name"),
+                        rs.getString("description"),
+                        rs.getInt("category_id"),
+                        rs.getBigDecimal("price"),
+                        rs.getTimestamp("created_at"),
+                        rs.getTimestamp("updated_at"),
+                        new ArrayList<>()
+                );
+                list.add(product);
+            }
+        } catch (SQLException e) {
+            System.err.println("Error fetching latest products: " + e.getMessage());
+            // Ghi log lỗi hoặc xử lý lỗi theo logic của ứng dụng
+            return Collections.emptyList(); // Trả về danh sách rỗng
+        }
+
+        return list;
+    }
+    
+    //get list product per page oldest
+    public List<Product> getProductsPerPageOldest(int page, int productsPerPage) {
+        List<Product> list = new ArrayList<>();
+        int start = (page - 1) * productsPerPage;
+
+        try {
+            String sql = "SELECT p.product_id, p.name, p.description, p.category_id, p.price, p.created_at, p.updated_at"
+                    + " FROM Products p\n"
+                    + "ORDER BY p.created_at ASC\n"
+                    + "OFFSET ? ROWS\n"
+                    + "FETCH NEXT ? ROWS ONLY;";
+            PreparedStatement statement = connection.prepareStatement(sql);
+            statement.setInt(1, start);
+            statement.setInt(2, productsPerPage);
+            ResultSet rs = statement.executeQuery();
+
+            while (rs.next()) {
+                Product product = new Product(
+                        rs.getInt("product_id"),
+                        rs.getString("name"),
+                        rs.getString("description"),
+                        rs.getInt("category_id"),
+                        rs.getBigDecimal("price"),
+                        rs.getTimestamp("created_at"),
+                        rs.getTimestamp("updated_at"),
+                        new ArrayList<>()
+                );
+                list.add(product);
+            }
+        } catch (SQLException e) {
+            System.err.println("Error fetching latest products: " + e.getMessage());
+            // Ghi log lỗi hoặc xử lý lỗi theo logic của ứng dụng
+            return Collections.emptyList(); // Trả về danh sách rỗng
+        }
+
+        return list;
+    }
+    
+    //get list product per page price high to low
+    public List<Product> getProductsPerPagePriceDesc(int page, int productsPerPage) {
+        List<Product> list = new ArrayList<>();
+        int start = (page - 1) * productsPerPage;
+
+        try {
+            String sql = "SELECT p.product_id, p.name, p.description, p.category_id, p.price, p.created_at, p.updated_at"
+                    + " FROM Products p\n"
+                    + "ORDER BY p.price DESC\n"
+                    + "OFFSET ? ROWS\n"
+                    + "FETCH NEXT ? ROWS ONLY;";
+            PreparedStatement statement = connection.prepareStatement(sql);
+            statement.setInt(1, start);
+            statement.setInt(2, productsPerPage);
+            ResultSet rs = statement.executeQuery();
+
+            while (rs.next()) {
+                Product product = new Product(
+                        rs.getInt("product_id"),
+                        rs.getString("name"),
+                        rs.getString("description"),
+                        rs.getInt("category_id"),
+                        rs.getBigDecimal("price"),
+                        rs.getTimestamp("created_at"),
+                        rs.getTimestamp("updated_at"),
+                        new ArrayList<>()
+                );
+                list.add(product);
+            }
+        } catch (SQLException e) {
+            System.err.println("Error fetching latest products: " + e.getMessage());
+            // Ghi log lỗi hoặc xử lý lỗi theo logic của ứng dụng
+            return Collections.emptyList(); // Trả về danh sách rỗng
+        }
+
+        return list;
+    }
+    
+    //get list product per page price low to high
+    public List<Product> getProductsPerPagePriceAsc(int page, int productsPerPage) {
+        List<Product> list = new ArrayList<>();
+        int start = (page - 1) * productsPerPage;
+
+        try {
+            String sql = "SELECT p.product_id, p.name, p.description, p.category_id, p.price, p.created_at, p.updated_at"
+                    + " FROM Products p\n"
+                    + "ORDER BY p.price ASC\n"
+                    + "OFFSET ? ROWS\n"
+                    + "FETCH NEXT ? ROWS ONLY;";
+            PreparedStatement statement = connection.prepareStatement(sql);
+            statement.setInt(1, start);
+            statement.setInt(2, productsPerPage);
+            ResultSet rs = statement.executeQuery();
+
+            while (rs.next()) {
+                Product product = new Product(
+                        rs.getInt("product_id"),
+                        rs.getString("name"),
+                        rs.getString("description"),
+                        rs.getInt("category_id"),
+                        rs.getBigDecimal("price"),
+                        rs.getTimestamp("created_at"),
+                        rs.getTimestamp("updated_at"),
+                        new ArrayList<>()
+                );
+                list.add(product);
+            }
+        } catch (SQLException e) {
+            System.err.println("Error fetching latest products: " + e.getMessage());
+            // Ghi log lỗi hoặc xử lý lỗi theo logic của ứng dụng
+            return Collections.emptyList(); // Trả về danh sách rỗng
+        }
+
+        return list;
+    }
+    
     //get list product per page
     public List<Product> getProductsPerPageByCate(int page, int productsPerPage, int cid) {
         List<Product> list = new ArrayList<>();
@@ -182,9 +352,169 @@ public class GetProductDAO extends DBContext {
             statement.setInt(2, start);
             statement.setInt(3, productsPerPage);
             ResultSet rs = statement.executeQuery();
-            
+
             while (rs.next()) {
-                Product product = new Product( 
+                Product product = new Product(
+                        rs.getInt("product_id"),
+                        rs.getString("name"),
+                        rs.getString("description"),
+                        rs.getInt("category_id"),
+                        rs.getBigDecimal("price"),
+                        rs.getTimestamp("created_at"),
+                        rs.getTimestamp("updated_at"),
+                        new ArrayList<>()
+                );
+                list.add(product);
+            }
+        } catch (SQLException e) {
+            System.err.println("Error fetching latest products: " + e.getMessage());
+            // Ghi log lỗi hoặc xử lý lỗi theo logic của ứng dụng
+            return Collections.emptyList(); // Trả về danh sách rỗng
+        }
+
+        return list;
+    }
+    
+    //get list product per page newest
+    public List<Product> getProductsPerPageByCateNewest(int page, int productsPerPage, int cid) {
+        List<Product> list = new ArrayList<>();
+        int start = (page - 1) * productsPerPage;
+
+        try {
+            String sql = "SELECT p.product_id, p.name, p.description, p.category_id, p.price, p.created_at, p.updated_at"
+                    + " FROM Products p\n"
+                    + "Where p.category_id = ?\n"
+                    + "ORDER BY p.created_at DESC\n"
+                    + "OFFSET ? ROWS\n"
+                    + "FETCH NEXT ? ROWS ONLY ;";
+            PreparedStatement statement = connection.prepareStatement(sql);
+            statement.setInt(1, cid);
+            statement.setInt(2, start);
+            statement.setInt(3, productsPerPage);
+            ResultSet rs = statement.executeQuery();
+
+            while (rs.next()) {
+                Product product = new Product(
+                        rs.getInt("product_id"),
+                        rs.getString("name"),
+                        rs.getString("description"),
+                        rs.getInt("category_id"),
+                        rs.getBigDecimal("price"),
+                        rs.getTimestamp("created_at"),
+                        rs.getTimestamp("updated_at"),
+                        new ArrayList<>()
+                );
+                list.add(product);
+            }
+        } catch (SQLException e) {
+            System.err.println("Error fetching latest products: " + e.getMessage());
+            // Ghi log lỗi hoặc xử lý lỗi theo logic của ứng dụng
+            return Collections.emptyList(); // Trả về danh sách rỗng
+        }
+
+        return list;
+    }
+
+    //get list product per page oldest
+    public List<Product> getProductsPerPageByCateOldest(int page, int productsPerPage, int cid) {
+        List<Product> list = new ArrayList<>();
+        int start = (page - 1) * productsPerPage;
+
+        try {
+            String sql = "SELECT p.product_id, p.name, p.description, p.category_id, p.price, p.created_at, p.updated_at"
+                    + " FROM Products p\n"
+                    + "Where p.category_id = ?\n"
+                    + "ORDER BY p.created_at ASC\n"
+                    + "OFFSET ? ROWS\n"
+                    + "FETCH NEXT ? ROWS ONLY ;";
+            PreparedStatement statement = connection.prepareStatement(sql);
+            statement.setInt(1, cid);
+            statement.setInt(2, start);
+            statement.setInt(3, productsPerPage);
+            ResultSet rs = statement.executeQuery();
+
+            while (rs.next()) {
+                Product product = new Product(
+                        rs.getInt("product_id"),
+                        rs.getString("name"),
+                        rs.getString("description"),
+                        rs.getInt("category_id"),
+                        rs.getBigDecimal("price"),
+                        rs.getTimestamp("created_at"),
+                        rs.getTimestamp("updated_at"),
+                        new ArrayList<>()
+                );
+                list.add(product);
+            }
+        } catch (SQLException e) {
+            System.err.println("Error fetching latest products: " + e.getMessage());
+            // Ghi log lỗi hoặc xử lý lỗi theo logic của ứng dụng
+            return Collections.emptyList(); // Trả về danh sách rỗng
+        }
+
+        return list;
+    }
+    
+    //get list product per page price high to low
+    public List<Product> getProductsPerPageByCatePriceDesc(int page, int productsPerPage, int cid) {
+        List<Product> list = new ArrayList<>();
+        int start = (page - 1) * productsPerPage;
+
+        try {
+            String sql = "SELECT p.product_id, p.name, p.description, p.category_id, p.price, p.created_at, p.updated_at"
+                    + " FROM Products p\n"
+                    + "Where p.category_id = ?\n"
+                    + "ORDER BY p.price DESC\n"
+                    + "OFFSET ? ROWS\n"
+                    + "FETCH NEXT ? ROWS ONLY ;";
+            PreparedStatement statement = connection.prepareStatement(sql);
+            statement.setInt(1, cid);
+            statement.setInt(2, start);
+            statement.setInt(3, productsPerPage);
+            ResultSet rs = statement.executeQuery();
+
+            while (rs.next()) {
+                Product product = new Product(
+                        rs.getInt("product_id"),
+                        rs.getString("name"),
+                        rs.getString("description"),
+                        rs.getInt("category_id"),
+                        rs.getBigDecimal("price"),
+                        rs.getTimestamp("created_at"),
+                        rs.getTimestamp("updated_at"),
+                        new ArrayList<>()
+                );
+                list.add(product);
+            }
+        } catch (SQLException e) {
+            System.err.println("Error fetching latest products: " + e.getMessage());
+            // Ghi log lỗi hoặc xử lý lỗi theo logic của ứng dụng
+            return Collections.emptyList(); // Trả về danh sách rỗng
+        }
+
+        return list;
+    }
+    
+    //get list product per page price low to high
+    public List<Product> getProductsPerPageByCatePriceAsc(int page, int productsPerPage, int cid) {
+        List<Product> list = new ArrayList<>();
+        int start = (page - 1) * productsPerPage;
+
+        try {
+            String sql = "SELECT p.product_id, p.name, p.description, p.category_id, p.price, p.created_at, p.updated_at"
+                    + " FROM Products p\n"
+                    + "Where p.category_id = ?\n"
+                    + "ORDER BY p.price ASC\n"
+                    + "OFFSET ? ROWS\n"
+                    + "FETCH NEXT ? ROWS ONLY ;";
+            PreparedStatement statement = connection.prepareStatement(sql);
+            statement.setInt(1, cid);
+            statement.setInt(2, start);
+            statement.setInt(3, productsPerPage);
+            ResultSet rs = statement.executeQuery();
+
+            while (rs.next()) {
+                Product product = new Product(
                         rs.getInt("product_id"),
                         rs.getString("name"),
                         rs.getString("description"),

@@ -3,7 +3,7 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/Servlet.java to edit this template
  */
 package Controller;
-
+    
 import dal.CategoryDAO;
 import dal.GetProductDAO;
 import java.io.IOException;
@@ -33,6 +33,7 @@ public class ShopServlet extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         // init size
+//          int[] sizes;
 //        int size = 0;
 //        if (request.getParameter("size")!= null) {
 //            size = Integer.parseInt(request.getParameter("size"));
@@ -43,10 +44,10 @@ public class ShopServlet extends HttpServlet {
             cid = Integer.parseInt(request.getParameter("cid"));
         }
 //        //init sort name
-//        String sort = "";
-//        if (request.getParameter("sort") != null) {
-//            sort = request.getParameter("sort");
-//        }
+        int sort = 0;
+        if (request.getParameter("sort") != null) {
+            sort = Integer.parseInt(request.getParameter("sort"));
+        }
 //        // init price from
 //        int priceFrom = 0;
 //        if (request.getParameter("priceFrom") != null) {
@@ -65,14 +66,33 @@ public class ShopServlet extends HttpServlet {
         }
         List<Product> products;
         GetProductDAO gpd = new GetProductDAO();
+        int totalProducts;
         if (cid != 0) {
-            products = gpd.getProductsPerPageByCate(page, PRODUCTS_PER_PAGE,cid);
+            totalProducts = gpd.getTotalProductsByCate(cid);
+            switch (sort) {
+                case 0 -> products = gpd.getProductsPerPageByCate(page, PRODUCTS_PER_PAGE,cid);
+                case 1 -> products = gpd.getProductsPerPageByCateNewest(page, PRODUCTS_PER_PAGE,cid);
+                case 2 -> products = gpd.getProductsPerPageByCateOldest(page, PRODUCTS_PER_PAGE,cid);
+                case 3 -> products = gpd.getProductsPerPageByCate(page, PRODUCTS_PER_PAGE,cid);
+                case 4 -> products = gpd.getProductsPerPageByCatePriceDesc(page, PRODUCTS_PER_PAGE,cid);
+                case 5 -> products = gpd.getProductsPerPageByCatePriceAsc(page, PRODUCTS_PER_PAGE,cid);
+                default -> throw new AssertionError();
+            }
         } else {
-            products = gpd.getProductsPerPage(page, PRODUCTS_PER_PAGE);
+            totalProducts = gpd.getTotalProducts();
+            switch (sort) {
+                case 0 -> products = gpd.getProductsPerPage(page, PRODUCTS_PER_PAGE);
+                case 1 -> products = gpd.getProductsPerPageNewest(page, PRODUCTS_PER_PAGE);
+                case 2 -> products = gpd.getProductsPerPageOldest(page, PRODUCTS_PER_PAGE);
+                case 3 -> products = gpd.getProductsPerPage(page, PRODUCTS_PER_PAGE);
+                case 4 -> products = gpd.getProductsPerPagePriceDesc(page, PRODUCTS_PER_PAGE);
+                case 5 -> products = gpd.getProductsPerPagePriceAsc(page, PRODUCTS_PER_PAGE);
+                default -> throw new AssertionError();
+            } 
         }
         gpd.fetchImagesForProducts(products);
 
-        int totalProducts = gpd.getTotalProducts();
+        
         int totalPages = (int) Math.ceil((double) totalProducts / PRODUCTS_PER_PAGE);
         CategoryDAO cd = new CategoryDAO();
         List<Category> listCat = cd.getALl();
@@ -84,9 +104,10 @@ public class ShopServlet extends HttpServlet {
         request.setAttribute("categoryMap", categoryMap);
         request.setAttribute("dataPro", products);
         request.setAttribute("currentPage", page);
+        request.setAttribute("totalProducts", totalProducts);
 //        request.setAttribute("size", size);
         request.setAttribute("cid", cid);
-//        request.setAttribute("sort", sort);
+        request.setAttribute("sort", sort);
 //        request.setAttribute("priceFrom", priceFrom);
 //        request.setAttribute("priceTo", priceTo);
         request.setAttribute("totalPages", totalPages);

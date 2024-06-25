@@ -34,6 +34,25 @@
             .clicked-category {
                 color: #dbcc8f;
             }
+            .hidden {
+                display: none;
+            }
+            .size-item {
+                border: 1px solid #ccc;
+                padding: 10px;
+                margin: 5px;
+                width: 25%;
+                text-align: center;
+                border-radius: 5px;
+            }
+            .size-item.default {
+                background-color: white;
+                color: black;
+            }
+            .size-item.highlight {
+                background-color: black;
+                color: white;
+            }
         </style>
     </head>
     <body class="goto-here">
@@ -91,10 +110,10 @@
         <div class="hero-wrap hero-bread" style="background-color:#fff; padding: 2em 0">
             <div class="container">
                 <div class="row no-gutters slider-text align-items-center justify-content-center">
-<!--                    <div class="col-md-9 ftco-animate text-center">
-                        <p class="breadcrumbs"><span class="mr-2"><a href="index">Home</a></span> <span>Shop</span></p>
-                        <h1 class="mb-0 bread">Shop</h1>
-                    </div>-->
+                    <!--                    <div class="col-md-9 ftco-animate text-center">
+                                            <p class="breadcrumbs"><span class="mr-2"><a href="index">Home</a></span> <span>Shop</span></p>
+                                            <h1 class="mb-0 bread">Shop</h1>
+                                        </div>-->
                 </div>
             </div>
         </div>
@@ -154,11 +173,11 @@
                                         </li>
                                         <c:forEach var="i" begin="1" end="${totalPages}">
                                             <li class="${i == currentPage ? 'active' : ''}">
-                                                <a href="shop?page=${i}&cid=${param.cid != null ? param.cid : 0}">${i}</a>
+                                                <a href="shop?page=${i}&cid=${param.cid != null ? param.cid : 0}&sort=${param.sort != null ? param.sort : 0}">${i}</a>
                                             </li>
                                         </c:forEach>
                                         <li>        
-                                            <a href="shop?page=${currentPage < totalPages ? currentPage + 1 : totalPages}&cid=${param.cid != null ? param.cid : 0}">&gt;</a>
+                                            <a href="shop?page=${currentPage < totalPages ? currentPage + 1 : totalPages}&cid=${param.cid != null ? param.cid : 0}&sort=${param.sort != null ? param.sort : 0}">&gt;</a>
                                         </li>
                                     </ul>
 
@@ -169,7 +188,15 @@
                     <div class="col-md-4 col-lg-2">
                         <div class="sidebar">
                             <div class="sidebar-box-2">
-                                <h2 class="heading" >All Shoes</h2>
+                                <c:choose>
+                                    <c:when test="${requestScope.cid != 0}">
+                                        <h2 class="heading" >${categoryMap[cid]} (${requestScope.totalProducts})</h2>
+                                    </c:when>
+                                    <c:otherwise>
+                                        <h2 class="heading" >All Shoes (${requestScope.totalProducts})</h2>
+                                    </c:otherwise>
+                                </c:choose>
+
                                 <div class="fancy-collapse-panel">
                                     <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
                                         <div class="panel panel-default">
@@ -182,6 +209,11 @@
                                             <div id="collapseOne" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingOne">
                                                 <div class="panel-body">
                                                     <ul>
+                                                        <c:if test="${requestScope.cid != 0}">
+                                                            <li>
+                                                                <a href="shop">All</a>
+                                                            </li>
+                                                        </c:if>
                                                         <c:forEach var="entry" items="${categoryMap}">
                                                             <li>
                                                                 <a href="shop?cid=${entry.key}"
@@ -202,11 +234,11 @@
                                             <div id="collapseTwo" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingTwo">
                                                 <div class="panel-body">
                                                     <ul>
-                                                        <li><a href="#">Newest</a></li>
-                                                        <li><a href="#">Oldest</a></li>
-                                                        <li><a href="#">Top Seller</a></li>
-                                                        <li><a href="#">Price(High - Low)</a></li>
-                                                        <li><a href="#">Price(Low - High)</a></li>
+                                                        <li><a href="shop?sort=1&cid=${param.cid != null ? param.cid : 0}">Newest</a></li>
+                                                        <li><a href="shop?sort=2&cid=${param.cid != null ? param.cid : 0}">Oldest</a></li>
+                                                        <li><a href="shop?sort=3&cid=${param.cid != null ? param.cid : 0}">Top Seller</a></li>
+                                                        <li><a href="shop?sort=4&cid=${param.cid != null ? param.cid : 0}">Price(High - Low)</a></li>
+                                                        <li><a href="shop?sort=5&cid=${param.cid != null ? param.cid : 0}">Price(Low - High)</a></li>
                                                     </ul>
                                                 </div>
                                             </div>
@@ -218,63 +250,19 @@
                                                     </a>
                                                 </h4>
                                             </div>
-                                            <div id="collapseThree" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingThree">
+                                            <div id="collapseThree" class="panel-collapse collapse show" role="tabpanel" aria-labelledby="headingThree">
                                                 <div class="panel-body">
-
-                                                    <ul style="list-style: none; display: flex; flex-wrap: wrap; width: 100%; margin: 0; padding: 0;">
-                                                        <li style="border: 1px solid #ccc; padding: 10px; margin: 5px; width: 25%; text-align: center; border-radius: 5px;">
-                                                            <a href="#">3</a>
-                                                        </li>
-                                                        <li style="border: 1px solid #ccc; padding: 10px; margin: 5px; width: 25%; text-align: center; border-radius: 5px;">
-                                                            <a href="#">4</a>
-                                                        </li>
-                                                        <li style="border: 1px solid #ccc; padding: 10px; margin: 5px; width: 25%; text-align: center; border-radius: 5px;">
-                                                            <a href="#">5</a>
-                                                        </li>
-                                                        <li style="border: 1px solid #ccc; padding: 10px; margin: 5px; width: 25%; text-align: center; border-radius: 5px;">
-                                                            <a href="#">6</a>
-                                                        </li>
-                                                        <li style="border: 1px solid #ccc; padding: 10px; margin: 5px; width: 25%; text-align: center; border-radius: 5px;">
-                                                            <a href="#">7</a>
-                                                        </li>
-                                                        <li style="border: 1px solid #ccc; padding: 10px; margin: 5px; width: 25%; text-align: center; border-radius: 5px;">
-                                                            <a href="#">8</a>
-                                                        </li>
-                                                        <li style="border: 1px solid #ccc; padding: 10px; margin: 5px; width: 25%; text-align: center; border-radius: 5px;">
-                                                            <a href="#">9</a>
-                                                        </li>
-                                                        <li style="border: 1px solid #ccc; padding: 10px; margin: 5px; width: 25%; text-align: center; border-radius: 5px;">
-                                                            <a href="#">10</a>
-                                                        </li>
-                                                        <li style="border: 1px solid #ccc; padding: 10px; margin: 5px; width: 25%; text-align: center; border-radius: 5px;">
-                                                            <a href="#">11</a>
-                                                        </li>
-                                                        <li style="border: 1px solid #ccc; padding: 10px; margin: 5px; width: 25%; text-align: center; border-radius: 5px;">
-                                                            <a href="#">12</a>
-                                                        </li>
-                                                        <li style="border: 1px solid #ccc; padding: 10px; margin: 5px; width: 25%; text-align: center; border-radius: 5px;">
-                                                            <a href="#">13</a>
-                                                        </li>
-                                                        <li style="border: 1px solid #ccc; padding: 10px; margin: 5px; width: 25%; text-align: center; border-radius: 5px;">
-                                                            <a href="#">14</a>
-                                                        </li>
-                                                        <li style="border: 1px solid #ccc; padding: 10px; margin: 5px; width: 25%; text-align: center; border-radius: 5px;">
-                                                            <a href="#">15</a>
-                                                        </li>
-                                                        <li style="border: 1px solid #ccc; padding: 10px; margin: 5px; width: 25%; text-align: center; border-radius: 5px;">
-                                                            <a href="#">16</a>
-                                                        </li>
-                                                        <li style="border: 1px solid #ccc; padding: 10px; margin: 5px; width: 25%; text-align: center; border-radius: 5px;">
-                                                            <a href="#">17</a>
-                                                        </li>
-                                                        <li style="border: 1px solid #ccc; padding: 10px; margin: 5px; width: 25%; text-align: center; border-radius: 5px;">
-                                                            <a href="#">18</a>
-                                                        </li>
+                                                    <ul id="sizeList" style="list-style: none; display: flex; flex-wrap: wrap; width: 100%; margin: 0; padding: 0;">
+                                                        <c:forEach var="i" begin="3" end="18">
+                                                            <li class="size-item default" style="border: 1px solid #ccc; padding: 10px; margin: 5px; width: 25%; text-align: center; border-radius: 5px;">
+                                                                <a href="#">${i}</a>
+                                                            </li>
+                                                        </c:forEach>    
                                                     </ul>
+                                                    <button id="showMoreBtn" onclick="toggleList()" style="margin-top: 10px;">Show More</button>
                                                 </div>
                                             </div>
                                         </div>
-
                                     </div>
                                 </div>
                             </div>
@@ -436,7 +424,62 @@
         <!-- loader -->
         <div id="ftco-loader" class="show fullscreen"><svg class="circular" width="48px" height="48px"><circle class="path-bg" cx="24" cy="24" r="22" fill="none" stroke-width="4" stroke="#eeeeee"/><circle class="path" cx="24" cy="24" r="22" fill="none" stroke-width="4" stroke-miterlimit="10" stroke="#F96D00"/></svg></div>
 
+        <script>
+            function updateColor() {
+                var items = document.querySelectorAll('.size-item');
 
+                items.forEach(function (item) {
+                    var link = item.querySelector('a');
+                    if (link.textContent.trim() === '${i}') { // Thay '${i}' bằng giá trị cụ thể
+                        item.classList.remove('default');
+                        item.classList.add('highlight');
+                    } else {
+                        item.classList.remove('highlight');
+                        item.classList.add('default');
+                    }
+                });
+            }
+
+            // Gọi hàm khi tài liệu được tải hoặc khi cần cập nhật
+            window.onload = updateColor;
+
+
+            function toggleList() {
+                var sizeItems = document.querySelectorAll('#sizeList .size-item');
+                var showMoreBtn = document.getElementById('showMoreBtn');
+                var isExpanded = showMoreBtn.getAttribute('data-expanded') === 'true';
+
+                if (isExpanded) {
+                    // Hide extra items
+                    sizeItems.forEach(function (item, index) {
+                        if (index >= 5) {
+                            item.classList.add('hidden');
+                        }
+                    });
+                    showMoreBtn.textContent = 'Show More';
+                    showMoreBtn.setAttribute('data-expanded', 'false');
+                } else {
+                    // Show all items
+                    sizeItems.forEach(function (item) {
+                        item.classList.remove('hidden');
+                    });
+                    showMoreBtn.textContent = 'Show Less';
+                    showMoreBtn.setAttribute('data-expanded', 'true');
+                }
+            }
+
+// Initially hide items beyond the first 5
+            window.onload = function () {
+                var sizeItems = document.querySelectorAll('#sizeList .size-item');
+                sizeItems.forEach(function (item, index) {
+                    if (index >= 5) {
+                        item.classList.add('hidden');
+                    }
+                });
+                document.getElementById('showMoreBtn').setAttribute('data-expanded', 'false');
+            };
+
+        </script>
         <script src="js/jquery.min.js"></script>
         <script src="js/jquery-migrate-3.0.1.min.js"></script>
         <script src="js/popper.min.js"></script>
