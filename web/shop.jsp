@@ -38,20 +38,40 @@
                 display: none;
             }
             .size-item {
-                border: 1px solid #ccc;
-                padding: 10px;
                 margin: 5px;
                 width: 25%;
                 text-align: center;
                 border-radius: 5px;
             }
-            .size-item.default {
-                background-color: white;
+            input[type="checkbox"] {
+                display: none;
+                margin-top: 0;
+                vertical-align: top;
+                width: 18px;
+                height: 18px;
+                /* -webkit-appearance: none; */
+                -moz-appearance: none;
+                appearance: none;
+                position: relative;
+                margin: 0 1rem 0 0;
+                cursor: pointer;
+                outline: none !important;
+                border: none !important;
+                box-sizing: border-box;
+                padding: 0;
+            }
+            label {
+                display: inline-block;
+                background-color: #f1f0f1;
+                margin-right: 15px;
+                padding: 5px 15px;
+                border-radius: 10px;
+                cursor: pointer;
                 color: black;
             }
-            .size-item.highlight {
-                background-color: black;
-                color: white;
+            input[type="checkbox"]:checked + label {
+                background-color: #dbcc8f; /* Màu nền khi checkbox được checked */
+                color: white; /* Màu chữ khi checkbox được checked */
             }
         </style>
     </head>
@@ -252,14 +272,22 @@
                                             </div>
                                             <div id="collapseThree" class="panel-collapse collapse show" role="tabpanel" aria-labelledby="headingThree">
                                                 <div class="panel-body">
-                                                    <ul id="sizeList" style="list-style: none; display: flex; flex-wrap: wrap; width: 100%; margin: 0; padding: 0;">
-                                                        <c:forEach var="i" begin="3" end="18">
-                                                            <li class="size-item default" style="border: 1px solid #ccc; padding: 10px; margin: 5px; width: 25%; text-align: center; border-radius: 5px;">
-                                                                <a href="#">${i}</a>
-                                                            </li>
-                                                        </c:forEach>    
-                                                    </ul>
-                                                    <button id="showMoreBtn" onclick="toggleList()" style="margin-top: 10px;">Show More</button>
+                                                    <form action="shop">
+                                                        <ul id="sizeList" style="list-style: none; display: flex; flex-wrap: wrap; width: 100%; margin: 0; padding: 0;">
+                                                            <c:forEach var="i" begin="3" end="18">
+                                                                <li class="size-item default" > 
+                                                                    <input type="checkbox" id="id${i}" name="size" value="${i}" onchange="this.form.submit()" 
+                                                                           <c:forEach items="${requestScope.size}" var="l">
+                                                                               <c:if test="${l==i}">checked</c:if>
+                                                                           </c:forEach> >
+                                                                    <label for="id${i}">${i}</label>
+                                                                </li>
+                                                            </c:forEach>    
+                                                        </ul>
+                                                        <input type="hidden" name="cid" value="${param.cid != null ? param.cid : 0}">
+                                                        <input type="hidden" name="sort" value="${param.sort != null ? param.sort : 0}">
+                                                    </form>
+                                                    <button id="showMoreBtn" onclick="toggleList()" style="margin-top: 10px; border: 1px solid #ccc; border-radius: 5px">Show More</button>
                                                 </div>
                                             </div>
                                         </div>
@@ -425,24 +453,6 @@
         <div id="ftco-loader" class="show fullscreen"><svg class="circular" width="48px" height="48px"><circle class="path-bg" cx="24" cy="24" r="22" fill="none" stroke-width="4" stroke="#eeeeee"/><circle class="path" cx="24" cy="24" r="22" fill="none" stroke-width="4" stroke-miterlimit="10" stroke="#F96D00"/></svg></div>
 
         <script>
-            function updateColor() {
-                var items = document.querySelectorAll('.size-item');
-
-                items.forEach(function (item) {
-                    var link = item.querySelector('a');
-                    if (link.textContent.trim() === '${i}') { // Thay '${i}' bằng giá trị cụ thể
-                        item.classList.remove('default');
-                        item.classList.add('highlight');
-                    } else {
-                        item.classList.remove('highlight');
-                        item.classList.add('default');
-                    }
-                });
-            }
-
-            // Gọi hàm khi tài liệu được tải hoặc khi cần cập nhật
-            window.onload = updateColor;
-
 
             function toggleList() {
                 var sizeItems = document.querySelectorAll('#sizeList .size-item');
