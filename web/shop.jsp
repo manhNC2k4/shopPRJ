@@ -25,7 +25,7 @@
 
         <link rel="stylesheet" href="css/bootstrap-datepicker.css">
         <link rel="stylesheet" href="css/jquery.timepicker.css">
-
+        <link rel="stylesheet" href="ashion/css/jquery-ui.min.css" type="text/css">
 
         <link rel="stylesheet" href="css/flaticon.css">
         <link rel="stylesheet" href="css/icomoon.css">
@@ -73,6 +73,66 @@
                 background-color: #dbcc8f; /* Màu nền khi checkbox được checked */
                 color: white; /* Màu chữ khi checkbox được checked */
             }
+            .filter-range-wrap .range-slider .price-input {
+                position: relative;
+            }
+
+            .filter-range-wrap .range-slider .price-input p {
+                font-size: 16px;
+                color: #0d0d0d;
+                font-weight: 500;
+                display: inline-block;
+                margin-bottom: 0;
+            }
+
+            .filter-range-wrap .range-slider .price-input:after {
+                position: absolute;
+                left: 93px;
+                top: 15px;
+                height: 1px;
+                width: 5px;
+                background: #000;
+                content: "";
+            }
+
+            .filter-range-wrap .range-slider .price-input input {
+                font-size: 16px;
+                background: #f8f9fa;
+                color: #0d0d0d;
+                max-width: 26%;
+                border: none;
+            }
+
+            .filter-range-wrap .range-slider .price-input input:nth-child(1) {
+                margin-right: 28px;
+            }
+
+            .filter-range-wrap .price-range {
+                border-radius: 0;
+                margin-bottom: 28px;
+            }
+
+            .filter-range-wrap .price-range.ui-widget-content {
+                border: none;
+                background: rgba(0, 0, 0, 0.1);
+                height: 5px;
+            }
+
+            .filter-range-wrap .price-range.ui-widget-content .ui-slider-handle {
+                height: 14px;
+                width: 14px;
+                border-radius: 50%;
+                background: #dbcc8f;
+                border: none;
+                outline: none;
+                cursor: pointer;
+            }
+
+            .filter-range-wrap .price-range .ui-slider-range {
+                background: #dbcc8f;
+                border-radius: 0;
+            }
+
         </style>
     </head>
     <body class="goto-here">
@@ -296,24 +356,17 @@
                             </div>
                             <div class="sidebar-box-2">
                                 <h2 class="heading">Price Range</h2>
-                                <form method="post" class="colorlib-form-2">
-                                    <div class="row">
-                                        <div class="col-md-12">
-                                            <div class="form-group">
-                                                <label for="guests">Price from:</label>
-                                                <div class="form-field">
-                                                    <i class="icon icon-arrow-down3"></i>
-                                                    <input type="number" name="people" id="people" class="form-control" style="padding-right: 10px">
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="col-md-12">
-                                            <div class="form-group">
-                                                <label for="guests">Price to:</label>
-                                                <div class="form-field">
-                                                    <i class="icon icon-arrow-down3"></i>
-                                                    <input type="number" name="people" id="people" class="form-control" style="padding-right: 10px">
-                                                </div>
+                                <form class="colorlib-form-2" action="shop">
+                                    <div class="filter-range-wrap">
+                                        <div class="price-range ui-slider ui-corner-all ui-slider-horizontal ui-widget ui-widget-content"
+                                             data-min="40" data-max="500"></div>
+                                        <div class="range-slider">
+                                            <div class="price-input">
+                                                <button class="btn btn-primary btn-outline-secondary" type="submit">Filter</button>
+                                                <input type="text" name="priceFrom" id="minamount">
+                                                <input type="text" name="priceTo" id="maxamount">
+                                                <input type="hidden" name="cid" value="${param.cid != null ? param.cid : 0}">
+                                                <input type="hidden" name="sort" value="${param.sort != null ? param.sort : 0}">
                                             </div>
                                         </div>
                                     </div>
@@ -491,6 +544,18 @@
 
         </script>
         <script src="js/jquery.min.js"></script>
+
+        <script src="ashion/js/jquery-3.3.1.min.js"></script>
+        <script src="ashion/js/bootstrap.min.js"></script>
+        <script src="ashion/js/jquery.magnific-popup.min.js"></script>
+        <script src="ashion/js/jquery-ui.min.js"></script>
+        <script src="ashion/js/mixitup.min.js"></script>
+        <script src="ashion/js/jquery.countdown.min.js"></script>
+        <script src="ashion/js/jquery.slicknav.js"></script>
+        <script src="ashion/js/owl.carousel.min.js"></script>
+        <script src="ashion/js/jquery.nicescroll.min.js"></script>
+        <script src="ashion/js/main.js"></script>
+
         <script src="js/jquery-migrate-3.0.1.min.js"></script>
         <script src="js/popper.min.js"></script>
         <script src="js/bootstrap.min.js"></script>

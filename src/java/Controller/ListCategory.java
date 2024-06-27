@@ -66,7 +66,7 @@ public class ListCategory extends HttpServlet {
         List<Category> listCat = cd.getALl();
         Map<Integer, Integer> categoryMap = new HashMap<>();
         for (Category category : listCat) {
-            int count = gpd.getTotalProductsByCate(category.getCategory_id());
+            int count = gpd.getTotalProductsByCateNoPrice(category.getCategory_id());
             categoryMap.put(category.getCategory_id(), count);
         }
         System.out.println("Category Map: " + categoryMap);
