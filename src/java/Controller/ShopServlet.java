@@ -54,79 +54,87 @@ public class ShopServlet extends HttpServlet {
 //        // init price from
         GetProductDAO gpd = new GetProductDAO();
         int priceFrom = gpd.getMinPrice();
-        if (request.getParameter("priceFrom") != null) {
-            priceFrom = Integer.parseInt(request.getParameter("priceFrom"));
-        }
+
 //        // init price to
         int priceTo = gpd.getMaxPrice();
-        if (request.getParameter("priceTo") != null) {
-            priceTo = Integer.parseInt(request.getParameter("priceTo"));
-        }
 
         System.out.println(priceFrom + " " + priceTo);
-        
+
         //init page
         int page = 1;
         if (request.getParameter("page") != null) {
-            Object sizesFromSession = session.getAttribute("sizes");
-            if (sizesFromSession instanceof Object[]) {
-                Object[] objectArray = (Object[]) sizesFromSession;
-                String[] stringArray = new String[objectArray.length];
-                int i = 0;
-                for (Object obj : objectArray) {
-                    if (obj instanceof String) {
-                        stringArray[i] = (String) obj;
-                        i++;
-                    }
-                }
-                sizes = Arrays.copyOf(stringArray, i);
-            } else if (sizesFromSession instanceof String[]) {
-                sizes = (String[]) sizesFromSession;
-            } else {
-                ArrayList<String> sizesList = (ArrayList<String>) sizesFromSession;
-                sizes = sizesList.toArray(new String[sizesList.size()]);
-            }
+            sizes = (String[]) session.getAttribute("sizes");
+            priceFrom = (Integer) session.getAttribute("priceFrom");
+            priceTo = (Integer) session.getAttribute("priceTo");
             page = Integer.parseInt(request.getParameter("page"));
+        } else if (request.getParameterValues("nosize") != null) {
+            if (request.getParameterValues("size") != null) {
+                sizes = request.getParameterValues("size");
+                priceFrom = (Integer) session.getAttribute("priceFrom");
+                priceTo = (Integer) session.getAttribute("priceTo");
+            } else {
+                sizes = null;
+                priceFrom = (Integer) session.getAttribute("priceFrom");
+                priceTo = (Integer) session.getAttribute("priceTo");
+            }
+        } else if (request.getParameter("priceFrom") != null) {
+            sizes = (String[]) session.getAttribute("sizes");
+            String fstr = request.getParameter("priceFrom");
+            String kq = fstr.substring(1);
+            priceFrom = Integer.parseInt(kq);
+            String fstr1 = request.getParameter("priceTo");
+            String kq1 = fstr1.substring(1);
+            priceTo = Integer.parseInt(kq1);
         } else {
-            sizes = request.getParameterValues("size");
+            if (session.getAttribute("sizes") == null) {
+                sizes = null;
+            } else {
+                sizes = (String[]) session.getAttribute("sizes");
+            }
+            if (session.getAttribute("priceFrom") != null) {
+                priceFrom = (Integer) session.getAttribute("priceFrom");
+            }
+            if (session.getAttribute("priceTo") != null) {
+                priceTo = (Integer) session.getAttribute("priceTo");
+            }
         }
         List<Product> products;
 
         int totalProducts;
         if (sizes == null) {
             if (cid != 0) {
-                totalProducts = gpd.getTotalProductsByCate(cid,new BigDecimal(priceFrom),new BigDecimal(priceTo));
+                totalProducts = gpd.getTotalProductsByCate(cid, new BigDecimal(priceFrom), new BigDecimal(priceTo));
                 switch (sort) {
                     case 0 ->
-                        products = gpd.getProductsPerPageByCate(page, PRODUCTS_PER_PAGE, cid,new BigDecimal(priceFrom),new BigDecimal(priceTo));
+                        products = gpd.getProductsPerPageByCate(page, PRODUCTS_PER_PAGE, cid, new BigDecimal(priceFrom), new BigDecimal(priceTo));
                     case 1 ->
-                        products = gpd.getProductsPerPageByCateNewest(page, PRODUCTS_PER_PAGE, cid,new BigDecimal(priceFrom),new BigDecimal(priceTo));
+                        products = gpd.getProductsPerPageByCateNewest(page, PRODUCTS_PER_PAGE, cid, new BigDecimal(priceFrom), new BigDecimal(priceTo));
                     case 2 ->
-                        products = gpd.getProductsPerPageByCateOldest(page, PRODUCTS_PER_PAGE, cid,new BigDecimal(priceFrom),new BigDecimal(priceTo));
+                        products = gpd.getProductsPerPageByCateOldest(page, PRODUCTS_PER_PAGE, cid, new BigDecimal(priceFrom), new BigDecimal(priceTo));
                     case 3 ->
-                        products = gpd.getProductsPerPageByCate(page, PRODUCTS_PER_PAGE, cid,new BigDecimal(priceFrom),new BigDecimal(priceTo));
+                        products = gpd.getProductsPerPageByCate(page, PRODUCTS_PER_PAGE, cid, new BigDecimal(priceFrom), new BigDecimal(priceTo));
                     case 4 ->
-                        products = gpd.getProductsPerPageByCatePriceDesc(page, PRODUCTS_PER_PAGE, cid,new BigDecimal(priceFrom),new BigDecimal(priceTo));
+                        products = gpd.getProductsPerPageByCatePriceDesc(page, PRODUCTS_PER_PAGE, cid, new BigDecimal(priceFrom), new BigDecimal(priceTo));
                     case 5 ->
-                        products = gpd.getProductsPerPageByCatePriceAsc(page, PRODUCTS_PER_PAGE, cid,new BigDecimal(priceFrom),new BigDecimal(priceTo));
+                        products = gpd.getProductsPerPageByCatePriceAsc(page, PRODUCTS_PER_PAGE, cid, new BigDecimal(priceFrom), new BigDecimal(priceTo));
                     default ->
                         throw new AssertionError();
                 }
             } else {
-                totalProducts = gpd.getTotalProducts(new BigDecimal(priceFrom),new BigDecimal(priceTo));
+                totalProducts = gpd.getTotalProducts(new BigDecimal(priceFrom), new BigDecimal(priceTo));
                 switch (sort) {
                     case 0 ->
-                        products = gpd.getProductsPerPage(page, PRODUCTS_PER_PAGE,new BigDecimal(priceFrom),new BigDecimal(priceTo));
+                        products = gpd.getProductsPerPage(page, PRODUCTS_PER_PAGE, new BigDecimal(priceFrom), new BigDecimal(priceTo));
                     case 1 ->
                         products = gpd.getProductsPerPageNewest(page, PRODUCTS_PER_PAGE, new BigDecimal(priceFrom), new BigDecimal(priceTo));
                     case 2 ->
-                        products = gpd.getProductsPerPageOldest(page, PRODUCTS_PER_PAGE,new BigDecimal(priceFrom),new BigDecimal(priceTo));
+                        products = gpd.getProductsPerPageOldest(page, PRODUCTS_PER_PAGE, new BigDecimal(priceFrom), new BigDecimal(priceTo));
                     case 3 ->
-                        products = gpd.getProductsPerPage(page, PRODUCTS_PER_PAGE,new BigDecimal(priceFrom),new BigDecimal(priceTo));
+                        products = gpd.getProductsPerPage(page, PRODUCTS_PER_PAGE, new BigDecimal(priceFrom), new BigDecimal(priceTo));
                     case 4 ->
-                        products = gpd.getProductsPerPagePriceDesc(page, PRODUCTS_PER_PAGE,new BigDecimal(priceFrom),new BigDecimal(priceTo));
+                        products = gpd.getProductsPerPagePriceDesc(page, PRODUCTS_PER_PAGE, new BigDecimal(priceFrom), new BigDecimal(priceTo));
                     case 5 ->
-                        products = gpd.getProductsPerPagePriceAsc(page, PRODUCTS_PER_PAGE,new BigDecimal(priceFrom),new BigDecimal(priceTo));
+                        products = gpd.getProductsPerPagePriceAsc(page, PRODUCTS_PER_PAGE, new BigDecimal(priceFrom), new BigDecimal(priceTo));
                     default ->
                         throw new AssertionError();
                 }
@@ -140,38 +148,38 @@ public class ShopServlet extends HttpServlet {
                 }
             }
             if (cid != 0) {
-                totalProducts = gpd.getTotalProductsInSizeByCate(sizeInt, cid,new BigDecimal(priceFrom),new BigDecimal(priceTo));
+                totalProducts = gpd.getTotalProductsInSizeByCate(sizeInt, cid, new BigDecimal(priceFrom), new BigDecimal(priceTo));
                 switch (sort) {
                     case 0 ->
-                        products = gpd.getProductsPerPageByCateInSize(page, PRODUCTS_PER_PAGE, cid, sizeInt,new BigDecimal(priceFrom),new BigDecimal(priceTo));
+                        products = gpd.getProductsPerPageByCateInSize(page, PRODUCTS_PER_PAGE, cid, sizeInt, new BigDecimal(priceFrom), new BigDecimal(priceTo));
                     case 1 ->
-                        products = gpd.getProductsPerPageByCateNewestInSize(page, PRODUCTS_PER_PAGE, cid, sizeInt,new BigDecimal(priceFrom),new BigDecimal(priceTo));
+                        products = gpd.getProductsPerPageByCateNewestInSize(page, PRODUCTS_PER_PAGE, cid, sizeInt, new BigDecimal(priceFrom), new BigDecimal(priceTo));
                     case 2 ->
-                        products = gpd.getProductsPerPageByCateOldestInSize(page, PRODUCTS_PER_PAGE, cid, sizeInt,new BigDecimal(priceFrom),new BigDecimal(priceTo));
+                        products = gpd.getProductsPerPageByCateOldestInSize(page, PRODUCTS_PER_PAGE, cid, sizeInt, new BigDecimal(priceFrom), new BigDecimal(priceTo));
                     case 3 ->
-                        products = gpd.getProductsPerPageByCateInSize(page, PRODUCTS_PER_PAGE, cid, sizeInt,new BigDecimal(priceFrom),new BigDecimal(priceTo));
+                        products = gpd.getProductsPerPageByCateInSize(page, PRODUCTS_PER_PAGE, cid, sizeInt, new BigDecimal(priceFrom), new BigDecimal(priceTo));
                     case 4 ->
-                        products = gpd.getProductsPerPageByCatePriceDescInSize(page, PRODUCTS_PER_PAGE, cid, sizeInt,new BigDecimal(priceFrom),new BigDecimal(priceTo));
+                        products = gpd.getProductsPerPageByCatePriceDescInSize(page, PRODUCTS_PER_PAGE, cid, sizeInt, new BigDecimal(priceFrom), new BigDecimal(priceTo));
                     case 5 ->
-                        products = gpd.getProductsPerPageByCatePriceAscInSize(page, PRODUCTS_PER_PAGE, cid, sizeInt,new BigDecimal(priceFrom),new BigDecimal(priceTo));
+                        products = gpd.getProductsPerPageByCatePriceAscInSize(page, PRODUCTS_PER_PAGE, cid, sizeInt, new BigDecimal(priceFrom), new BigDecimal(priceTo));
                     default ->
                         throw new AssertionError();
                 }
             } else {
-                totalProducts = gpd.getTotalProductsInSize(sizeInt,new BigDecimal(priceFrom),new BigDecimal(priceTo));
+                totalProducts = gpd.getTotalProductsInSize(sizeInt, new BigDecimal(priceFrom), new BigDecimal(priceTo));
                 switch (sort) {
                     case 0 ->
-                        products = gpd.getProductsPerPageInSize(page, PRODUCTS_PER_PAGE, sizeInt,new BigDecimal(priceFrom),new BigDecimal(priceTo));
+                        products = gpd.getProductsPerPageInSize(page, PRODUCTS_PER_PAGE, sizeInt, new BigDecimal(priceFrom), new BigDecimal(priceTo));
                     case 1 ->
-                        products = gpd.getProductsPerPageNewestInSize(page, PRODUCTS_PER_PAGE, sizeInt,new BigDecimal(priceFrom),new BigDecimal(priceTo));
+                        products = gpd.getProductsPerPageNewestInSize(page, PRODUCTS_PER_PAGE, sizeInt, new BigDecimal(priceFrom), new BigDecimal(priceTo));
                     case 2 ->
-                        products = gpd.getProductsPerPageOldestInSize(page, PRODUCTS_PER_PAGE, sizeInt,new BigDecimal(priceFrom),new BigDecimal(priceTo));
+                        products = gpd.getProductsPerPageOldestInSize(page, PRODUCTS_PER_PAGE, sizeInt, new BigDecimal(priceFrom), new BigDecimal(priceTo));
                     case 3 ->
-                        products = gpd.getProductsPerPageInSize(page, PRODUCTS_PER_PAGE, sizeInt,new BigDecimal(priceFrom),new BigDecimal(priceTo));
+                        products = gpd.getProductsPerPageInSize(page, PRODUCTS_PER_PAGE, sizeInt, new BigDecimal(priceFrom), new BigDecimal(priceTo));
                     case 4 ->
-                        products = gpd.getProductsPerPagePriceDescInSize(page, PRODUCTS_PER_PAGE, sizeInt,new BigDecimal(priceFrom),new BigDecimal(priceTo));
+                        products = gpd.getProductsPerPagePriceDescInSize(page, PRODUCTS_PER_PAGE, sizeInt, new BigDecimal(priceFrom), new BigDecimal(priceTo));
                     case 5 ->
-                        products = gpd.getProductsPerPagePriceAscInSize(page, PRODUCTS_PER_PAGE, sizeInt,new BigDecimal(priceFrom),new BigDecimal(priceTo));
+                        products = gpd.getProductsPerPagePriceAscInSize(page, PRODUCTS_PER_PAGE, sizeInt, new BigDecimal(priceFrom), new BigDecimal(priceTo));
                     default ->
                         throw new AssertionError();
                 }
@@ -196,6 +204,12 @@ public class ShopServlet extends HttpServlet {
         if (session.getAttribute("sizes") != null) {
             session.removeAttribute("sizes");
         }
+        if (session.getAttribute("priceFrom") != null) {
+            session.removeAttribute("priceFrom");
+        }
+        if (session.getAttribute("priceTo") != null) {
+            session.removeAttribute("priceTo");
+        }
         int totalPages = (int) Math.ceil((double) totalProducts / PRODUCTS_PER_PAGE);
         CategoryDAO cd = new CategoryDAO();
         List<Category> listCat = cd.getALl();
@@ -204,6 +218,9 @@ public class ShopServlet extends HttpServlet {
             categoryMap.put(category.getCategory_id(), category.getName());
         }
         session.setAttribute("sizes", sizes);
+        session.setAttribute("priceFrom", priceFrom);
+        session.setAttribute("priceTo", priceTo);
+        System.out.println(priceFrom + " " + priceTo);
         request.setAttribute("categoryMap", categoryMap);
         request.setAttribute("dataPro", products);
         request.setAttribute("currentPage", page);
@@ -211,6 +228,9 @@ public class ShopServlet extends HttpServlet {
         request.setAttribute("size", sizeInt);
         request.setAttribute("cid", cid);
         request.setAttribute("sort", sort);
+        request.setAttribute("minPrice", gpd.getMinPrice());
+        request.setAttribute("maxPrice", gpd.getMaxPrice());
+
 //        request.setAttribute("priceFrom", priceFrom);
 //        request.setAttribute("priceTo", priceTo);
         request.setAttribute("totalPages", totalPages);

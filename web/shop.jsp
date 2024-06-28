@@ -6,7 +6,7 @@
 <!DOCTYPE html>
 <html lang="en">
     <head>
-        <title>MayJaShop - Free Bootstrap 4 Template by Colorlib</title>
+        <title>MayJaShop</title>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
@@ -87,7 +87,7 @@
 
             .filter-range-wrap .range-slider .price-input:after {
                 position: absolute;
-                left: 93px;
+                left: 97px;
                 top: 15px;
                 height: 1px;
                 width: 5px;
@@ -232,7 +232,7 @@
                                                     </div>
                                                     <p class="bottom-area d-flex px-3">
                                                         <a href="#" class="add-to-cart text-center py-2 mr-1"><span>Add to cart <i class="ion-ios-add ml-1"></i></span></a>
-                                                        <a href="#" class="buy-now text-center py-2">Buy now<span><i class="ion-ios-cart ml-1"></i></span></a>
+                                                        <a href="singleProduct?id=${p.id}" class="buy-now text-center py-2">Buy now<span><i class="ion-ios-cart ml-1"></i></span></a>
                                                     </p>
                                                 </div>
                                             </div>
@@ -344,6 +344,7 @@
                                                                 </li>
                                                             </c:forEach>    
                                                         </ul>
+                                                         <input type="hidden" name="nosize" value="nosize">
                                                         <input type="hidden" name="cid" value="${param.cid != null ? param.cid : 0}">
                                                         <input type="hidden" name="sort" value="${param.sort != null ? param.sort : 0}">
                                                     </form>
@@ -359,12 +360,15 @@
                                 <form class="colorlib-form-2" action="shop">
                                     <div class="filter-range-wrap">
                                         <div class="price-range ui-slider ui-corner-all ui-slider-horizontal ui-widget ui-widget-content"
-                                             data-min="40" data-max="500"></div>
+                                             data-min="${requestScope.minPrice}" data-max="${requestScope.maxPrice}"
+                                             data-selected-min="${sessionScope.priceFrom}"
+                                             data-selected-max="${sessionScope.priceTo}"
+                                             ></div>
                                         <div class="range-slider">
                                             <div class="price-input">
                                                 <button class="btn btn-primary btn-outline-secondary" type="submit">Filter</button>
                                                 <input type="text" name="priceFrom" id="minamount">
-                                                <input type="text" name="priceTo" id="maxamount">
+                                                <input type="text" name="priceTo"  id="maxamount">
                                                 <input type="hidden" name="cid" value="${param.cid != null ? param.cid : 0}">
                                                 <input type="hidden" name="sort" value="${param.sort != null ? param.sort : 0}">
                                             </div>
