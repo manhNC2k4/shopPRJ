@@ -16,6 +16,21 @@ public class Cart {
     public Cart() {
     }
 
+    // Constructor chuyển chuỗi thành đối tượng Cart
+    public Cart(String cartString) throws IllegalArgumentException {
+        String[] parts = cartString.split("\\|");
+        if (parts.length != 3) {
+            throw new IllegalArgumentException("Invalid cart string format");
+        }
+        try {
+            this.id = Integer.parseInt(parts[0]);
+            this.user_id = Integer.parseInt(parts[1]);
+            this.nums_items = Integer.parseInt(parts[2]);
+        } catch (NumberFormatException e) {
+            throw new IllegalArgumentException("Invalid number format in cart string", e);
+        }
+    }
+    
     public Cart(int id, int user_id, int nums_items) {
         this.id = id;
         this.user_id = user_id;
@@ -44,6 +59,11 @@ public class Cart {
 
     public void setNums_items(int nums_items) {
         this.nums_items = nums_items;
+    }
+
+    @Override
+    public String toString() {
+        return id + "|" + user_id + "|" + nums_items;
     }
     
     

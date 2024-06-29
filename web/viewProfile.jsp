@@ -5,6 +5,21 @@
 --%>
 
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
+<%@ page import="DTO.UserDTO" %>
+<%@ page import="jakarta.servlet.http.Cookie" %>
+<%
+  Cookie[] cookies = request.getCookies();
+  UserDTO user = null;
+  if (cookies != null) {
+    for (Cookie cookie : cookies) {
+      if (cookie.getName().equals("account")) {
+        // Chuyển đổi chuỗi accountStr thành đối tượng UserDTO
+        user = new UserDTO(cookie.getValue()); 
+      }
+    }
+  }
+  pageContext.setAttribute("user", user); 
+%>
 <%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <!DOCTYPE html>
 <html>
@@ -26,7 +41,7 @@
         </style>
     </head>
     <body>
-        <c:set var="c" value="${sessionScope.account}"/>
+        <c:set var="c" value="${user}"/>
         <div class="container mt-5">
             <div class="row justify-content-center">
                 <div class="col-md-8">

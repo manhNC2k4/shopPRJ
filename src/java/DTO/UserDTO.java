@@ -7,6 +7,7 @@ import java.util.Date;
  * @author LNV
  */
 public class UserDTO {
+
     private int user_id;
     private String username;
     private String email;
@@ -17,6 +18,23 @@ public class UserDTO {
     private Date created_at;
     private Date updated_at;
     private int role;
+
+       // Constructor nhận chuỗi
+    public UserDTO(String serializedData) {
+        String[] parts = serializedData.split("\\|");
+        this.user_id = Integer.parseInt(parts[0]);
+        this.username = parts[1];
+        this.email = parts[2];
+        this.first_name = parts[3];
+        this.last_name = parts[4];
+        this.phone = parts[5];
+        this.address = parts[6];
+        // Chuyển đổi từ mili giây thành Date
+        this.created_at = new Date(Long.parseLong(parts[7]));
+        this.updated_at = new Date(Long.parseLong(parts[8]));
+        this.role = Integer.parseInt(parts[9]);
+    }
+
     // Constructor không tham số
     public UserDTO() {
     }
@@ -119,22 +137,10 @@ public class UserDTO {
     public int getRole() {
         return role;
     }
-    
-    
 
     // Phương thức toString để hiển thị thông tin người dùng
-    @Override
+     @Override
     public String toString() {
-        return "UserDTO{" +
-                "user_id=" + user_id +
-                ", username='" + username + '\'' +
-                ", email='" + email + '\'' +
-                ", first_name='" + first_name + '\'' +
-                ", last_name='" + last_name + '\'' +
-                ", phone='" + phone + '\'' +
-                ", address='" + address + '\'' +
-                ", created_at=" + created_at +
-                ", updated_at=" + updated_at +
-                '}';
+        return user_id + "|" + username + "|" + email + "|" + first_name + "|" + last_name + "|" + phone + "|" + address + "|" + created_at.getTime() + "|" + updated_at.getTime() + "|" + role;
     }
 }

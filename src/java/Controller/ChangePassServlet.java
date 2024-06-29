@@ -11,6 +11,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -76,8 +77,22 @@ public class ChangePassServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        HttpSession session = request.getSession();
-        UserDTO userDTO = (UserDTO) session.getAttribute("account");
+        Cookie[] cookies = request.getCookies();
+        UserDTO userDTO = null;
+        if (cookies != null) {
+            for (Cookie cookie : cookies) {
+                if (cookie.getName().equals("account")) {
+                    // Chuyển đổi chuỗi cookie thành UserDTO
+                    userDTO = new UserDTO(cookie.getValue());
+                    break; // Dừng vòng lặp khi tìm thấy cookie
+                }
+            }
+        }
+        if (userDTO == null) {
+            // Xử lý trường hợp người dùng chưa đăng nhập
+            response.sendRedirect("login.jsp");
+            return; // Kết thúc phương thức
+        }
         String curPass = request.getParameter("currentPassword");
         String newPass = request.getParameter("newPassword");
         UserDAO ud = new UserDAO();
@@ -91,6 +106,10 @@ public class ChangePassServlet extends HttpServlet {
                         userDTO.getFirst_name(), userDTO.getLast_name(), userDTO.getPhone(), userDTO.getAddress());
                 String result2 = ud.updateUser(user, userDTO.getUser_id());
                 if ("Update successful".equals(result2)) {
+                    // Tạo lại cookie với thông tin cập nhật
+                    Cookie cookie = new Cookie("account", userDTO.toString()); // Giả sử UserDTO có toString()
+                    cookie.setMaxAge(60 * 60 * 24 * 60 * 2); // Tồn tại 2 tháng (tính bằng giây)
+                    response.addCookie(cookie);
                     response.sendRedirect("index");
                 } else {
                     request.setAttribute("error", result2);

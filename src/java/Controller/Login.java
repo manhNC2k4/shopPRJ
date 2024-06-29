@@ -5,16 +5,19 @@
 package Controller;
 
 import DTO.UserDTO;
+import dal.CartDAO;
+import dal.FavoriteDAO;
 import dal.LoginDAO;
 import dal.UserDAO;
 import java.io.IOException;
 import java.io.PrintWriter;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import jakarta.servlet.http.HttpSession;
+import model.Cart;
 
 /**
  *
@@ -61,7 +64,7 @@ public class Login extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-            request.getRequestDispatcher("login.jsp").forward(request, response);
+        request.getRequestDispatcher("login.jsp").forward(request, response);
     }
 
     /**
@@ -83,13 +86,33 @@ public class Login extends HttpServlet {
             if (result.equals("success")) {
                 UserDAO ud = new UserDAO();
                 UserDTO user = ud.getUserByMail(email);
-                HttpSession session = request.getSession();
-                session.setAttribute("account", user);
+                // Tạo cookie với thời hạn 2 tháng
+                Cookie cookie = new Cookie("account", user.toString()); // Giả sử UserDTO có phương thức toString()
+                cookie.setMaxAge(60 * 60 * 24 * 60); // 2 tháng (tính bằng giây)
+                response.addCookie(cookie);
+
                 if (user.getRole() == 1) {
                     // Chuyển hướng đến admin.jsp nếu role = 1
                     request.getRequestDispatcher("admin").forward(request, response);
                 } else {
                     // Chuyển hướng đến index.jsp nếu role != 1
+                    CartDAO cd = new CartDAO();
+                    Cart c;
+                    c = cd.getCartById(user.getUser_id());
+                    if (c == null) {
+                        int cid = cd.insertCart(user.getUser_id());
+                        c = cd.getCartByCartId(cid);
+                    }
+                    Cookie cookie1 = new Cookie("cart", c.toString());
+                    cookie1.setMaxAge(60 * 60 * 24 * 60);
+                    response.addCookie(cookie1);
+
+                    // Lấy số lượng sản phẩm yêu thích và tạo cookie cho nó
+                    FavoriteDAO fd = new FavoriteDAO();
+                    int favoriteCount = fd.countFavoritesByUserId(user.getUser_id());
+                    Cookie favoriteCookie = new Cookie("favoriteCount", String.valueOf(favoriteCount));
+                    favoriteCookie.setMaxAge(60 * 60 * 24 * 60);
+                    response.addCookie(favoriteCookie);
                     request.getRequestDispatcher("index").forward(request, response);
                 }
             } else {
@@ -97,6 +120,13 @@ public class Login extends HttpServlet {
                 request.getRequestDispatcher("login.jsp").forward(request, response);
             }
         } catch (NumberFormatException e) {
+            e.printStackTrace();
+            request.setAttribute("error", "Invalid number format");
+            request.getRequestDispatcher("login.jsp").forward(request, response);
+        } catch (Exception e) {
+            e.printStackTrace();
+            request.setAttribute("error", "An error occurred during login");
+            request.getRequestDispatcher("login.jsp").forward(request, response);
         }
     }
 
