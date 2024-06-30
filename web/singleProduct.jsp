@@ -5,7 +5,32 @@
 --%>
 
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
-<%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ page import="DTO.UserDTO" %>
+<%@ page import="model.Cart" %>
+<%@ page import="jakarta.servlet.http.Cookie" %>
+<%
+  Cookie[] cookies = request.getCookies();
+  UserDTO user = null;
+  Cart c = null;
+  int countFavorite = 0;
+  if (cookies != null) {
+    for (Cookie cookie : cookies) {
+      if (cookie.getName().equals("account")) {
+        user = new UserDTO(cookie.getValue()); 
+      }
+      if (cookie.getName().equals("cart")) {
+        c = new Cart(cookie.getValue()); 
+      }
+      if (cookie.getName().equals("favoriteCount")) {
+        countFavorite = Integer.parseInt(cookie.getValue());
+      }
+    }
+  }
+  pageContext.setAttribute("user", user);
+  pageContext.setAttribute("cart", c);
+  pageContext.setAttribute("countFavorite", countFavorite);
+%>
+<%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <!DOCTYPE html>
 <html lang="en">
     <head>
@@ -82,8 +107,8 @@
                         <li class="nav-item"><a href="about.html" class="nav-link">About</a></li>
                         <li class="nav-item"><a href="blog.html" class="nav-link">Blog</a></li>
                         <li class="nav-item"><a href="contact.html" class="nav-link">Contact</a></li>
-                        <li class="nav-item cta cta-colored"><a href="cart.html" class="nav-link"><span class="icon-shopping_cart"></span>[0]</a></li>
-
+                        <li class="nav-item cta cta-colored"><a href="favoriteShow" class="nav-link"><span class="icon-heart"></span>[${countFavorite}]</a></li>
+                        <li class="nav-item cta cta-colored"><a href="cart.html" class="nav-link"><span class="icon-shopping_cart"></span>[${cart.nums_items}]</a></li>
                     </ul>
                 </div>
             </div>
@@ -170,16 +195,16 @@
                             </div>
                             <div class="w-100"></div>
                             <div class="col-md-12">
-                                <p style="color: #000;" id="stock-display">50 piece available</p>
+                                <p style="color: #000;" id="stock-display">${product.sizes[0].stock} piece available</p>
                             </div>
                         </div>
-                        <p><a href="cart.html" class="btn btn-black py-3 px-5 mr-2">Add to Cart</a><a href="cart.html" class="btn btn-primary py-3 px-5">Buy now</a></p>
+                        <p>
+
+                            <a href="#" id="addToCartBtn" class="btn btn-black py-3 px-5 mr-2">Add to Cart</a>
+
+                            <a href="cart.html" class="btn btn-primary py-3 px-5">Buy now</a></p>
                     </div>
                 </div>
-
-
-
-
                 <div class="row mt-5">
                     <div class="col-md-12 nav-link-wrap">
                         <div class="nav nav-pills d-flex text-center" id="v-pills-tab" role="tablist" aria-orientation="vertical">
@@ -431,19 +456,31 @@
         <script src="js/main.js"></script>
 
         <script>
-
             // Sử dụng jQuery
             $(document).ready(function () {
-                $("#size").change(function () {
-                    var selectedSize = $(this).val();
+                function validateQuantity(maxStock) {
+                    var value = parseInt($("#quantity").val());
+                    if (value < 1) {
+                        $("#quantity").val(1);
+                    } else if (value > maxStock) {
+                        $("#quantity").val(maxStock);
+                    }
+                }
+                // Function to update stock and validate quantity
+                function updateStockAndValidate() {
+                    var selectedSize = $("#size").val();
                     var stock = $("#size option[value='" + selectedSize + "']").data("stock");
-                    $("#stock-display").text(stock + " piece available"); // Thay thế "stock-display" bằng ID của phần tử hiển thị stock
-                     $("#quantity").attr("max", stock); 
-                });
-                
-            });
+                    $("#stock-display").text(stock + " piece available"); // Replace "stock-display" with the ID of the stock display element
+                    $("#quantity").attr("max", stock);
+                    validateQuantity(stock); // Validate quantity when stock changes
+                }
 
-            $(document).ready(function () {
+                // Call updateStockAndValidate when the page loads
+                updateStockAndValidate();
+
+                $("#size").change(function () {
+                    updateStockAndValidate();
+                });
 
                 var quantitiy = 0;
                 $('.quantity-right-plus').click(function (e) {
@@ -452,15 +489,16 @@
                     e.preventDefault();
                     // Get the field name
                     var quantity = parseInt($('#quantity').val());
-
+                    var maxStock = parseInt($('#quantity').attr('max'));
                     // If is not undefined
 
-                    $('#quantity').val(quantity + 1);
-
-
-                    // Increment
+                    if (quantity < maxStock) {
+                        $('#quantity').val(quantity + 1);
+                    }
+                    validateQuantity(maxStock);
 
                 });
+
 
                 $('.quantity-left-minus').click(function (e) {
                     // Stop acting like a button
@@ -476,6 +514,18 @@
                     }
                 });
 
+                $("#quantity").on("input", function () {
+                    var maxStock = parseInt($('#quantity').attr('max'));
+                    validateQuantity(maxStock);
+                });
+                $("#addToCartBtn").click(function (e) {
+                    e.preventDefault();
+                    var productId = "${product.id}";
+                    var quantity = $("#quantity").val();
+                    var size = $("#size").val();
+                    var addToCartUrl = "addToCart?productId=" + productId + "&quantity=" + quantity + "&size=" + size;
+                    window.location.href = addToCartUrl;
+                });
             });
         </script>
 
