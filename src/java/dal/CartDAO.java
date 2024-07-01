@@ -217,4 +217,48 @@ public class CartDAO extends DBContext {
         return cartItems;
     }
     
+    //get cart by cart id
+    public Cart_Item getCart_ItemById(int id) {
+        String sql = "select * from [dbo].[Cart_Items] where [cart_item_id] = ?";
+        try {
+            PreparedStatement st = connection.prepareStatement(sql);
+            st.setInt(1, id);
+            ResultSet rs = st.executeQuery();
+            if (rs.next()) {
+                Cart_Item cartItem = new Cart_Item(
+                    rs.getInt("cart_item_id"),
+                    rs.getInt("cart_id"),
+                    rs.getInt("product_size_id"),
+                    rs.getInt("quantity")
+                );
+                return cartItem;
+            }
+        } catch (SQLException e) {
+            System.out.println(e);
+        }
+        return null;
+    }
+    
+    //update cart item by size 
+    public String updateCartItemBySize(int id, int size_id) {
+        String message = null;
+        String updateCart = "UPDATE [dbo].[Cart_Items]"
+                + "   SET [product_size_id] = ?"
+                + " WHERE [cart_item_id] = ?";
+        try {
+            PreparedStatement st = connection.prepareStatement(updateCart);
+            st.setInt(1, size_id);
+            st.setInt(2, id);
+            int rowsAffected = st.executeUpdate();
+            if (rowsAffected > 0) {
+                message = "Update successfull!";
+            } else {
+                message = "Error execute";
+            }
+        } catch (SQLException e) {
+            message = "Error: " + e.getMessage();
+        }
+        return message;
+    }
+    
 }

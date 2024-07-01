@@ -6,7 +6,6 @@ package Controller;
 
 import DTO.UserDTO;
 import dal.CartDAO;
-import dal.ProductDAO;
 import java.io.IOException;
 import java.io.PrintWriter;
 import jakarta.servlet.ServletException;
@@ -15,18 +14,14 @@ import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import java.sql.SQLException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import model.Cart;
-import model.Cart_Item;
 
 /**
  *
  * @author LNV
  */
-@WebServlet(name = "AddToCart", urlPatterns = {"/addToCart"})
-public class AddToCart extends HttpServlet {
+@WebServlet(name = "DeleteCart", urlPatterns = {"/deleteCart"})
+public class DeleteCart extends HttpServlet {
 
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
@@ -45,10 +40,10 @@ public class AddToCart extends HttpServlet {
             out.println("<!DOCTYPE html>");
             out.println("<html>");
             out.println("<head>");
-            out.println("<title>Servlet AddToCart</title>");
+            out.println("<title>Servlet DeleteCart</title>");
             out.println("</head>");
             out.println("<body>");
-            out.println("<h1>Servlet AddToCart at " + request.getContextPath() + "</h1>");
+            out.println("<h1>Servlet DeleteCart at " + request.getContextPath() + "</h1>");
             out.println("</body>");
             out.println("</html>");
         }
@@ -76,59 +71,50 @@ public class AddToCart extends HttpServlet {
                 }
             }
         }
-        // Kiểm tra nếu giỏ hàng tồn tại
         if (c != null) {
+            String rctid = request.getParameter("cid");
+            String rquantity = request.getParameter("quantity");
             try {
-                // Kiểm tra và lấy giá trị tham số
-                String productIdParam = request.getParameter("productId");
-                String quantityParam = request.getParameter("quantity");
-                String sizeParam = request.getParameter("size");
-
-                System.out.println("Received parameters: productId=" + productIdParam + ", quantity=" + quantityParam + ", size=" + sizeParam);
-
-                // Chuyển đổi các tham số sang số nguyên
-                int pid = Integer.parseInt(productIdParam);
-                int quantity = Integer.parseInt(quantityParam);
-                int size = Integer.parseInt(sizeParam);
-
-                System.out.println("Parsed parameters: productId=" + pid + ", quantity=" + quantity + ", size=" + size);
-
+                int cid = Integer.parseInt(rctid);
+                int quantity = Integer.parseInt(rquantity);
                 CartDAO cd = new CartDAO();
-                String updateCart = cd.updateCart(c.getId(), c.getNums_items() + 1);
-                System.out.println("Update cart status: " + updateCart);
-
-                if ("Update successfull!".equals(updateCart)) {
-//                    c = cd.getCartByCartId(c.getId());
-//                    if (c != null) {
-//                        Cookie cookie1 = new Cookie("cart", c.toString());
-//                        cookie1.setMaxAge(60 * 60 * 24 * 60);
-//                        response.addCookie(cookie1);
-//                    } else {
-//                        // Xử lý nếu không lấy được giỏ hàng mới từ CSDL
-//                        System.out.println("Failed to retrieve updated cart from database.");
-//                    }
-
-                    ProductDAO pd = new ProductDAO();
-                    int psid = pd.getProduct_Size_Id(pid, size);
-                    Cart_Item ci = new Cart_Item(-1, c.getId(), psid, quantity);
-
-                    int ciid = cd.addCartItem(ci);
-                    System.out.println("Cart item added with ID: " + ciid);
-
-                    request.getSession().setAttribute("message", updateCart);
-                    request.setAttribute("id", pid);
-                    request.getRequestDispatcher("singleProduct").forward(request, response);
-                } else {
-                    request.getSession().setAttribute("message", updateCart);
-                    request.setAttribute("id", pid);
-                    request.getRequestDispatcher("singleProduct").forward(request, response);
+                if(c.getNums_items() == 0) {
+                    String result0 = cd.updateCart(c.getId(), 0);
                 }
-            } catch (NumberFormatException ex) {
-                Logger.getLogger(AddToCart.class.getName()).log(Level.SEVERE, "Number format exception: " + ex.getMessage(), ex);
-                response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid input");
-            } catch (SQLException ex) {
-                Logger.getLogger(AddToCart.class.getName()).log(Level.SEVERE, "SQL exception: " + ex.getMessage(), ex);
-                response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Database error");
+                String result0 = cd.updateCart(c.getId(), c.getNums_items() - 1);
+                if ("Update successfull!".equals(result0)) {
+                    String result = cd.deleteCartItem(cid);
+                    if ("Delete successful".equals(result)) {
+                        // Lấy thông tin user từ session hoặc cookie
+                        UserDTO user = null;
+                        if (cookies != null) {
+                            for (Cookie cookie : cookies) {
+                                if (cookie.getName().equals("account")) {
+                                    user = new UserDTO(cookie.getValue());
+                                    break;
+                                }
+                            }
+                        }
+                        if (user != null) {
+                            // Lấy số lượng sản phẩm yêu thích của user
+                            CartDAO cartd = new CartDAO();
+                            Cart c1;
+                            c1 = cartd.getCartById(user.getUser_id());
+                            Cookie cookie1 = new Cookie("cart", c1.toString());
+                            cookie1.setMaxAge(60 * 60 * 24 * 60);
+                            response.addCookie(cookie1);
+                            request.getRequestDispatcher("cartShow").forward(request, response);
+                        }
+                    } else {
+                        System.out.println("delete cart item is reject!");
+                        request.getRequestDispatcher("cartShow").forward(request, response);
+                    }
+                } else {
+                    System.out.println("update cart is reject!");
+                    request.getRequestDispatcher("cartShow").forward(request, response);
+                }
+            } catch (NumberFormatException e) {
+                System.out.println(e);
             }
         } else {
             System.out.println("No cart found, redirecting to login.jsp");

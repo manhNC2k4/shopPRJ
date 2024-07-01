@@ -2,55 +2,58 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/Servlet.java to edit this template
  */
-
 package Controller;
 
-import DTO.UserDTO;
-import dal.FavoriteDAO;
+import dal.CartDAO;
+import dal.ProductDAO;
 import java.io.IOException;
 import java.io.PrintWriter;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
-import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-
+import model.Cart_Item;
+import model.Product;
+import model.Product_Size;
 
 /**
  *
  * @author LNV
  */
-@WebServlet(name="DeleteFavoriteItem", urlPatterns={"/deleteFavoriteItem"})
-public class DeleteFavoriteItem extends HttpServlet {
-   
-    /** 
-     * Processes requests for both HTTP <code>GET</code> and <code>POST</code> methods.
+@WebServlet(name = "ChangeSizeCart", urlPatterns = {"/changeSizeCart"})
+public class ChangeSizeCart extends HttpServlet {
+
+    /**
+     * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
+     * methods.
+     *
      * @param request servlet request
      * @param response servlet response
      * @throws ServletException if a servlet-specific error occurs
      * @throws IOException if an I/O error occurs
      */
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
-    throws ServletException, IOException {
+            throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
         try (PrintWriter out = response.getWriter()) {
             /* TODO output your page here. You may use following sample code. */
             out.println("<!DOCTYPE html>");
             out.println("<html>");
             out.println("<head>");
-            out.println("<title>Servlet DeleteFavoriteItem</title>");  
+            out.println("<title>Servlet ChangeSizeCart</title>");
             out.println("</head>");
             out.println("<body>");
-            out.println("<h1>Servlet DeleteFavoriteItem at " + request.getContextPath () + "</h1>");
+            out.println("<h1>Servlet ChangeSizeCart at " + request.getContextPath() + "</h1>");
             out.println("</body>");
             out.println("</html>");
         }
-    } 
+    }
 
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
-    /** 
+    /**
      * Handles the HTTP <code>GET</code> method.
+     *
      * @param request servlet request
      * @param response servlet response
      * @throws ServletException if a servlet-specific error occurs
@@ -58,31 +61,13 @@ public class DeleteFavoriteItem extends HttpServlet {
      */
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
-    throws ServletException, IOException {
-        int product_id = Integer.parseInt(request.getParameter("product_id"));
-        FavoriteDAO fd = new FavoriteDAO();
-        // Lấy thông tin user từ session hoặc cookie
-        Cookie[] cookies = request.getCookies();
-        UserDTO user = null;
-        if (cookies != null) {
-            for (Cookie cookie : cookies) {
-                if (cookie.getName().equals("account")) {
-                    user = new UserDTO(cookie.getValue());
-                    break;
-                }
-            }
-        }
-        
-        if (user != null) {
-           fd.removeFavorite(user.getUser_id(), product_id);
-           request.getRequestDispatcher("favoriteShow").forward(request, response);
-        } else {
-            response.sendRedirect("login.jsp");
-        }
-    } 
+            throws ServletException, IOException {
+        processRequest(request, response);
+    }
 
-    /** 
+    /**
      * Handles the HTTP <code>POST</code> method.
+     *
      * @param request servlet request
      * @param response servlet response
      * @throws ServletException if a servlet-specific error occurs
@@ -90,12 +75,32 @@ public class DeleteFavoriteItem extends HttpServlet {
      */
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
-    throws ServletException, IOException {
-        processRequest(request, response);
+            throws ServletException, IOException {
+        String rid = request.getParameter("id");
+        String rsize = request.getParameter("size");
+        try {
+            int id = Integer.parseInt(rid);
+            int size = Integer.parseInt(rsize);
+            CartDAO cd = new CartDAO();
+            Cart_Item cit = cd.getCart_ItemById(id);
+            ProductDAO pd = new ProductDAO();
+            Product_Size ps = pd.getProduct_SizeById(cit.getProduct_size_id());
+            int new_product_size_id = pd.getProduct_Size_Id(ps.getProductId(), size);
+            String result = cd.updateCartItemBySize(id, new_product_size_id);
+            if("Update successfull!".equals(result)) {
+                System.out.println("Update successful!");
+                request.getRequestDispatcher("cartShow").forward(request, response);
+            } else {
+                System.out.println("Update fail!");
+                response.sendRedirect("cartShow");
+            }
+        } catch (NumberFormatException e) {
+        }
     }
 
-    /** 
+    /**
      * Returns a short description of the servlet.
+     *
      * @return a String containing servlet description
      */
     @Override

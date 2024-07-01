@@ -2,6 +2,31 @@
 
 
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
+<%@ page import="DTO.UserDTO" %>
+<%@ page import="model.Cart" %>
+<%@ page import="jakarta.servlet.http.Cookie" %>
+<%
+  Cookie[] cookies = request.getCookies();
+  UserDTO user = null;
+  Cart c = null;
+  int countFavorite = 0;
+  if (cookies != null) {
+    for (Cookie cookie : cookies) {
+      if (cookie.getName().equals("account")) {
+        user = new UserDTO(cookie.getValue()); 
+      }
+      if (cookie.getName().equals("cart")) {
+        c = new Cart(cookie.getValue()); 
+      }
+      if (cookie.getName().equals("favoriteCount")) {
+        countFavorite = Integer.parseInt(cookie.getValue());
+      }
+    }
+  }
+  pageContext.setAttribute("user", user);
+  pageContext.setAttribute("cart", c);
+  pageContext.setAttribute("countFavorite", countFavorite);
+%>
 <%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <!DOCTYPE html>
 <html lang="en">
@@ -164,23 +189,28 @@
                     <span class="oi oi-menu"></span> Menu
                 </button>
 
-                <div class="collapse navbar-collapse" id="ftco-nav">
+                 <div class="collapse navbar-collapse" id="ftco-nav">
                     <ul class="navbar-nav ml-auto">
-                        <li class="nav-item"><a href="index" class="nav-link">Home</a></li>
-                        <li class="nav-item dropdown active">
-                            <a class="nav-link dropdown-toggle" href="#" id="dropdown04" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Catalog</a>
-                            <div class="dropdown-menu" aria-labelledby="dropdown04">
-                                <a class="dropdown-item" href="shop">Shop</a>
-                                <a class="dropdown-item" href="product-single.html">Single Product</a>
-                                <a class="dropdown-item" href="cart.html">Cart</a>
-                                <a class="dropdown-item" href="checkout.html">Checkout</a>
-                            </div>
-                        </li>
+                        <li class="nav-item active"><a href="index" class="nav-link">Home</a></li>
+                        <li class="nav-item"><a href="shop" class="nav-link">Shop</a></li>
                         <li class="nav-item"><a href="about.html" class="nav-link">About</a></li>
                         <li class="nav-item"><a href="blog.html" class="nav-link">Blog</a></li>
                         <li class="nav-item"><a href="contact.html" class="nav-link">Contact</a></li>
-                        <li class="nav-item cta cta-colored"><a href="cart.html" class="nav-link"><span class="icon-shopping_cart"></span>[0]</a></li>
-
+                        <li class="nav-item cta cta-colored"><a href="favoriteShow" class="nav-link"><span class="icon-heart"></span>[${countFavorite}]</a></li>
+                        <li class="nav-item cta cta-colored"><a href="cartShow" class="nav-link"><span class="icon-shopping_cart"></span>[${cart.nums_items}]</a></li>
+                            <c:if test="${user == null}">
+                            <li class="nav-item"><a href="login.jsp" class="nav-link">Login</a></li>
+                            </c:if>
+                            <c:if test="${user != null}">
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle" href="#" id="dropdown04" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">${user.username}</a>
+                                <div class="dropdown-menu" aria-labelledby="dropdown04">
+                                    <a class="dropdown-item" href="viewProfile">View profile</a>
+                                    <a class="dropdown-item" href="changePass">Change password</a>
+                                    <a class="dropdown-item" href="logout">Log out</a>
+                                </div>
+                            </li>
+                        </c:if>
                     </ul>
                 </div>
             </div>

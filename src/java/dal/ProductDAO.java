@@ -566,5 +566,25 @@ public class ProductDAO extends DBContext {
         }
         return id;
     }
+    
+    //get a product size by id
+    public Product_Size getProduct_SizeById(int psid) {
+        Product_Size ps;
+        String getProductSizesSql = "SELECT * FROM [dbo].[Product_Size] "
+                + "WHERE product_size_id = ?";
+        try {
+            PreparedStatement getSizesStmt = connection.prepareStatement(getProductSizesSql);
+            getSizesStmt.setInt(1, psid);
+            ResultSet sizesRs = getSizesStmt.executeQuery();
+            if (sizesRs.next()) {
+                ps = new Product_Size(sizesRs.getInt("product_id"), sizesRs.getInt("size"),
+                        sizesRs.getInt("stock"));
+                return ps;
+            }
+        } catch (SQLException e) {
+            System.out.println(e);
+        }
+        return null;
+    }
 
 }
