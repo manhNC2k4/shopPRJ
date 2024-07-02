@@ -11,10 +11,13 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
+import java.net.URLDecoder;
+import java.net.URLEncoder;
 import model.User;
 
 /**
@@ -76,8 +79,18 @@ public class ChangeProfileServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        HttpSession session = request.getSession();
-        UserDTO userDTO = (UserDTO) session.getAttribute("account");
+        Cookie[] cookies = request.getCookies();
+        UserDTO userDTO = null;
+        if (cookies != null) {
+            for (Cookie cookie : cookies) {
+                if (cookie.getName().equals("account")) {
+                    // Chuyển đổi chuỗi cookie thành UserDTO
+                    String decodedUser = URLDecoder.decode(cookie.getValue(), "UTF-8");
+                    userDTO = new UserDTO(decodedUser);
+                    break; // Dừng vòng lặp khi tìm thấy cookie
+                }
+            }
+        }
         String username = request.getParameter("username");
         String email = request.getParameter("email");
         String first_name = request.getParameter("first_name");
@@ -89,9 +102,7 @@ public class ChangeProfileServlet extends HttpServlet {
         String error;
         try {
             if (userDTO == null) {
-                error = "Something wrong. Please login again.";
-                request.setAttribute("error", error);
-                request.getRequestDispatcher("userUpdateProfile.jsp").forward(request, response);
+                response.sendRedirect("login.jsp");
             } else {
                 User user = ud.getUserById(userDTO.getUser_id());
                 if (user == null) {
@@ -113,9 +124,12 @@ public class ChangeProfileServlet extends HttpServlet {
                             User newUser = new User(username, user.getPassword(), email, first_name, last_name, phone, address);
                             String result = ud.updateUser(newUser, userDTO.getUser_id());
                             if (result.equals("Update successful")) {
-                                session.removeAttribute("account");
                                 UserDTO newDTO = ud.getUserDTOById(userDTO.getUser_id());
-                                session.setAttribute("account", newDTO);
+                                // Tạo lại cookie với thông tin cập nhật
+                                String encodedUser = URLEncoder.encode(newDTO.toString(), "UTF-8");
+                                Cookie cookie = new Cookie("account", encodedUser); // Giả sử UserDTO có toString()
+                                cookie.setMaxAge(60 * 60 * 24 * 60 * 2); // Tồn tại 2 tháng (tính bằng giây)
+                                response.addCookie(cookie);
                                 request.getRequestDispatcher("viewProfile.jsp").forward(request, response);
                             } else {
                                 message = result; // Lấy message lỗi từ hàm insertUser

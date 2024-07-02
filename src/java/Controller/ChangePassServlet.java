@@ -16,6 +16,8 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
+import java.net.URLDecoder;
+import java.net.URLEncoder;
 import model.User;
 
 /**
@@ -83,7 +85,8 @@ public class ChangePassServlet extends HttpServlet {
             for (Cookie cookie : cookies) {
                 if (cookie.getName().equals("account")) {
                     // Chuyển đổi chuỗi cookie thành UserDTO
-                    userDTO = new UserDTO(cookie.getValue());
+                    String decodedUser = URLDecoder.decode(cookie.getValue(), "UTF-8");
+                    userDTO = new UserDTO(decodedUser);
                     break; // Dừng vòng lặp khi tìm thấy cookie
                 }
             }
@@ -107,7 +110,8 @@ public class ChangePassServlet extends HttpServlet {
                 String result2 = ud.updateUser(user, userDTO.getUser_id());
                 if ("Update successful".equals(result2)) {
                     // Tạo lại cookie với thông tin cập nhật
-                    Cookie cookie = new Cookie("account", userDTO.toString()); // Giả sử UserDTO có toString()
+                    String encodedUser = URLEncoder.encode(userDTO.toString(), "UTF-8");
+                    Cookie cookie = new Cookie("account", encodedUser); // Giả sử UserDTO có toString()
                     cookie.setMaxAge(60 * 60 * 24 * 60 * 2); // Tồn tại 2 tháng (tính bằng giây)
                     response.addCookie(cookie);
                     response.sendRedirect("index");

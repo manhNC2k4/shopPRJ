@@ -22,11 +22,36 @@ public class Product {
     private Date updatedAt;
     private List<String> images;
     private List<Product_Size> sizes;
-    
+    private int sale_id;
     // Constructor không tham số
     public Product() {
     }
 
+    public Product(int id, String name, String description, int categoryId, BigDecimal price, Date createdAt, Date updatedAt, List<String> images, List<Product_Size> sizes, int sale_id) {
+        this.id = id;
+        this.name = name;
+        this.description = description;
+        this.categoryId = categoryId;
+        this.price = price;
+        this.createdAt = createdAt;
+        this.updatedAt = updatedAt;
+        this.images = images;
+        this.sizes = sizes;
+        this.sale_id = sale_id;
+    }
+
+    
+    public Product(int id, String name, String description, int categoryId, BigDecimal price, Date createdAt, Date updatedAt, List<String> images, int sale_id) {
+        this.id = id;
+        this.name = name;
+        this.description = description;
+        this.categoryId = categoryId;
+        this.price = price;
+        this.createdAt = createdAt;
+        this.updatedAt = updatedAt;
+        this.images = images;
+        this.sale_id = sale_id;
+    }
     // Constructor có tham số
     public Product(int id, String name, String description, int categoryId, BigDecimal price, Date createdAt,  Date updatedAt) {
         this.id = id;
@@ -139,6 +164,14 @@ public class Product {
 
     public void setSizes(List<Product_Size> sizes) {
         this.sizes = sizes;
+    }
+
+    public int getSale_id() {
+        return sale_id;
+    }
+
+    public void setSale_id(int sale_id) {
+        this.sale_id = sale_id;
     }
     
     

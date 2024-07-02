@@ -5,6 +5,8 @@
 <%@ page import="DTO.UserDTO" %>
 <%@ page import="model.Cart" %>
 <%@ page import="jakarta.servlet.http.Cookie" %>
+<%@ page import="java.net.URLEncoder" %>
+<%@ page import="java.net.URLDecoder" %>
 <%
   Cookie[] cookies = request.getCookies();
   UserDTO user = null;
@@ -13,7 +15,8 @@
   if (cookies != null) {
     for (Cookie cookie : cookies) {
       if (cookie.getName().equals("account")) {
-        user = new UserDTO(cookie.getValue()); 
+        String decodedUser = URLDecoder.decode(cookie.getValue(), "UTF-8");
+        user = new UserDTO(decodedUser); 
       }
       if (cookie.getName().equals("cart")) {
         c = new Cart(cookie.getValue()); 

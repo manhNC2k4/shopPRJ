@@ -5,8 +5,6 @@
 
 package Controller;
 
-import dal.CategoryDAO;
-import dal.ProductDAO;
 import dal.SaleDAO;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -16,21 +14,17 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.sql.SQLException;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import model.Category;
-import model.Product;
 import model.Sale;
 
 /**
  *
  * @author LNV
  */
-@WebServlet(name="AdminShowProduct", urlPatterns={"/showProduct"})
-public class AdminShowProduct extends HttpServlet {
+@WebServlet(name="ListSale", urlPatterns={"/listSale"})
+public class ListSale extends HttpServlet {
    
     /** 
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code> methods.
@@ -47,10 +41,10 @@ public class AdminShowProduct extends HttpServlet {
             out.println("<!DOCTYPE html>");
             out.println("<html>");
             out.println("<head>");
-            out.println("<title>Servlet AdminShowProduct</title>");  
+            out.println("<title>Servlet ListSale</title>");  
             out.println("</head>");
             out.println("<body>");
-            out.println("<h1>Servlet AdminShowProduct at " + request.getContextPath () + "</h1>");
+            out.println("<h1>Servlet ListSale at " + request.getContextPath () + "</h1>");
             out.println("</body>");
             out.println("</html>");
         }
@@ -67,37 +61,15 @@ public class AdminShowProduct extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
     throws ServletException, IOException {
-        CategoryDAO cd = new CategoryDAO();
-        List<Category> listCat = cd.getALl();
-        ProductDAO pd = new ProductDAO();
-        Map<Integer, String> categoryMap = new HashMap<>();
-        for (Category category : listCat) {
-            categoryMap.put(category.getCategory_id(), category.getName());
-        }
         SaleDAO sd = new SaleDAO();
         try {
-            List<Sale> listSale = sd.getActiveSales();
+            List<Sale> listSale = sd.getAllSales();
             request.setAttribute("listSale", listSale);
+            request.getRequestDispatcher("listSale.jsp").forward(request, response);
         } catch (SQLException ex) {
             Logger.getLogger(ListSale.class.getName()).log(Level.SEVERE, null, ex);
         }
-        if(request.getParameter("cid") != null) {
-            String rid = request.getParameter("cid");
-            try {
-                int id = Integer.parseInt(rid);
-                List<Product> list = pd.getProductsOf(id);
-            request.setAttribute("categoryMap", categoryMap);
-            request.setAttribute("dataCat", listCat);
-            request.setAttribute("dataPro", list);
-            request.getRequestDispatcher("listProducts.jsp").forward(request, response);
-            } catch (NumberFormatException e) {
-            }
-        }
-        request.setAttribute("categoryMap", categoryMap);
-        List<Product> listPro = pd.getAllProduct();
-        request.setAttribute("dataPro", listPro);
-        request.setAttribute("dataCat", listCat);
-        request.getRequestDispatcher("listProducts.jsp").forward(request, response);
+        
     } 
 
     /** 
@@ -110,39 +82,15 @@ public class AdminShowProduct extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
     throws ServletException, IOException {
-        CategoryDAO cd = new CategoryDAO();
-        List<Category> listCat = cd.getALl();
-        ProductDAO pd = new ProductDAO();
-        Map<Integer, String> categoryMap = new HashMap<>();
-        for (Category category : listCat) {
-            categoryMap.put(category.getCategory_id(), category.getName());
-        }
-         SaleDAO sd = new SaleDAO();
+        SaleDAO sd = new SaleDAO();
         try {
-            List<Sale> listSale = sd.getActiveSales();
+            List<Sale> listSale = sd.getAllSales();
             request.setAttribute("listSale", listSale);
+            request.getRequestDispatcher("listSale.jsp").forward(request, response);
         } catch (SQLException ex) {
             Logger.getLogger(ListSale.class.getName()).log(Level.SEVERE, null, ex);
         }
-        if(request.getParameter("cid") != null) {
-            String rid = request.getParameter("cid");
-            try {
-                int id = Integer.parseInt(rid);
-                List<Product> list = pd.getProductsOf(id);
-            request.setAttribute("categoryMap", categoryMap);
-            request.setAttribute("dataCat", listCat);
-            request.setAttribute("dataPro", list);
-            request.getRequestDispatcher("listProducts.jsp").forward(request, response);
-            } catch (NumberFormatException e) {
-            }
-        }
         
-        List<Product> listPro = pd.getAllProduct();
-        request.setAttribute("categoryMap", categoryMap);
-        request.setAttribute("dataPro", listPro);
-        request.setAttribute("dataCat", listCat);
-        request.getRequestDispatcher("listProducts.jsp").forward(request, response);
-   
     }
 
     /** 

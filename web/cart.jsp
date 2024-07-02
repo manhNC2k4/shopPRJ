@@ -31,6 +31,7 @@
   pageContext.setAttribute("countFavorite", countFavorite);
 %>
 <%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>
 <!DOCTYPE html>
 <html lang="en">
     <head>
@@ -152,71 +153,76 @@
                                         <th>Select</th>
                                     </tr>
                                 </thead>
-                                <tbody>
-                                    <c:forEach var="p" items="${sessionScope.productInfoList}" varStatus="status">
-                                        <tr class="text-center">
-                                            <td class="product-remove"><a href="deleteCart?cid=${p.cart_item_id}&quantity=${p.quantity}"><span class="ion-ios-close"></span></a></td>
+                                <form id="cartForm" action="cartShow" method="post">
+                                    <tbody>
+                                        <c:forEach var="p" items="${sessionScope.productInfoList}" varStatus="status">
+                                            <tr class="text-center">
+                                                <td class="product-remove"><a href="deleteCart?cid=${p.cart_item_id}&quantity=${p.quantity}"><span class="ion-ios-close"></span></a></td>
 
-                                            <td class="image-prod"><div class="img" style="background-image:url(${p.product.images[0]}); width: 150px;"></div></td>
+                                                <td class="image-prod"><div class="img" style="background-image:url(${p.product.images[0]}); width: 150px;"></div></td>
 
-                                            <td class="product-name">
-                                                <h3>
-                                                    <a href="singleProduct?id=${p.product.id}" style="color: black;">
-                                                        ${p.product.name}
-                                                    </a>
-                                                </h3>
-                                                <p class="description">
-                                                    <a href="singleProduct?id=${p.product.id}" style="color: black;">
-                                                        ${p.product.description}
-                                                    </a>
-                                                </p>
-                                            </td>
+                                                <td class="product-name">
+                                                    <h3>
+                                                        <a href="singleProduct?id=${p.product.id}" style="color: black;">
+                                                            ${p.product.name}
+                                                        </a>
+                                                    </h3>
+                                                    <p class="description">
+                                                        <a href="singleProduct?id=${p.product.id}" style="color: black;">
+                                                            ${p.product.description}
+                                                        </a>
+                                                    </p>
+                                                </td>
 
 
-                                            <td class="size">
-                                                <div class="form-group d-flex">
-                                                    <div class="select-wrap">
-                                                        <div class="icon"><span class="ion-ios-arrow-down"></span></div>
-                                                        <select name="size" id="size${status.index}" class="form-control size-select" style="padding:0 40px 0 20px">
-                                                            <c:forEach var="size" items="${p.product.sizes}">
-                                                                <option value="${size.size}" data-stock="${size.stock}"
-                                                                        <c:if test="${size.size == p.size.size}">
-                                                                            selected
-                                                                        </c:if>
-                                                                        >${size.size}</option>     
-                                                            </c:forEach>
-                                                        </select>
+                                                <td class="size">
+                                                    <div class="form-group d-flex">
+                                                        <div class="select-wrap">
+                                                            <div class="icon"><span class="ion-ios-arrow-down"></span></div>
+                                                            <select name="size" id="size${status.index}" class="form-control size-select" style="padding:0 40px 0 20px">
+                                                                <c:forEach var="size" items="${p.product.sizes}">
+                                                                    <option value="${size.size}" data-stock="${size.stock}"
+                                                                            <c:if test="${size.size == p.size.size}">
+                                                                                selected
+                                                                            </c:if>
+                                                                            >${size.size}</option>     
+                                                                </c:forEach>
+                                                            </select>
+                                                        </div>
                                                     </div>
-                                                </div>
-                                            </td>
-                                            <td class="quantity">
-                                                <div class="input-group mb-3">
-                                                    <span class="input-group-btn mr-2">
-                                                        <button type="button" class="quantity-left-minus btn" data-index="${status.index}" data-type="minus" data-field="">
-                                                            <i class="ion-ios-remove"></i>
-                                                        </button>
-                                                    </span>
-                                                    <input type="text" id="quantity${status.index}" name="quantity" data-price="${p.product.price}" data-index="${status.index}" class="quantity form-control input-number" value="${p.quantity}" readonly>
-                                                    <span class="input-group-btn ml-2">
-                                                        <button type="button" class="quantity-right-plus btn" data-index="${status.index}" data-type="plus" data-field="">
-                                                            <i class="ion-ios-add"></i>
-                                                        </button>
-                                                    </span>
-                                                </div>
-                                            </td>
-                                            <td class="total" >
-                                                <div id="total${status.index}" class="product-total" style="margin-bottom: 15px; padding: 10px; font-weight: 600;">
-                                                    $${p.product.price * p.quantity}
-                                                </div>
-                                            </td>
-                                            <td>
-                                                <div class="item">
-                                                    <input type="checkbox" class="product-checkbox" data-id="${p.cart_item_id}" data-price="${p.product.price}" data-size="${p.size.size}" data-quantity="${p.quantity}">
-                                                </div>
-                                            </td>
-                                        </tr><!-- END TR-->
-                                    </c:forEach>
-                                </tbody>
+                                                </td>
+                                                <td class="quantity">
+                                                    <div class="input-group mb-3">
+                                                        <span class="input-group-btn mr-2">
+                                                            <button type="button" class="quantity-left-minus btn" data-index="${status.index}" data-type="minus" data-field="">
+                                                                <i class="ion-ios-remove"></i>
+                                                            </button>
+                                                        </span>
+                                                        <input type="text" id="quantity${status.index}" name="quantity" data-price="${p.product.price}" data-index="${status.index}" class="quantity form-control input-number" value="${p.quantity}" readonly>
+                                                        <span class="input-group-btn ml-2">
+                                                            <button type="button" class="quantity-right-plus btn" data-index="${status.index}" data-type="plus" data-field="">
+                                                                <i class="ion-ios-add"></i>
+                                                            </button>
+                                                        </span>
+                                                    </div>
+                                                </td>
+                                                <td class="total" >
+                                                    <div id="total${status.index}" class="product-total" style="margin-bottom: 15px; padding: 10px; font-weight: 600;">
+                                                        $${p.product.price * p.quantity}
+                                                    </div>
+                                                </td>
+                                                <td>
+                                                    <div class="item">
+                                                        <input type="checkbox" class="product-checkbox" data-id="${p.cart_item_id}"  <c:forEach items="${sessionScope.listItemChecked}" var="l">
+                                                                   <c:if test="${l==p.cart_item_id}">checked</c:if>
+                                                               </c:forEach> > 
+                                                    </div>
+                                                </td>
+                                            </tr><!-- END TR-->
+                                        </c:forEach>
+                                    </tbody>
+                                    <input type="hidden" id="checkedItems" name="checkedItems">
+                                </form>
                             </table>
                         </div>
                     </div>
@@ -227,7 +233,7 @@
                             <h3>Cart Totals</h3>
                             <p class="d-flex">
                                 <span>Subtotal</span>
-                                <span id="subtotal">$0</span>
+                                <span id="subtotal">$${sessionScope.total}</span>
                             </p>
                             <!--                            <p class="d-flex">
                                                             <span>Delivery</span>
@@ -240,7 +246,7 @@
                             <hr>
                             <p class="d-flex total-price">
                                 <span>Total</span>
-                                <span id="total">$0</span>
+                                <span id="total">$${sessionScope.total}</span>
                             </p>
                         </div>
                         <p class="text-center"><a href="checkout.html" class="btn btn-primary py-3 px-4">Proceed to Checkout</a></p>
@@ -338,35 +344,36 @@
         <script src="js/google-map.js"></script>
         <script src="js/main.js"></script>
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
         <script>
             $(document).ready(function () {
-
-                function updateCartTotals() {
-                    var subtotal = 0;
-                    $('.item').each(function () {
-                        var checkbox = $(this).find('.product-checkbox');
-                        if (checkbox.prop('checked')) {
-                            var price = parseFloat(checkbox.data('price'));
-                            var quantity = parseFloat(checkbox.data('quantity'));
-                            var total = price * quantity;
-                            subtotal += total;
-                        }
-                    });
-                    $('#discount').text(subtotal.toFixed(2));
-                    // Update subtotal and total in the cart
-                    $('#subtotal').text('$' + subtotal.toFixed(2));
-                    // Update other totals as needed
-                    $('#total').text('$' + subtotal.toFixed(2)); // For now, total is the same as subtotal
-                }
-
-                // Initial update when the page loads
-                updateCartTotals();
-
-                // Listen for change in checkboxes
-                $('.product-checkbox').on('change', function () {
-//                    location.reload();
-                    updateCartTotals();
-                });
+//
+//                function updateCartTotals() {
+//                    var subtotal = 0;
+//                    $('.item').each(function () {
+//                        var checkbox = $(this).find('.product-checkbox');
+//                        if (checkbox.prop('checked')) {
+//                            var price = parseFloat(checkbox.data('price'));
+//                            var quantity = parseFloat(checkbox.data('quantity'));
+//                            var total = price * quantity;
+//                            subtotal += total;
+//                        }
+//                    });
+////                    $('#discount').text(subtotal.toFixed(2));
+//                    // Update subtotal and total in the cart
+//                    $('#subtotal').text('$' + subtotal.toFixed(2));
+//                    // Update other totals as needed
+//                    $('#total').text('$' + subtotal.toFixed(2)); // For now, total is the same as subtotal
+//                }
+//
+//                // Initial update when the page loads
+//                updateCartTotals();
+//
+//                // Listen for change in checkboxes
+//                $('.product-checkbox').on('change', function () {
+////                    location.reload();
+//                    updateCartTotals();
+//                });
 
                 var minQuantity = 1;
                 // Khi nút giảm số lượng được nhấn
@@ -437,6 +444,37 @@
                         }
                     });
                 });
+            });
+
+            document.addEventListener('DOMContentLoaded', function () {
+                const checkboxes = document.querySelectorAll('.product-checkbox');
+                const form = document.getElementById('cartForm');
+
+                checkboxes.forEach(checkbox => {
+                    checkbox.addEventListener('change', function () {
+                        submitFormWithCheckedItems();
+                    });
+                });
+
+                function submitFormWithCheckedItems() {
+                    // Xóa các input ẩn hiện có
+                    const existingHiddenInputs = document.querySelectorAll('input[name="checkedItemIds"]');
+                    existingHiddenInputs.forEach(input => input.remove());
+
+                    // Tạo các input ẩn mới cho các checkbox được chọn
+                    checkboxes.forEach(checkbox => {
+                        if (checkbox.checked) {
+                            const hiddenInput = document.createElement('input');
+                            hiddenInput.type = 'hidden';
+                            hiddenInput.name = 'checkedItemIds';
+                            hiddenInput.value = checkbox.getAttribute('data-id');
+                            form.appendChild(hiddenInput);
+                        }
+                    });
+
+                    // Submit form
+                    form.submit();
+                }
             });
         </script>
     </body>

@@ -154,7 +154,7 @@ public class ProductDAO extends DBContext {
     public List<Product> getProductsOf(int cid) {
         List<Product> list = new ArrayList<>();
         //lenh sql select * from category
-        String sql = "SELECT p.product_id, p.name, p.description, p.category_id, p.price, p.created_at, p.updated_at, pi.image_url "
+        String sql = "SELECT p.product_id, p.name, p.description, p.category_id, p.price, p.created_at, p.updated_at, p.sale_id, pi.image_url "
                 + "FROM Products p "
                 + "LEFT JOIN ProductImages pi ON p.product_id = pi.product_id "
                 + "WHERE p.category_id = ?";
@@ -163,19 +163,37 @@ public class ProductDAO extends DBContext {
             st.setInt(1, cid);
             ResultSet rs = st.executeQuery();
             while (rs.next()) {
+                Integer saleId = null;
+                if (rs.getObject("sale_id") != null) {
+                    saleId = rs.getInt("sale_id");
+                }
                 int productId = rs.getInt("product_id");
                 Product product = findProductById(list, productId);
                 if (product == null) {
-                    product = new Product(
-                            productId,
-                            rs.getString("name"),
-                            rs.getString("description"),
-                            rs.getInt("category_id"),
-                            rs.getBigDecimal("price"),
-                            rs.getTimestamp("created_at"),
-                            rs.getTimestamp("updated_at"),
-                            new ArrayList<>()
-                    );
+                    if (saleId != null) {
+                        product = new Product(
+                                productId,
+                                rs.getString("name"),
+                                rs.getString("description"),
+                                rs.getInt("category_id"),
+                                rs.getBigDecimal("price"),
+                                rs.getTimestamp("created_at"),
+                                rs.getTimestamp("updated_at"),
+                                new ArrayList<>(),
+                                saleId
+                        );
+                    } else {
+                        product = new Product(
+                                productId,
+                                rs.getString("name"),
+                                rs.getString("description"),
+                                rs.getInt("category_id"),
+                                rs.getBigDecimal("price"),
+                                rs.getTimestamp("created_at"),
+                                rs.getTimestamp("updated_at"),
+                                new ArrayList<>()
+                        );
+                    }
                     list.add(product);
                 }
                 String imageUrl = rs.getString("image_url");
@@ -193,26 +211,45 @@ public class ProductDAO extends DBContext {
     public List<Product> getAllProduct() {
         List<Product> list = new ArrayList<>();
         //lenh sql select * from category
-        String sql = "SELECT p.product_id, p.name, p.description, p.category_id, p.price, p.created_at, p.updated_at, pi.image_url\n"
-                + "   FROM Products p\n"
+        String sql = "SELECT p.product_id, p.name, p.description, p.category_id, p.price, p.created_at, p.updated_at , p.sale_id, pi.image_url"
+                + "   FROM Products p"
                 + "   LEFT JOIN ProductImages pi ON p.product_id = pi.product_id";
         try {
             PreparedStatement st = connection.prepareStatement(sql);
             ResultSet rs = st.executeQuery();
             while (rs.next()) {
+                Integer saleId = null;
+                if (rs.getObject("sale_id") != null) {
+                    saleId = rs.getInt("sale_id");
+                }
                 int productId = rs.getInt("product_id");
                 Product product = findProductById(list, productId);
                 if (product == null) {
-                    product = new Product(
-                            productId,
-                            rs.getString("name"),
-                            rs.getString("description"),
-                            rs.getInt("category_id"),
-                            rs.getBigDecimal("price"),
-                            rs.getTimestamp("created_at"),
-                            rs.getTimestamp("updated_at"),
-                            new ArrayList<>()
-                    );
+                    if (saleId != null) {
+                        product = new Product(
+                                productId,
+                                rs.getString("name"),
+                                rs.getString("description"),
+                                rs.getInt("category_id"),
+                                rs.getBigDecimal("price"),
+                                rs.getTimestamp("created_at"),
+                                rs.getTimestamp("updated_at"),
+                                new ArrayList<>(),
+                                saleId
+                        );
+                    } else {
+                        product = new Product(
+                                productId,
+                                rs.getString("name"),
+                                rs.getString("description"),
+                                rs.getInt("category_id"),
+                                rs.getBigDecimal("price"),
+                                rs.getTimestamp("created_at"),
+                                rs.getTimestamp("updated_at"),
+                                new ArrayList<>()
+                        );
+                    }
+
                     list.add(product);
                 }
                 String imageUrl = rs.getString("image_url");
@@ -299,7 +336,7 @@ public class ProductDAO extends DBContext {
     //get product by id
     public Product getProductById(int productId) {
         Product product = null;
-        String getProductSql = "SELECT p.product_id, p.name, p.description, p.category_id, p.price, p.created_at, p.updated_at "
+        String getProductSql = "SELECT p.product_id, p.name, p.description, p.category_id, p.price, p.created_at, p.updated_at, p.sale_id "
                 + "FROM Products p "
                 + "WHERE p.product_id = ?";
         String getProductImagesSql = "SELECT image_url FROM [dbo].[ProductImages] WHERE product_id = ?";
@@ -311,17 +348,37 @@ public class ProductDAO extends DBContext {
             getProductStmt.setInt(1, productId);
             ResultSet productRs = getProductStmt.executeQuery();
             if (productRs.next()) {
-                product = new Product(
-                        productRs.getInt("product_id"),
-                        productRs.getString("name"),
-                        productRs.getString("description"),
-                        productRs.getInt("category_id"),
-                        productRs.getBigDecimal("price"),
-                        productRs.getTimestamp("created_at"),
-                        productRs.getTimestamp("updated_at"),
-                        new ArrayList<>(),
-                        new ArrayList<>()
-                );
+
+                Integer saleId = null;
+                if (productRs.getObject("sale_id") != null) {
+                    saleId = productRs.getInt("sale_id");
+                }
+                if (saleId != null) {
+                        product = new Product(
+                                productId,
+                                productRs.getString("name"),
+                                productRs.getString("description"),
+                                productRs.getInt("category_id"),
+                                productRs.getBigDecimal("price"),
+                                productRs.getTimestamp("created_at"),
+                                productRs.getTimestamp("updated_at"),
+                                new ArrayList<>(),
+                                new ArrayList<>(),
+                                saleId
+                        );
+                    } else {
+                        product = new Product(
+                                productId,
+                                productRs.getString("name"),
+                                productRs.getString("description"),
+                                productRs.getInt("category_id"),
+                                productRs.getBigDecimal("price"),
+                                productRs.getTimestamp("created_at"),
+                                productRs.getTimestamp("updated_at"),
+                                new ArrayList<>(),
+                                new ArrayList<>()
+                        );
+                    }
             }
             if (product != null) {
                 // Lấy danh sách các hình ảnh sản phẩm
@@ -547,7 +604,7 @@ public class ProductDAO extends DBContext {
         }
         return message;
     }
-    
+
     //get all size of a product
     public int getProduct_Size_Id(int product_id, int size) {
         int id = 0;
@@ -566,7 +623,7 @@ public class ProductDAO extends DBContext {
         }
         return id;
     }
-    
+
     //get a product size by id
     public Product_Size getProduct_SizeById(int psid) {
         Product_Size ps;
@@ -586,5 +643,24 @@ public class ProductDAO extends DBContext {
         }
         return null;
     }
+
+   public void updateSaleForProduct(int pid, Integer sid) {
+    String sql = "UPDATE Products SET sale_id = ? WHERE product_id = ?";
+    try (PreparedStatement st = connection.prepareStatement(sql)) {
+        if (sid != null) {
+            st.setInt(1, sid); 
+        } else {
+            st.setNull(1, java.sql.Types.INTEGER); // Set sale_id là NULL
+        }
+        st.setInt(2, pid);
+
+        int rowsAffected = st.executeUpdate();
+        if (rowsAffected == 0) {
+            throw new SQLException("Updating sale_id failed, no rows affected.");
+        }
+    } catch (SQLException e) {
+        System.out.println(e);
+    }
+}
 
 }

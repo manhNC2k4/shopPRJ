@@ -17,6 +17,7 @@ import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import java.net.URLEncoder;
 import model.Cart;
 
 /**
@@ -86,9 +87,13 @@ public class Login extends HttpServlet {
             if (result.equals("success")) {
                 UserDAO ud = new UserDAO();
                 UserDTO user = ud.getUserByMail(email);
+                System.out.println(user.toString());
+
                 // Tạo cookie với thời hạn 2 tháng
-                Cookie cookie = new Cookie("account", user.toString()); // Giả sử UserDTO có phương thức toString()
+                String encodedUser = URLEncoder.encode(user.toString(), "UTF-8");
+                Cookie cookie = new Cookie("account", encodedUser);
                 cookie.setMaxAge(60 * 60 * 24 * 60); // 2 tháng (tính bằng giây)
+                System.out.println(cookie);
                 response.addCookie(cookie);
 
                 if (user.getRole() == 1) {
@@ -110,6 +115,7 @@ public class Login extends HttpServlet {
                     // Lấy số lượng sản phẩm yêu thích và tạo cookie cho nó
                     FavoriteDAO fd = new FavoriteDAO();
                     int favoriteCount = fd.countFavoritesByUserId(user.getUser_id());
+                    System.out.println(favoriteCount);
                     Cookie favoriteCookie = new Cookie("favoriteCount", String.valueOf(favoriteCount));
                     favoriteCookie.setMaxAge(60 * 60 * 24 * 60);
                     response.addCookie(favoriteCookie);
@@ -120,11 +126,10 @@ public class Login extends HttpServlet {
                 request.getRequestDispatcher("login.jsp").forward(request, response);
             }
         } catch (NumberFormatException e) {
-            e.printStackTrace();
             request.setAttribute("error", "Invalid number format");
             request.getRequestDispatcher("login.jsp").forward(request, response);
-        } catch (Exception e) {
-            e.printStackTrace();
+        } catch (ServletException | IOException e) {
+
             request.setAttribute("error", "An error occurred during login");
             request.getRequestDispatcher("login.jsp").forward(request, response);
         }

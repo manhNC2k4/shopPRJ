@@ -8,6 +8,8 @@
 <%@ page import="DTO.UserDTO" %>
 <%@ page import="model.Cart" %>
 <%@ page import="jakarta.servlet.http.Cookie" %>
+<%@ page import="java.net.URLEncoder" %>
+<%@ page import="java.net.URLDecoder" %>
 <%
   Cookie[] cookies = request.getCookies();
   UserDTO user = null;
@@ -16,7 +18,8 @@
   if (cookies != null) {
     for (Cookie cookie : cookies) {
       if (cookie.getName().equals("account")) {
-        user = new UserDTO(cookie.getValue()); 
+        String decodedUser = URLDecoder.decode(cookie.getValue(), "UTF-8");
+        user = new UserDTO(decodedUser); 
       }
       if (cookie.getName().equals("cart")) {
         c = new Cart(cookie.getValue()); 
@@ -59,6 +62,18 @@
         <link rel="stylesheet" href="css/flaticon.css">
         <link rel="stylesheet" href="css/icomoon.css">
         <link rel="stylesheet" href="css/style.css">
+        <style>
+            /* Giá cũ (gạch ngang) */
+            .pricing .original-price {
+                text-decoration: line-through;
+                color: #888; /* Màu xám */
+            }
+
+            /* Giá mới (áp dụng khuyến mãi) */
+            .pricing .has-sale span:last-child { /* Chọn span cuối cùng, là giá mới */
+                color: red;
+            }
+        </style>
     </head>
     <body class="goto-here">
         <div class="py-1 bg-black">
@@ -110,7 +125,7 @@
                                     <a class="dropdown-item" href="logout">Log out</a>
                                 </div>
                             </li>
-                            </c:if>
+                        </c:if>
                     </ul>
                 </div>
             </div>
@@ -237,7 +252,29 @@
                                             </div>
                                             <h3><a href="#">${p.name}</a></h3>
                                             <div class="pricing">
-                                                <p class="price"><span>$${p.price}</span></p>
+                                                <c:set var="hasSale" value="false"/>
+                                                <c:forEach var="sale" items="${listSale}">
+                                                    <c:if test="${p.sale_id == sale.id}">
+                                                        <c:set var="hasSale" value="true" />
+                                                        <c:choose>
+                                                            <c:when test="${sale.discountType == 'percentage'}">
+                                                                <p class="price has-sale">
+                                                                    <span class="original-price">$${p.price}</span>
+                                                                    <span>$${p.price - (p.price * sale.discountValue / 100)}</span>
+                                                                </p>
+                                                            </c:when>
+                                                            <c:when test="${sale.discountType == 'fixed_amount'}">
+                                                                <p class="price has-sale">
+                                                                    <span class="original-price">$${p.price}</span>
+                                                                    <span>$${p.price - sale.discountValue}</span>
+                                                                </p>
+                                                            </c:when>
+                                                        </c:choose>
+                                                    </c:if>
+                                                </c:forEach>
+                                                <c:if test="${!hasSale}">
+                                                    <p class="price"><span>$${p.price}</span></p>
+                                                </c:if>
                                             </div>
                                             <p class="bottom-area d-flex px-3">
                                                 <a href="addFavorite?product_id=${p.id}" class="add-to-cart text-center py-2 mr-1"><span>Favorite <i class="ion-ios-add ml-1"></i></span></a>

@@ -21,6 +21,34 @@
         <link href="vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet" type="text/css">
         <link href="css/ruang-admin.min.css" rel="stylesheet">
         <link href="vendor/datatables/dataTables.bootstrap4.min.css" rel="stylesheet">
+        <style>
+            .popup {
+                display: none; /* Ẩn popup mặc định */
+                position: fixed; /* Giữ popup cố định khi cuộn trang */
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background-color: rgba(0, 0, 0, 0.5); /* Nền mờ */
+            }
+
+            .popup-content {
+                background-color: #fefefe;
+                margin: 10% auto; /* Canh giữa popup */
+                padding: 20px;
+                border-radius: 5px;
+                max-width: 1000px;
+                position: relative;
+            }
+
+            .close-button {
+                position: absolute;
+                top: 10px;
+                right: 15px;
+                font-size: 20px;
+                cursor: pointer;
+            }
+        </style>
     </head>
 
     <body id="page-top">
@@ -82,6 +110,20 @@
                             <h6 class="collapse-header">Category</h6>
                             <a class="collapse-item" href="listCategory">List Category</a>
                             <a class="collapse-item" href="addCategory">Add Category</a>
+                        </div>
+                    </div>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseSale" aria-expanded="true"
+                       aria-controls="collapseSale">
+                        <i class="fab fa-fw fa-wpforms"></i>
+                        <span>Sale</span>
+                    </a>
+                    <div id="collapseSale" class="collapse" aria-labelledby="headingSale" data-parent="#accordionSidebar">
+                        <div class="bg-white py-2 collapse-inner rounded">
+                            <h6 class="collapse-header">Sales</h6>
+                            <a class="collapse-item" href="listSale">List Sales</a>
+                            <a class="collapse-item" href="addSale">Add Sales</a>
                         </div>
                     </div>
                 </li>
@@ -386,6 +428,7 @@
                                                     <th>Price</th>
                                                     <th>Created At</th>
                                                     <th>Updated At</th>
+                                                    <th>Sale</th>
                                                     <th>Action</th>
                                                 </tr>
                                             </thead>
@@ -396,6 +439,7 @@
                                                     <th>Price</th>
                                                     <th>Created At</th>
                                                     <th>Updated At</th>
+                                                    <th>Sale</th>
                                                     <th>Action</th>
                                                 </tr>
                                             </tfoot>
@@ -407,11 +451,14 @@
                                                         <td>${p.price}</td>
                                                         <td>${p.createdAt}</td>
                                                         <td>${p.updatedAt}</td>
+                                                        <td><a href="detailSale?id=${p.sale_id}">${p.sale_id}</a></td>
                                                         <td>
                                                             <div class="btn-group" role="group">
-                                                                <a href="updateProduct?id=${p.id}" class="btn btn-primary btn-sm" onclick="return checkAdmin()">Update</a>
-                                                                <a href="deleteProduct?id=${p.id}" class="btn btn-danger btn-sm" onclick="return checkAdmin() && confirmDelete()">Delete</a>
-                                                            </div>
+                                                                <a href="updateProduct?id=${p.id}" class="btn btn-primary btn-sm"><i class="fas fa-edit"></i></a>
+                                                                <a href="deleteProduct?id=${p.id}" class="btn btn-danger btn-sm" onclick="return checkAdmin() && confirmDelete()"><i class="fas fa-trash-alt"></i></a>
+                                                                <a href="#" onclick="openPopup('${p.id}')" class="btn btn-outline-warning btn-sm" >
+                                                                    <i class="fas fa-tags"></i>
+                                                                </a>                                                            </div>
                                                         </td>
                                                     </tr>
                                                 </c:forEach>
@@ -476,7 +523,73 @@
         <a class="scroll-to-top rounded" href="#page-top">
             <i class="fas fa-angle-up"></i>
         </a>
-
+        <div id="salePopup" class="popup">
+            <div class="popup-content">
+                <div class="form-group">
+                    <span class="close-button" onclick="closePopup()">×</span>
+                </div>
+                <form id="saleForm" method="POST" action="setSale"> 
+                    <input type="hidden" name="id" value="${p.id}">
+                    <div class="row">
+                        <div class="col-lg-12 mb-4">
+                            <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                                <h6 class="m-0 font-weight-bold text-primary">List Sales</h6>
+                            </div>
+                            <div class="table-responsive">
+                                <table class="table align-items-center table-flush">
+                                    <thead class="thead-light">
+                                        <tr>
+                                            <th>ID</th>
+                                            <th>Name</th>
+                                            <th>Value</th>
+                                            <th>Start</th>
+                                            <th>End</th>
+                                            <th>Status</th>
+                                            <th>Select</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <c:forEach var="j" items="${requestScope.listSale}">
+                                            <tr>
+                                                <td><a href="detailSale?id=${j.id}">${j.id}</a></td>
+                                                <td>${j.name}</td>
+                                                <td>
+                                                    ${j.discountValue}
+                                                    <c:choose>
+                                                        <c:when test="${j.discountType == 'percentage'}">%</c:when>
+                                                        <c:when test="${j.discountType == 'fixed_amount'}">$</c:when>
+                                                    </c:choose> 
+                                                </td>
+                                                <td>${j.startDate}</td>
+                                                <td>${j.endDate}</td>
+                                                <td>
+                                                    <span 
+                                                        <c:choose>
+                                                            <c:when test="${j.status == 'active'}">class="badge badge-success"</c:when>
+                                                            <c:when test="${j.status == 'inactive'}">class="badge badge-danger"</c:when>
+                                                            <c:otherwise>class="badge badge-secondary"</c:otherwise> 
+                                                        </c:choose>
+                                                        >
+                                                        ${j.status}
+                                                    </span>
+                                                </td>
+                                                <td>
+                                                    <div class="item">
+                                                        <input type="radio" class="sale-radio" name="radio" value="${j.id}" > 
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                        </c:forEach>
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div class="card-footer"></div>
+                        </div>
+                    </div>
+                    <button type="submit">Xác nhận</button>
+                </form>
+            </div>
+        </div>
         <script src="vendor/jquery/jquery.min.js"></script>
         <script src="vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
         <script src="vendor/jquery-easing/jquery.easing.min.js"></script>
@@ -487,21 +600,44 @@
 
         <!-- Page level custom scripts -->
         <script>
-                                $(document).ready(function () {
-                                    $('#dataTable').DataTable(); // ID From dataTable 
-                                    $('#dataTableHover').DataTable(); // ID From dataTable with Hover
+                        const saleRadios = document.querySelectorAll('.sale-radio');
+
+                        saleRadios.forEach(radio => {
+                            radio.addEventListener('change', () => {
+                                saleRadios.forEach(otherRadio => {
+                                    if (otherRadio !== radio && otherRadio.checked) {
+                                        otherRadio.checked = false;
+                                    }
                                 });
-                                function checkAdmin() {
-                                    var isAdmin = <%= session.getAttribute("admin") != null %>;
-                                    //                if (!isAdmin) {
-                                    //                    alert('Bạn không có quyền thực hiện hành động này.');
-                                    //                    return false;
-                                    //                }
-                                    return true;
-                                }
-                                function confirmDelete() {
-                                    return confirm('Are you sure you want to delete this user?');
-                                }
+                            });
+                        });
+                        function openPopup(productId) {
+                            // Hiển thị popup
+                            document.getElementById("salePopup").style.display = "block";
+                            // Set giá trị id vào input hidden trong form
+                            document.querySelector("#saleForm input[name='id']").value = productId;
+                            
+                        }
+
+                        function closePopup() {
+                            // Ẩn popup
+                            document.getElementById("salePopup").style.display = "none";
+                        }
+                        $(document).ready(function () {
+                            $('#dataTable').DataTable(); // ID From dataTable 
+                            $('#dataTableHover').DataTable(); // ID From dataTable with Hover
+                        });
+                        function checkAdmin() {
+                            var isAdmin = <%= session.getAttribute("admin") != null %>;
+                            //                if (!isAdmin) {
+                            //                    alert('Bạn không có quyền thực hiện hành động này.');
+                            //                    return false;
+                            //                }
+                            return true;
+                        }
+                        function confirmDelete() {
+                            return confirm('Are you sure you want to delete this user?');
+                        }
         </script>
 
     </body>

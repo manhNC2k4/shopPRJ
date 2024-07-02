@@ -86,6 +86,20 @@
                     </div>
                 </li>
                 <li class="nav-item">
+                    <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseSale" aria-expanded="true"
+                       aria-controls="collapseSale">
+                        <i class="fab fa-fw fa-wpforms"></i>
+                        <span>Sale</span>
+                    </a>
+                    <div id="collapseSale" class="collapse" aria-labelledby="headingSale" data-parent="#accordionSidebar">
+                        <div class="bg-white py-2 collapse-inner rounded">
+                            <h6 class="collapse-header">Sales</h6>
+                            <a class="collapse-item" href="listSale">List Sales</a>
+                            <a class="collapse-item" href="addSale">Add Sales</a>
+                        </div>
+                    </div>
+                </li>
+                <li class="nav-item">
                     <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseBootstrap"
                        aria-expanded="true" aria-controls="collapseBootstrap">
                         <i class="far fa-fw fa-window-maximize"></i>

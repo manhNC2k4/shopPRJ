@@ -7,6 +7,7 @@
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <%@ page import="DTO.UserDTO" %>
 <%@ page import="jakarta.servlet.http.Cookie" %>
+<%@ page import="java.net.URLDecoder" %>
 <%
   Cookie[] cookies = request.getCookies();
   UserDTO user = null;
@@ -14,7 +15,8 @@
     for (Cookie cookie : cookies) {
       if (cookie.getName().equals("account")) {
         // Chuyển đổi chuỗi accountStr thành đối tượng UserDTO
-        user = new UserDTO(cookie.getValue()); 
+       String decodedUser = URLDecoder.decode(cookie.getValue(), "UTF-8");
+        user = new UserDTO(decodedUser); 
       }
     }
   }

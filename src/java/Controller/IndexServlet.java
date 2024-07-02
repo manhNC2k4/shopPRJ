@@ -8,6 +8,7 @@ import DTO.UserDTO;
 import dal.CategoryDAO;
 import dal.FavoriteDAO;
 import dal.GetProductDAO;
+import dal.SaleDAO;
 import java.io.IOException;
 import java.io.PrintWriter;
 import jakarta.servlet.ServletException;
@@ -16,11 +17,15 @@ import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import model.Category;
 import model.Product;
+import model.Sale;
 
 /**
  *
@@ -67,7 +72,7 @@ public class IndexServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-       CategoryDAO cd = new CategoryDAO();
+        CategoryDAO cd = new CategoryDAO();
         List<Category> listCat = cd.getALl();
         GetProductDAO gpd = new GetProductDAO();
         List<Product> listPro = gpd.getLatestProducts(8);
@@ -78,7 +83,13 @@ public class IndexServlet extends HttpServlet {
         }
         request.getSession().setAttribute("categoryMap", categoryMap);
         request.getSession().setAttribute("dataPro", listPro);
-
+        SaleDAO sd = new SaleDAO();
+        try {
+            List<Sale> listSale = sd.getAllSales();
+            request.getSession().setAttribute("listSale", listSale);
+        } catch (SQLException ex) {
+            Logger.getLogger(ListSale.class.getName()).log(Level.SEVERE, null, ex);
+        }
         // Lấy thông tin user từ session hoặc cookie
         Cookie[] cookies = request.getCookies();
         UserDTO user = null;
@@ -90,17 +101,17 @@ public class IndexServlet extends HttpServlet {
                 }
             }
         }
-        
-        if (user != null) {
-        // Lấy số lượng sản phẩm yêu thích của user
-        FavoriteDAO favoriteDAO = new FavoriteDAO();
-        int countFavorite = favoriteDAO.countFavoritesByUserId(user.getUser_id());
 
-        // Tạo cookie với thời hạn 2 tháng
-        Cookie favoriteCookie = new Cookie("favoriteCount", String.valueOf(countFavorite));
-        favoriteCookie.setMaxAge(60 * 60 * 24 * 60); // 2 tháng (tính bằng giây)
-        response.addCookie(favoriteCookie);
-    }
+        if (user != null) {
+            // Lấy số lượng sản phẩm yêu thích của user
+            FavoriteDAO favoriteDAO = new FavoriteDAO();
+            int countFavorite = favoriteDAO.countFavoritesByUserId(user.getUser_id());
+
+            // Tạo cookie với thời hạn 2 tháng
+            Cookie favoriteCookie = new Cookie("favoriteCount", String.valueOf(countFavorite));
+            favoriteCookie.setMaxAge(60 * 60 * 24 * 60); // 2 tháng (tính bằng giây)
+            response.addCookie(favoriteCookie);
+        }
 
         response.sendRedirect("index.jsp");
     }
@@ -127,7 +138,13 @@ public class IndexServlet extends HttpServlet {
         }
         request.getSession().setAttribute("categoryMap", categoryMap);
         request.getSession().setAttribute("dataPro", listPro);
-
+        SaleDAO sd = new SaleDAO();
+        try {
+            List<Sale> listSale = sd.getAllSales();
+            request.getSession().setAttribute("listSale", listSale);
+        } catch (SQLException ex) {
+            Logger.getLogger(ListSale.class.getName()).log(Level.SEVERE, null, ex);
+        }
         // Lấy thông tin user từ session hoặc cookie
         Cookie[] cookies = request.getCookies();
         UserDTO user = null;
@@ -139,17 +156,17 @@ public class IndexServlet extends HttpServlet {
                 }
             }
         }
-        
-        if (user != null) {
-        // Lấy số lượng sản phẩm yêu thích của user
-        FavoriteDAO favoriteDAO = new FavoriteDAO();
-        int countFavorite = favoriteDAO.countFavoritesByUserId(user.getUser_id());
 
-        // Tạo cookie với thời hạn 2 tháng
-        Cookie favoriteCookie = new Cookie("favoriteCount", String.valueOf(countFavorite));
-        favoriteCookie.setMaxAge(60 * 60 * 24 * 60); // 2 tháng (tính bằng giây)
-        response.addCookie(favoriteCookie);
-    }
+        if (user != null) {
+            // Lấy số lượng sản phẩm yêu thích của user
+            FavoriteDAO favoriteDAO = new FavoriteDAO();
+            int countFavorite = favoriteDAO.countFavoritesByUserId(user.getUser_id());
+
+            // Tạo cookie với thời hạn 2 tháng
+            Cookie favoriteCookie = new Cookie("favoriteCount", String.valueOf(countFavorite));
+            favoriteCookie.setMaxAge(60 * 60 * 24 * 60); // 2 tháng (tính bằng giây)
+            response.addCookie(favoriteCookie);
+        }
 
         response.sendRedirect("index.jsp");
     }

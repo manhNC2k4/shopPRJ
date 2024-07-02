@@ -15,6 +15,7 @@ import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -132,9 +133,27 @@ public class CartShow extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        String productId = request.getParameter("productId");
-        String size = request.getParameter("size");
-        String rquantity = request.getParameter("quantity");
+        CartDAO cd = new CartDAO();
+        ProductDAO pd = new ProductDAO();
+        String[] checkedItemIds = request.getParameterValues("checkedItemIds");
+        List<Integer> listItemChecked = new ArrayList<>();
+        if (checkedItemIds != null) {
+            request.getSession().removeAttribute("total");
+            request.getSession().removeAttribute("listItemChecked");
+            int total = 0;
+
+            for (String itemId : checkedItemIds) {
+                int id = Integer.parseInt(itemId);
+                listItemChecked.add(id);
+                Cart_Item catitem = cd.getCart_ItemById(id);
+                Product_Size ps = pd.getProduct_SizeById(catitem.getProduct_size_id());
+                Product product = pd.getProductById(ps.getProductId());
+                total += product.getPrice().intValue() * catitem.getQuantity();
+            }
+            request.getSession().setAttribute("total", total);
+            request.getSession().setAttribute("listItemChecked", listItemChecked);
+        }
+
         request.getSession().removeAttribute("productInfoList");
         Cookie[] cookies = request.getCookies();
         Cart c = null;
@@ -147,8 +166,7 @@ public class CartShow extends HttpServlet {
             }
         }
         if (c != null) {
-            CartDAO cd = new CartDAO();
-            ProductDAO pd = new ProductDAO();
+
             List<Cart_Item> listItem = cd.getAllCartItemsByCartId(c.getId());
             if (listItem != null && !listItem.isEmpty()) {
                 List<ProductInfo> productInfoList = new ArrayList<>();

@@ -19,9 +19,9 @@ public class UserDTO {
     private Date updated_at;
     private int role;
 
-       // Constructor nhận chuỗi
+    // Constructor nhận chuỗi
     public UserDTO(String serializedData) {
-        String[] parts = serializedData.split("\\|");
+        String[] parts = serializedData.split("-");
         this.user_id = Integer.parseInt(parts[0]);
         this.username = parts[1];
         this.email = parts[2];
@@ -139,8 +139,8 @@ public class UserDTO {
     }
 
     // Phương thức toString để hiển thị thông tin người dùng
-     @Override
+    @Override
     public String toString() {
-        return user_id + "|" + username + "|" + email + "|" + first_name + "|" + last_name + "|" + phone + "|" + address + "|" + created_at.getTime() + "|" + updated_at.getTime() + "|" + role;
+        return user_id + "-" + username + "-" + email + "-" + first_name + "-" + last_name + "-" + phone + "-" + address + "-" + created_at.getTime() + "-" + updated_at.getTime() + "-" + role;
     }
 }

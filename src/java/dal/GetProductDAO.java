@@ -26,8 +26,8 @@ public class GetProductDAO extends DBContext {
 
         try {
             String sql = "SELECT top 1 [price]"
-                          +" FROM [dbo].[Products]"
-                          +" order by [price] ASC ";
+                    + " FROM [dbo].[Products]"
+                    + " order by [price] ASC ";
             PreparedStatement statement = connection.prepareStatement(sql);
             ResultSet resultSet = statement.executeQuery();
             if (resultSet.next()) {
@@ -39,15 +39,15 @@ public class GetProductDAO extends DBContext {
         }
         return minPrice;
     }
-    
+
     //get max price
     public int getMaxPrice() {
         int maxPrice = 0;
 
         try {
             String sql = "SELECT top 1 [price]"
-                          +" FROM [dbo].[Products]"
-                          +" order by [price] DESC ";
+                    + " FROM [dbo].[Products]"
+                    + " order by [price] DESC ";
             PreparedStatement statement = connection.prepareStatement(sql);
             ResultSet resultSet = statement.executeQuery();
             if (resultSet.next()) {
@@ -66,23 +66,42 @@ public class GetProductDAO extends DBContext {
         if (limit <= 0) {
             throw new IllegalArgumentException("Limit must be a positive integer.");
         }
-        String sql = "SELECT TOP " + limit + " p.product_id, p.name, p.description, p.category_id, p.price, p.created_at, p.updated_at\n"
+        String sql = "SELECT TOP " + limit + " p.product_id, p.name, p.description, p.category_id, p.price, p.created_at, p.updated_at, p.sale_id\n"
                 + " FROM Products p\n"
                 + " ORDER BY p.created_at DESC";
         try {
             PreparedStatement st = connection.prepareStatement(sql);
             ResultSet rs = st.executeQuery();
             while (rs.next()) {
-                Product product = new Product(
-                        rs.getInt("product_id"),
-                        rs.getString("name"),
-                        rs.getString("description"),
-                        rs.getInt("category_id"),
-                        rs.getBigDecimal("price"),
-                        rs.getTimestamp("created_at"),
-                        rs.getTimestamp("updated_at"),
-                        new ArrayList<>()
-                );
+                Integer saleId = null;
+                if (rs.getObject("sale_id") != null) {
+                    saleId = rs.getInt("sale_id");
+                }
+                Product product;
+                if (saleId != null) {
+                    product = new Product(
+                            rs.getInt("product_id"),
+                            rs.getString("name"),
+                            rs.getString("description"),
+                            rs.getInt("category_id"),
+                            rs.getBigDecimal("price"),
+                            rs.getTimestamp("created_at"),
+                            rs.getTimestamp("updated_at"),
+                            new ArrayList<>(),
+                            saleId
+                    );
+                } else {
+                    product = new Product(
+                            rs.getInt("product_id"),
+                            rs.getString("name"),
+                            rs.getString("description"),
+                            rs.getInt("category_id"),
+                            rs.getBigDecimal("price"),
+                            rs.getTimestamp("created_at"),
+                            rs.getTimestamp("updated_at"),
+                            new ArrayList<>()
+                    );
+                }
                 list.add(product);
             }
         } catch (SQLException e) {
@@ -167,7 +186,7 @@ public class GetProductDAO extends DBContext {
         }
         return totalProducts;
     }
-    
+
     //count product by category
     public int getTotalProductsByCate(int id, BigDecimal minPrice, BigDecimal maxPrice) {
         int totalProducts = 0;
@@ -190,7 +209,7 @@ public class GetProductDAO extends DBContext {
     }
 
     //count product
-    public int getTotalProducts( BigDecimal minPrice, BigDecimal maxPrice) {
+    public int getTotalProducts(BigDecimal minPrice, BigDecimal maxPrice) {
         int totalProducts = 0;
 
         try {
@@ -210,7 +229,7 @@ public class GetProductDAO extends DBContext {
     }
 
     //get list product per page
-    public List<Product> getProductsPerPage(int page, int productsPerPage,BigDecimal minPrice, BigDecimal maxPrice) {
+    public List<Product> getProductsPerPage(int page, int productsPerPage, BigDecimal minPrice, BigDecimal maxPrice) {
         List<Product> list = new ArrayList<>();
         int start = (page - 1) * productsPerPage;
 
