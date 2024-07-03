@@ -160,6 +160,16 @@
                 background: #dbcc8f;
                 border-radius: 0;
             }
+            /* Giá cũ (gạch ngang) */
+            .pricing .original-price {
+                text-decoration: line-through;
+                color: #888; /* Màu xám */
+            }
+
+            /* Giá mới (áp dụng khuyến mãi) */
+            .pricing .has-sale span:last-child { /* Chọn span cuối cùng, là giá mới */
+                color: red;
+            }
 
         </style>
     </head>
@@ -192,7 +202,7 @@
                     <span class="oi oi-menu"></span> Menu
                 </button>
 
-                 <div class="collapse navbar-collapse" id="ftco-nav">
+                <div class="collapse navbar-collapse" id="ftco-nav">
                     <ul class="navbar-nav ml-auto">
                         <li class="nav-item active"><a href="index" class="nav-link">Home</a></li>
                         <li class="nav-item"><a href="shop" class="nav-link">Shop</a></li>
@@ -261,10 +271,35 @@
                                                     </div>
                                                     <h3><a href="#">${p.name}</a></h3>
                                                     <div class="pricing">
-                                                        <p class="price"><span>$${p.price}</span></p>
+                                                        <c:set var="hasSale" value="false"/>
+                                                        <c:forEach var="sale" items="${listSale}">
+                                                            <c:if test="${p.sale_id == sale.id}">
+                                                                <c:set var="now" value="<%= new java.util.Date() %>" />
+                                                                <c:if test="${now >= sale.startDate && now <= sale.endDate && sale.status == 'active'}">
+                                                                    <c:set var="hasSale" value="true" />
+                                                                    <c:choose>
+                                                                        <c:when test="${sale.discountType == 'percentage'}">
+                                                                            <p class="price has-sale">
+                                                                                <span class="original-price">$${p.price}</span>
+                                                                                <span>$${p.price - (p.price * sale.discountValue / 100)}</span>
+                                                                            </p>
+                                                                        </c:when>
+                                                                        <c:when test="${sale.discountType == 'fixed_amount'}">
+                                                                            <p class="price has-sale">
+                                                                                <span class="original-price">$${p.price}</span>
+                                                                                <span>$${p.price - sale.discountValue}</span>
+                                                                            </p>
+                                                                        </c:when>
+                                                                    </c:choose>
+                                                                </c:if> 
+                                                            </c:if>
+                                                        </c:forEach>
+                                                        <c:if test="${!hasSale}">
+                                                            <p class="price"><span>$${p.price}</span></p>
+                                                        </c:if>
                                                     </div>
                                                     <p class="bottom-area d-flex px-3">
-                                                        <a href="#" class="add-to-cart text-center py-2 mr-1"><span>Add to cart <i class="ion-ios-add ml-1"></i></span></a>
+                                                        <a href="addFavorite?product_id=${p.id}" class="add-to-cart text-center py-2 mr-1"><span>Favorite <i class="ion-ios-add ml-1"></i></span></a>
                                                         <a href="singleProduct?id=${p.id}" class="buy-now text-center py-2">Buy now<span><i class="ion-ios-cart ml-1"></i></span></a>
                                                     </p>
                                                 </div>
@@ -377,7 +412,7 @@
                                                                 </li>
                                                             </c:forEach>    
                                                         </ul>
-                                                         <input type="hidden" name="nosize" value="nosize">
+                                                        <input type="hidden" name="nosize" value="nosize">
                                                         <input type="hidden" name="cid" value="${param.cid != null ? param.cid : 0}">
                                                         <input type="hidden" name="sort" value="${param.sort != null ? param.sort : 0}">
                                                     </form>

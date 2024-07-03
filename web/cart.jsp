@@ -249,7 +249,14 @@
                                 <span id="total">$${sessionScope.total}</span>
                             </p>
                         </div>
-                        <p class="text-center"><a href="checkout.html" class="btn btn-primary py-3 px-4">Proceed to Checkout</a></p>
+                        <form action="checkout" method="POST"> <%-- Form để gửi dữ liệu --%>
+                            <input type="hidden" id="checkedItems" name="checkedItemIds" value=""> 
+                            <p class="text-center">
+                                <button id="checkoutButton" class="btn btn-primary py-3 px-4" disabled>
+                                    Proceed to Checkout
+                                </button>
+                            </p>
+                        </form>
                     </div>
                 </div>
             </div>
@@ -346,35 +353,39 @@
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 
         <script>
-            $(document).ready(function () {
-//
-//                function updateCartTotals() {
-//                    var subtotal = 0;
-//                    $('.item').each(function () {
-//                        var checkbox = $(this).find('.product-checkbox');
-//                        if (checkbox.prop('checked')) {
-//                            var price = parseFloat(checkbox.data('price'));
-//                            var quantity = parseFloat(checkbox.data('quantity'));
-//                            var total = price * quantity;
-//                            subtotal += total;
-//                        }
-//                    });
-////                    $('#discount').text(subtotal.toFixed(2));
-//                    // Update subtotal and total in the cart
-//                    $('#subtotal').text('$' + subtotal.toFixed(2));
-//                    // Update other totals as needed
-//                    $('#total').text('$' + subtotal.toFixed(2)); // For now, total is the same as subtotal
-//                }
-//
-//                // Initial update when the page loads
-//                updateCartTotals();
-//
-//                // Listen for change in checkboxes
-//                $('.product-checkbox').on('change', function () {
-////                    location.reload();
-//                    updateCartTotals();
-//                });
 
+            // Hàm kiểm tra có item nào được chọn hay chưa
+            function checkSelectedItems() {
+                const checkedItems = document.querySelectorAll('.product-checkbox:checked');
+                const checkoutButton = document.getElementById('checkoutButton');
+                const checkedItemsInput = document.getElementById('checkedItems');
+
+                // Tạo mảng chứa các ID sản phẩm được chọn
+                let checkedItemIds = [];
+                checkedItems.forEach(item => {
+                    checkedItemIds.push(item.getAttribute('data-id'));
+                });
+
+                // Cập nhật giá trị của input hidden
+                checkedItemsInput.value = checkedItemIds.join(',');
+
+                if (checkedItems.length > 0) {
+                    checkoutButton.disabled = false;
+                } else {
+                    checkoutButton.disabled = true;
+                }
+            }
+
+            // Gọi hàm kiểm tra mỗi khi có checkbox thay đổi
+            const checkboxes = document.querySelectorAll('.product-checkbox');
+            checkboxes.forEach(checkbox => {
+                checkbox.addEventListener('change', checkSelectedItems);
+            });
+
+            // Gọi hàm kiểm tra khi trang web được tải lên
+            checkSelectedItems();
+
+            $(document).ready(function () {
                 var minQuantity = 1;
                 // Khi nút giảm số lượng được nhấn
                 $('.quantity-left-minus').click(function (e) {

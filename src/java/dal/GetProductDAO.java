@@ -234,7 +234,7 @@ public class GetProductDAO extends DBContext {
         int start = (page - 1) * productsPerPage;
 
         try {
-            String sql = "SELECT p.product_id, p.name, p.description, p.category_id, p.price, p.created_at, p.updated_at FROM Products p"
+            String sql = "SELECT p.product_id, p.name, p.description, p.category_id, p.price, p.created_at, p.updated_at, p.sale_id FROM Products p"
                     + " WHERE p.price >= ? AND p.price <= ?"
                     + " ORDER BY p.product_id"
                     + " OFFSET ? ROWS"
@@ -248,16 +248,35 @@ public class GetProductDAO extends DBContext {
             ResultSet rs = statement.executeQuery();
 
             while (rs.next()) {
-                Product product = new Product(
-                        rs.getInt("product_id"),
-                        rs.getString("name"),
-                        rs.getString("description"),
-                        rs.getInt("category_id"),
-                        rs.getBigDecimal("price"),
-                        rs.getTimestamp("created_at"),
-                        rs.getTimestamp("updated_at"),
-                        new ArrayList<>()
-                );
+                Integer saleId = null;
+                if (rs.getObject("sale_id") != null) {
+                    saleId = rs.getInt("sale_id");
+                }
+                Product product;
+                if (saleId != null) {
+                    product = new Product(
+                            rs.getInt("product_id"),
+                            rs.getString("name"),
+                            rs.getString("description"),
+                            rs.getInt("category_id"),
+                            rs.getBigDecimal("price"),
+                            rs.getTimestamp("created_at"),
+                            rs.getTimestamp("updated_at"),
+                            new ArrayList<>(),
+                            saleId
+                    );
+                } else {
+                    product = new Product(
+                            rs.getInt("product_id"),
+                            rs.getString("name"),
+                            rs.getString("description"),
+                            rs.getInt("category_id"),
+                            rs.getBigDecimal("price"),
+                            rs.getTimestamp("created_at"),
+                            rs.getTimestamp("updated_at"),
+                            new ArrayList<>()
+                    );
+                }
                 list.add(product);
             }
         } catch (SQLException e) {
@@ -275,7 +294,7 @@ public class GetProductDAO extends DBContext {
         int start = (page - 1) * productsPerPage;
 
         try {
-            String sql = "SELECT p.product_id, p.name, p.description, p.category_id, p.price, p.created_at, p.updated_at"
+            String sql = "SELECT p.product_id, p.name, p.description, p.category_id, p.price, p.created_at, p.updated_at, p.sale_id"
                     + " FROM Products p"
                     + " WHERE p.price >= ? AND p.price <= ?"
                     + " ORDER BY p.created_at DESC"
@@ -289,16 +308,35 @@ public class GetProductDAO extends DBContext {
             ResultSet rs = statement.executeQuery();
 
             while (rs.next()) {
-                Product product = new Product(
-                        rs.getInt("product_id"),
-                        rs.getString("name"),
-                        rs.getString("description"),
-                        rs.getInt("category_id"),
-                        rs.getBigDecimal("price"),
-                        rs.getTimestamp("created_at"),
-                        rs.getTimestamp("updated_at"),
-                        new ArrayList<>()
-                );
+                Integer saleId = null;
+                if (rs.getObject("sale_id") != null) {
+                    saleId = rs.getInt("sale_id");
+                }
+                Product product;
+                if (saleId != null) {
+                    product = new Product(
+                            rs.getInt("product_id"),
+                            rs.getString("name"),
+                            rs.getString("description"),
+                            rs.getInt("category_id"),
+                            rs.getBigDecimal("price"),
+                            rs.getTimestamp("created_at"),
+                            rs.getTimestamp("updated_at"),
+                            new ArrayList<>(),
+                            saleId
+                    );
+                } else {
+                    product = new Product(
+                            rs.getInt("product_id"),
+                            rs.getString("name"),
+                            rs.getString("description"),
+                            rs.getInt("category_id"),
+                            rs.getBigDecimal("price"),
+                            rs.getTimestamp("created_at"),
+                            rs.getTimestamp("updated_at"),
+                            new ArrayList<>()
+                    );
+                }
                 list.add(product);
             }
         } catch (SQLException e) {
@@ -316,7 +354,7 @@ public class GetProductDAO extends DBContext {
         int start = (page - 1) * productsPerPage;
 
         try {
-            String sql = "SELECT p.product_id, p.name, p.description, p.category_id, p.price, p.created_at, p.updated_at"
+            String sql = "SELECT p.product_id, p.name, p.description, p.category_id, p.price, p.created_at, p.updated_at, p.sale_id"
                     + " FROM Products p"
                     + " WHERE p.price >= ? AND p.price <= ?"
                     + " ORDER BY p.created_at ASC"
@@ -330,16 +368,35 @@ public class GetProductDAO extends DBContext {
             ResultSet rs = statement.executeQuery();
 
             while (rs.next()) {
-                Product product = new Product(
-                        rs.getInt("product_id"),
-                        rs.getString("name"),
-                        rs.getString("description"),
-                        rs.getInt("category_id"),
-                        rs.getBigDecimal("price"),
-                        rs.getTimestamp("created_at"),
-                        rs.getTimestamp("updated_at"),
-                        new ArrayList<>()
-                );
+                Integer saleId = null;
+                if (rs.getObject("sale_id") != null) {
+                    saleId = rs.getInt("sale_id");
+                }
+                Product product;
+                if (saleId != null) {
+                    product = new Product(
+                            rs.getInt("product_id"),
+                            rs.getString("name"),
+                            rs.getString("description"),
+                            rs.getInt("category_id"),
+                            rs.getBigDecimal("price"),
+                            rs.getTimestamp("created_at"),
+                            rs.getTimestamp("updated_at"),
+                            new ArrayList<>(),
+                            saleId
+                    );
+                } else {
+                    product = new Product(
+                            rs.getInt("product_id"),
+                            rs.getString("name"),
+                            rs.getString("description"),
+                            rs.getInt("category_id"),
+                            rs.getBigDecimal("price"),
+                            rs.getTimestamp("created_at"),
+                            rs.getTimestamp("updated_at"),
+                            new ArrayList<>()
+                    );
+                }
                 list.add(product);
             }
         } catch (SQLException e) {
@@ -357,7 +414,7 @@ public class GetProductDAO extends DBContext {
         int start = (page - 1) * productsPerPage;
 
         try {
-            String sql = "SELECT p.product_id, p.name, p.description, p.category_id, p.price, p.created_at, p.updated_at"
+            String sql = "SELECT p.product_id, p.name, p.description, p.category_id, p.price, p.created_at, p.updated_at, p.sale_id"
                     + " FROM Products p"
                     + " WHERE p.price >= ? AND p.price <= ?"
                     + " ORDER BY p.price DESC"
@@ -371,16 +428,35 @@ public class GetProductDAO extends DBContext {
             ResultSet rs = statement.executeQuery();
 
             while (rs.next()) {
-                Product product = new Product(
-                        rs.getInt("product_id"),
-                        rs.getString("name"),
-                        rs.getString("description"),
-                        rs.getInt("category_id"),
-                        rs.getBigDecimal("price"),
-                        rs.getTimestamp("created_at"),
-                        rs.getTimestamp("updated_at"),
-                        new ArrayList<>()
-                );
+                Integer saleId = null;
+                if (rs.getObject("sale_id") != null) {
+                    saleId = rs.getInt("sale_id");
+                }
+                Product product;
+                if (saleId != null) {
+                    product = new Product(
+                            rs.getInt("product_id"),
+                            rs.getString("name"),
+                            rs.getString("description"),
+                            rs.getInt("category_id"),
+                            rs.getBigDecimal("price"),
+                            rs.getTimestamp("created_at"),
+                            rs.getTimestamp("updated_at"),
+                            new ArrayList<>(),
+                            saleId
+                    );
+                } else {
+                    product = new Product(
+                            rs.getInt("product_id"),
+                            rs.getString("name"),
+                            rs.getString("description"),
+                            rs.getInt("category_id"),
+                            rs.getBigDecimal("price"),
+                            rs.getTimestamp("created_at"),
+                            rs.getTimestamp("updated_at"),
+                            new ArrayList<>()
+                    );
+                }
                 list.add(product);
             }
         } catch (SQLException e) {
@@ -398,7 +474,7 @@ public class GetProductDAO extends DBContext {
         int start = (page - 1) * productsPerPage;
 
         try {
-            String sql = "SELECT p.product_id, p.name, p.description, p.category_id, p.price, p.created_at, p.updated_at"
+            String sql = "SELECT p.product_id, p.name, p.description, p.category_id, p.price, p.created_at, p.updated_at, p.sale_id"
                     + " FROM Products p"
                     + " WHERE p.price >= ? AND p.price <= ?"
                     + " ORDER BY p.price ASC"
@@ -412,16 +488,35 @@ public class GetProductDAO extends DBContext {
             ResultSet rs = statement.executeQuery();
 
             while (rs.next()) {
-                Product product = new Product(
-                        rs.getInt("product_id"),
-                        rs.getString("name"),
-                        rs.getString("description"),
-                        rs.getInt("category_id"),
-                        rs.getBigDecimal("price"),
-                        rs.getTimestamp("created_at"),
-                        rs.getTimestamp("updated_at"),
-                        new ArrayList<>()
-                );
+                Integer saleId = null;
+                if (rs.getObject("sale_id") != null) {
+                    saleId = rs.getInt("sale_id");
+                }
+                Product product;
+                if (saleId != null) {
+                    product = new Product(
+                            rs.getInt("product_id"),
+                            rs.getString("name"),
+                            rs.getString("description"),
+                            rs.getInt("category_id"),
+                            rs.getBigDecimal("price"),
+                            rs.getTimestamp("created_at"),
+                            rs.getTimestamp("updated_at"),
+                            new ArrayList<>(),
+                            saleId
+                    );
+                } else {
+                    product = new Product(
+                            rs.getInt("product_id"),
+                            rs.getString("name"),
+                            rs.getString("description"),
+                            rs.getInt("category_id"),
+                            rs.getBigDecimal("price"),
+                            rs.getTimestamp("created_at"),
+                            rs.getTimestamp("updated_at"),
+                            new ArrayList<>()
+                    );
+                }
                 list.add(product);
             }
         } catch (SQLException e) {
@@ -439,7 +534,7 @@ public class GetProductDAO extends DBContext {
         int start = (page - 1) * productsPerPage;
 
         try {
-            String sql = "SELECT p.product_id, p.name, p.description, p.category_id, p.price, p.created_at, p.updated_at"
+            String sql = "SELECT p.product_id, p.name, p.description, p.category_id, p.price, p.created_at, p.updated_at, p.sale_id"
                     + " FROM Products p"
                     + " Where p.category_id = ? AND p.price >= ? AND p.price <= ?"
                     + " ORDER BY p.product_id"
@@ -454,16 +549,35 @@ public class GetProductDAO extends DBContext {
             ResultSet rs = statement.executeQuery();
 
             while (rs.next()) {
-                Product product = new Product(
-                        rs.getInt("product_id"),
-                        rs.getString("name"),
-                        rs.getString("description"),
-                        rs.getInt("category_id"),
-                        rs.getBigDecimal("price"),
-                        rs.getTimestamp("created_at"),
-                        rs.getTimestamp("updated_at"),
-                        new ArrayList<>()
-                );
+                Integer saleId = null;
+                if (rs.getObject("sale_id") != null) {
+                    saleId = rs.getInt("sale_id");
+                }
+                Product product;
+                if (saleId != null) {
+                    product = new Product(
+                            rs.getInt("product_id"),
+                            rs.getString("name"),
+                            rs.getString("description"),
+                            rs.getInt("category_id"),
+                            rs.getBigDecimal("price"),
+                            rs.getTimestamp("created_at"),
+                            rs.getTimestamp("updated_at"),
+                            new ArrayList<>(),
+                            saleId
+                    );
+                } else {
+                    product = new Product(
+                            rs.getInt("product_id"),
+                            rs.getString("name"),
+                            rs.getString("description"),
+                            rs.getInt("category_id"),
+                            rs.getBigDecimal("price"),
+                            rs.getTimestamp("created_at"),
+                            rs.getTimestamp("updated_at"),
+                            new ArrayList<>()
+                    );
+                }
                 list.add(product);
             }
         } catch (SQLException e) {
@@ -481,7 +595,7 @@ public class GetProductDAO extends DBContext {
         int start = (page - 1) * productsPerPage;
 
         try {
-            String sql = "SELECT p.product_id, p.name, p.description, p.category_id, p.price, p.created_at, p.updated_at"
+            String sql = "SELECT p.product_id, p.name, p.description, p.category_id, p.price, p.created_at, p.updated_at, p.sale_id"
                     + " FROM Products p"
                     + " Where p.category_id = ? AND p.price >= ? AND p.price <= ?"
                     + " ORDER BY p.created_at DESC"
@@ -496,16 +610,35 @@ public class GetProductDAO extends DBContext {
             ResultSet rs = statement.executeQuery();
 
             while (rs.next()) {
-                Product product = new Product(
-                        rs.getInt("product_id"),
-                        rs.getString("name"),
-                        rs.getString("description"),
-                        rs.getInt("category_id"),
-                        rs.getBigDecimal("price"),
-                        rs.getTimestamp("created_at"),
-                        rs.getTimestamp("updated_at"),
-                        new ArrayList<>()
-                );
+                Integer saleId = null;
+                if (rs.getObject("sale_id") != null) {
+                    saleId = rs.getInt("sale_id");
+                }
+                Product product;
+                if (saleId != null) {
+                    product = new Product(
+                            rs.getInt("product_id"),
+                            rs.getString("name"),
+                            rs.getString("description"),
+                            rs.getInt("category_id"),
+                            rs.getBigDecimal("price"),
+                            rs.getTimestamp("created_at"),
+                            rs.getTimestamp("updated_at"),
+                            new ArrayList<>(),
+                            saleId
+                    );
+                } else {
+                    product = new Product(
+                            rs.getInt("product_id"),
+                            rs.getString("name"),
+                            rs.getString("description"),
+                            rs.getInt("category_id"),
+                            rs.getBigDecimal("price"),
+                            rs.getTimestamp("created_at"),
+                            rs.getTimestamp("updated_at"),
+                            new ArrayList<>()
+                    );
+                }
                 list.add(product);
             }
         } catch (SQLException e) {
@@ -523,7 +656,7 @@ public class GetProductDAO extends DBContext {
         int start = (page - 1) * productsPerPage;
 
         try {
-            String sql = "SELECT p.product_id, p.name, p.description, p.category_id, p.price, p.created_at, p.updated_at"
+            String sql = "SELECT p.product_id, p.name, p.description, p.category_id, p.price, p.created_at, p.updated_at, p.sale_id"
                     + " FROM Products p"
                     + " Where p.category_id = ? AND p.price >= ? AND p.price <= ?"
                     + " ORDER BY p.created_at ASC"
@@ -538,16 +671,35 @@ public class GetProductDAO extends DBContext {
             ResultSet rs = statement.executeQuery();
 
             while (rs.next()) {
-                Product product = new Product(
-                        rs.getInt("product_id"),
-                        rs.getString("name"),
-                        rs.getString("description"),
-                        rs.getInt("category_id"),
-                        rs.getBigDecimal("price"),
-                        rs.getTimestamp("created_at"),
-                        rs.getTimestamp("updated_at"),
-                        new ArrayList<>()
-                );
+                Integer saleId = null;
+                if (rs.getObject("sale_id") != null) {
+                    saleId = rs.getInt("sale_id");
+                }
+                Product product;
+                if (saleId != null) {
+                    product = new Product(
+                            rs.getInt("product_id"),
+                            rs.getString("name"),
+                            rs.getString("description"),
+                            rs.getInt("category_id"),
+                            rs.getBigDecimal("price"),
+                            rs.getTimestamp("created_at"),
+                            rs.getTimestamp("updated_at"),
+                            new ArrayList<>(),
+                            saleId
+                    );
+                } else {
+                    product = new Product(
+                            rs.getInt("product_id"),
+                            rs.getString("name"),
+                            rs.getString("description"),
+                            rs.getInt("category_id"),
+                            rs.getBigDecimal("price"),
+                            rs.getTimestamp("created_at"),
+                            rs.getTimestamp("updated_at"),
+                            new ArrayList<>()
+                    );
+                }
                 list.add(product);
             }
         } catch (SQLException e) {
@@ -565,7 +717,7 @@ public class GetProductDAO extends DBContext {
         int start = (page - 1) * productsPerPage;
 
         try {
-            String sql = "SELECT p.product_id, p.name, p.description, p.category_id, p.price, p.created_at, p.updated_at"
+            String sql = "SELECT p.product_id, p.name, p.description, p.category_id, p.price, p.created_at, p.updated_at, p.sale_id"
                     + " FROM Products p"
                     + " Where p.category_id = ? AND p.price >= ? AND p.price <= ?"
                     + " ORDER BY p.price DESC"
@@ -580,16 +732,35 @@ public class GetProductDAO extends DBContext {
             ResultSet rs = statement.executeQuery();
 
             while (rs.next()) {
-                Product product = new Product(
-                        rs.getInt("product_id"),
-                        rs.getString("name"),
-                        rs.getString("description"),
-                        rs.getInt("category_id"),
-                        rs.getBigDecimal("price"),
-                        rs.getTimestamp("created_at"),
-                        rs.getTimestamp("updated_at"),
-                        new ArrayList<>()
-                );
+                Integer saleId = null;
+                if (rs.getObject("sale_id") != null) {
+                    saleId = rs.getInt("sale_id");
+                }
+                Product product;
+                if (saleId != null) {
+                    product = new Product(
+                            rs.getInt("product_id"),
+                            rs.getString("name"),
+                            rs.getString("description"),
+                            rs.getInt("category_id"),
+                            rs.getBigDecimal("price"),
+                            rs.getTimestamp("created_at"),
+                            rs.getTimestamp("updated_at"),
+                            new ArrayList<>(),
+                            saleId
+                    );
+                } else {
+                    product = new Product(
+                            rs.getInt("product_id"),
+                            rs.getString("name"),
+                            rs.getString("description"),
+                            rs.getInt("category_id"),
+                            rs.getBigDecimal("price"),
+                            rs.getTimestamp("created_at"),
+                            rs.getTimestamp("updated_at"),
+                            new ArrayList<>()
+                    );
+                }
                 list.add(product);
             }
         } catch (SQLException e) {
@@ -607,7 +778,7 @@ public class GetProductDAO extends DBContext {
         int start = (page - 1) * productsPerPage;
 
         try {
-            String sql = "SELECT p.product_id, p.name, p.description, p.category_id, p.price, p.created_at, p.updated_at"
+            String sql = "SELECT p.product_id, p.name, p.description, p.category_id, p.price, p.created_at, p.updated_at, p.sale_id"
                     + " FROM Products p"
                     + " Where p.category_id = ?"
                     + " ORDER BY p.price ASC"
@@ -620,16 +791,35 @@ public class GetProductDAO extends DBContext {
             ResultSet rs = statement.executeQuery();
 
             while (rs.next()) {
-                Product product = new Product(
-                        rs.getInt("product_id"),
-                        rs.getString("name"),
-                        rs.getString("description"),
-                        rs.getInt("category_id"),
-                        rs.getBigDecimal("price"),
-                        rs.getTimestamp("created_at"),
-                        rs.getTimestamp("updated_at"),
-                        new ArrayList<>()
-                );
+                Integer saleId = null;
+                if (rs.getObject("sale_id") != null) {
+                    saleId = rs.getInt("sale_id");
+                }
+                Product product;
+                if (saleId != null) {
+                    product = new Product(
+                            rs.getInt("product_id"),
+                            rs.getString("name"),
+                            rs.getString("description"),
+                            rs.getInt("category_id"),
+                            rs.getBigDecimal("price"),
+                            rs.getTimestamp("created_at"),
+                            rs.getTimestamp("updated_at"),
+                            new ArrayList<>(),
+                            saleId
+                    );
+                } else {
+                    product = new Product(
+                            rs.getInt("product_id"),
+                            rs.getString("name"),
+                            rs.getString("description"),
+                            rs.getInt("category_id"),
+                            rs.getBigDecimal("price"),
+                            rs.getTimestamp("created_at"),
+                            rs.getTimestamp("updated_at"),
+                            new ArrayList<>()
+                    );
+                }
                 list.add(product);
             }
         } catch (SQLException e) {
@@ -659,11 +849,11 @@ public class GetProductDAO extends DBContext {
         }
 
         try {
-            String sql = "SELECT p.product_id, p.name, p.category_id, p.price, p.created_at, p.updated_at"
+            String sql = "SELECT p.product_id, p.name, p.category_id, p.price, p.created_at, p.updated_at, p.sale_id"
                     + " FROM Products p"
                     + " JOIN Product_Size ps ON p.product_id = ps.product_id"
                     + " WHERE p.price >= ? AND p.price <= ?" + sizeFilter.toString()
-                    + " GROUP BY p.product_id, p.name, p.category_id, p.price, p.created_at, p.updated_at"
+                    + " GROUP BY p.product_id, p.name, p.category_id, p.price, p.created_at, p.updated_at, p.sale_id"
                     + " ORDER BY p.product_id"
                     + " OFFSET ? ROWS FETCH NEXT ? ROWS ONLY;";
             PreparedStatement statement = connection.prepareStatement(sql);
@@ -680,16 +870,35 @@ public class GetProductDAO extends DBContext {
             ResultSet rs = statement.executeQuery();
 
             while (rs.next()) {
-                Product product = new Product(
-                        rs.getInt("product_id"),
-                        rs.getString("name"),
-                        "",
-                        rs.getInt("category_id"),
-                        rs.getBigDecimal("price"),
-                        rs.getTimestamp("created_at"),
-                        rs.getTimestamp("updated_at"),
-                        new ArrayList<>()
-                );
+                Integer saleId = null;
+                if (rs.getObject("sale_id") != null) {
+                    saleId = rs.getInt("sale_id");
+                }
+                Product product;
+                if (saleId != null) {
+                    product = new Product(
+                            rs.getInt("product_id"),
+                            rs.getString("name"),
+                            "",
+                            rs.getInt("category_id"),
+                            rs.getBigDecimal("price"),
+                            rs.getTimestamp("created_at"),
+                            rs.getTimestamp("updated_at"),
+                            new ArrayList<>(),
+                            saleId
+                    );
+                } else {
+                    product = new Product(
+                            rs.getInt("product_id"),
+                            rs.getString("name"),
+                            "",
+                            rs.getInt("category_id"),
+                            rs.getBigDecimal("price"),
+                            rs.getTimestamp("created_at"),
+                            rs.getTimestamp("updated_at"),
+                            new ArrayList<>()
+                    );
+                }
                 list.add(product);
             }
         } catch (SQLException e) {
@@ -802,11 +1011,11 @@ public class GetProductDAO extends DBContext {
         }
 
         try {
-            String sql = "SELECT p.product_id, p.name, p.category_id, p.price, p.created_at, p.updated_at"
+            String sql = "SELECT p.product_id, p.name, p.category_id, p.price, p.created_at, p.updated_at, p.sale_id"
                     + " FROM Products p"
                     + " JOIN Product_Size ps ON p.product_id = ps.product_id"
                     + " WHERE p.price >= ? AND p.price <= ? " + sizeFilter.toString()
-                    + " GROUP BY p.product_id, p.name, p.category_id, p.price, p.created_at, p.updated_at"
+                    + " GROUP BY p.product_id, p.name, p.category_id, p.price, p.created_at, p.updated_at, p.sale_id"
                     + " ORDER BY p.created_at DESC"
                     + " OFFSET ? ROWS FETCH NEXT ? ROWS ONLY;";
             PreparedStatement statement = connection.prepareStatement(sql);
@@ -823,16 +1032,35 @@ public class GetProductDAO extends DBContext {
             ResultSet rs = statement.executeQuery();
 
             while (rs.next()) {
-                Product product = new Product(
-                        rs.getInt("product_id"),
-                        rs.getString("name"),
-                        "",
-                        rs.getInt("category_id"),
-                        rs.getBigDecimal("price"),
-                        rs.getTimestamp("created_at"),
-                        rs.getTimestamp("updated_at"),
-                        new ArrayList<>()
-                );
+                Integer saleId = null;
+                if (rs.getObject("sale_id") != null) {
+                    saleId = rs.getInt("sale_id");
+                }
+                Product product;
+                if (saleId != null) {
+                    product = new Product(
+                            rs.getInt("product_id"),
+                            rs.getString("name"),
+                            "",
+                            rs.getInt("category_id"),
+                            rs.getBigDecimal("price"),
+                            rs.getTimestamp("created_at"),
+                            rs.getTimestamp("updated_at"),
+                            new ArrayList<>(),
+                            saleId
+                    );
+                } else {
+                    product = new Product(
+                            rs.getInt("product_id"),
+                            rs.getString("name"),
+                            "",
+                            rs.getInt("category_id"),
+                            rs.getBigDecimal("price"),
+                            rs.getTimestamp("created_at"),
+                            rs.getTimestamp("updated_at"),
+                            new ArrayList<>()
+                    );
+                }
                 list.add(product);
             }
         } catch (SQLException e) {
@@ -862,11 +1090,11 @@ public class GetProductDAO extends DBContext {
         }
 
         try {
-            String sql = "SELECT p.product_id, p.name, p.category_id, p.price, p.created_at, p.updated_at"
+            String sql = "SELECT p.product_id, p.name, p.category_id, p.price, p.created_at, p.updated_at, p.sale_id"
                     + " FROM Products p"
                     + " JOIN Product_Size ps ON p.product_id = ps.product_id"
                     + " WHERE p.price >= ? AND p.price <= ?" + sizeFilter.toString()
-                    + " GROUP BY p.product_id, p.name, p.category_id, p.price, p.created_at, p.updated_at"
+                    + " GROUP BY p.product_id, p.name, p.category_id, p.price, p.created_at, p.updated_at, p.sale_id"
                     + " ORDER BY p.created_at ASC"
                     + " OFFSET ? ROWS FETCH NEXT ? ROWS ONLY;";
             PreparedStatement statement = connection.prepareStatement(sql);
@@ -883,16 +1111,35 @@ public class GetProductDAO extends DBContext {
             ResultSet rs = statement.executeQuery();
 
             while (rs.next()) {
-                Product product = new Product(
-                        rs.getInt("product_id"),
-                        rs.getString("name"),
-                        "",
-                        rs.getInt("category_id"),
-                        rs.getBigDecimal("price"),
-                        rs.getTimestamp("created_at"),
-                        rs.getTimestamp("updated_at"),
-                        new ArrayList<>()
-                );
+                Integer saleId = null;
+                if (rs.getObject("sale_id") != null) {
+                    saleId = rs.getInt("sale_id");
+                }
+                Product product;
+                if (saleId != null) {
+                    product = new Product(
+                            rs.getInt("product_id"),
+                            rs.getString("name"),
+                            "",
+                            rs.getInt("category_id"),
+                            rs.getBigDecimal("price"),
+                            rs.getTimestamp("created_at"),
+                            rs.getTimestamp("updated_at"),
+                            new ArrayList<>(),
+                            saleId
+                    );
+                } else {
+                    product = new Product(
+                            rs.getInt("product_id"),
+                            rs.getString("name"),
+                            "",
+                            rs.getInt("category_id"),
+                            rs.getBigDecimal("price"),
+                            rs.getTimestamp("created_at"),
+                            rs.getTimestamp("updated_at"),
+                            new ArrayList<>()
+                    );
+                }
                 list.add(product);
             }
         } catch (SQLException e) {
@@ -922,11 +1169,11 @@ public class GetProductDAO extends DBContext {
         }
 
         try {
-            String sql = "SELECT p.product_id, p.name, p.category_id, p.price, p.created_at, p.updated_at"
+            String sql = "SELECT p.product_id, p.name, p.category_id, p.price, p.created_at, p.updated_at, p.sale_id"
                     + " FROM Products p"
                     + " JOIN Product_Size ps ON p.product_id = ps.product_id"
                     + " WHERE p.price >= ? AND p.price <= ?" + sizeFilter.toString()
-                    + " GROUP BY p.product_id, p.name, p.category_id, p.price, p.created_at, p.updated_at"
+                    + " GROUP BY p.product_id, p.name, p.category_id, p.price, p.created_at, p.updated_at, p.sale_id"
                     + " ORDER BY p.price DESC"
                     + " OFFSET ? ROWS FETCH NEXT ? ROWS ONLY;";
             PreparedStatement statement = connection.prepareStatement(sql);
@@ -943,16 +1190,35 @@ public class GetProductDAO extends DBContext {
             ResultSet rs = statement.executeQuery();
 
             while (rs.next()) {
-                Product product = new Product(
-                        rs.getInt("product_id"),
-                        rs.getString("name"),
-                        "",
-                        rs.getInt("category_id"),
-                        rs.getBigDecimal("price"),
-                        rs.getTimestamp("created_at"),
-                        rs.getTimestamp("updated_at"),
-                        new ArrayList<>()
-                );
+                Integer saleId = null;
+                if (rs.getObject("sale_id") != null) {
+                    saleId = rs.getInt("sale_id");
+                }
+                Product product;
+                if (saleId != null) {
+                    product = new Product(
+                            rs.getInt("product_id"),
+                            rs.getString("name"),
+                            "",
+                            rs.getInt("category_id"),
+                            rs.getBigDecimal("price"),
+                            rs.getTimestamp("created_at"),
+                            rs.getTimestamp("updated_at"),
+                            new ArrayList<>(),
+                            saleId
+                    );
+                } else {
+                    product = new Product(
+                            rs.getInt("product_id"),
+                            rs.getString("name"),
+                            "",
+                            rs.getInt("category_id"),
+                            rs.getBigDecimal("price"),
+                            rs.getTimestamp("created_at"),
+                            rs.getTimestamp("updated_at"),
+                            new ArrayList<>()
+                    );
+                }
                 list.add(product);
             }
         } catch (SQLException e) {
@@ -982,11 +1248,11 @@ public class GetProductDAO extends DBContext {
         }
 
         try {
-            String sql = "SELECT p.product_id, p.name, p.category_id, p.price, p.created_at, p.updated_at"
+            String sql = "SELECT p.product_id, p.name, p.category_id, p.price, p.created_at, p.updated_at, p.sale_id"
                     + " FROM Products p"
                     + " JOIN Product_Size ps ON p.product_id = ps.product_id"
                     + " WHERE p.price >= ? AND p.price <= ?" + sizeFilter.toString()
-                    + " GROUP BY p.product_id, p.name, p.category_id, p.price, p.created_at, p.updated_at"
+                    + " GROUP BY p.product_id, p.name, p.category_id, p.price, p.created_at, p.updated_at, p.sale_id"
                     + " ORDER BY p.price ASC"
                     + " OFFSET ? ROWS FETCH NEXT ? ROWS ONLY;";
             PreparedStatement statement = connection.prepareStatement(sql);
@@ -1003,16 +1269,35 @@ public class GetProductDAO extends DBContext {
             ResultSet rs = statement.executeQuery();
 
             while (rs.next()) {
-                Product product = new Product(
-                        rs.getInt("product_id"),
-                        rs.getString("name"),
-                        "",
-                        rs.getInt("category_id"),
-                        rs.getBigDecimal("price"),
-                        rs.getTimestamp("created_at"),
-                        rs.getTimestamp("updated_at"),
-                        new ArrayList<>()
-                );
+                Integer saleId = null;
+                if (rs.getObject("sale_id") != null) {
+                    saleId = rs.getInt("sale_id");
+                }
+                Product product;
+                if (saleId != null) {
+                    product = new Product(
+                            rs.getInt("product_id"),
+                            rs.getString("name"),
+                            "",
+                            rs.getInt("category_id"),
+                            rs.getBigDecimal("price"),
+                            rs.getTimestamp("created_at"),
+                            rs.getTimestamp("updated_at"),
+                            new ArrayList<>(),
+                            saleId
+                    );
+                } else {
+                    product = new Product(
+                            rs.getInt("product_id"),
+                            rs.getString("name"),
+                            "",
+                            rs.getInt("category_id"),
+                            rs.getBigDecimal("price"),
+                            rs.getTimestamp("created_at"),
+                            rs.getTimestamp("updated_at"),
+                            new ArrayList<>()
+                    );
+                }
                 list.add(product);
             }
         } catch (SQLException e) {
@@ -1042,11 +1327,11 @@ public class GetProductDAO extends DBContext {
         }
 
         try {
-            String sql = "SELECT p.product_id, p.name, p.category_id, p.price, p.created_at, p.updated_at"
+            String sql = "SELECT p.product_id, p.name, p.category_id, p.price, p.created_at, p.updated_at, p.sale_id"
                     + " FROM Products p"
                     + " JOIN Product_Size ps ON p.product_id = ps.product_id"
                     + " WHERE p.category_id = ? AND p.price >= ? AND p.price <= ? " + sizeFilter.toString()
-                    + " GROUP BY p.product_id, p.name, p.category_id, p.price, p.created_at, p.updated_at"
+                    + " GROUP BY p.product_id, p.name, p.category_id, p.price, p.created_at, p.updated_at, p.sale_id"
                     + " ORDER BY p.product_id"
                     + " OFFSET ? ROWS FETCH NEXT ? ROWS ONLY;";
             PreparedStatement statement = connection.prepareStatement(sql);
@@ -1064,16 +1349,35 @@ public class GetProductDAO extends DBContext {
             ResultSet rs = statement.executeQuery();
 
             while (rs.next()) {
-                Product product = new Product(
-                        rs.getInt("product_id"),
-                        rs.getString("name"),
-                        "",
-                        rs.getInt("category_id"),
-                        rs.getBigDecimal("price"),
-                        rs.getTimestamp("created_at"),
-                        rs.getTimestamp("updated_at"),
-                        new ArrayList<>()
-                );
+                Integer saleId = null;
+                if (rs.getObject("sale_id") != null) {
+                    saleId = rs.getInt("sale_id");
+                }
+                Product product;
+                if (saleId != null) {
+                    product = new Product(
+                            rs.getInt("product_id"),
+                            rs.getString("name"),
+                            "",
+                            rs.getInt("category_id"),
+                            rs.getBigDecimal("price"),
+                            rs.getTimestamp("created_at"),
+                            rs.getTimestamp("updated_at"),
+                            new ArrayList<>(),
+                            saleId
+                    );
+                } else {
+                    product = new Product(
+                            rs.getInt("product_id"),
+                            rs.getString("name"),
+                            "",
+                            rs.getInt("category_id"),
+                            rs.getBigDecimal("price"),
+                            rs.getTimestamp("created_at"),
+                            rs.getTimestamp("updated_at"),
+                            new ArrayList<>()
+                    );
+                }
                 list.add(product);
             }
         } catch (SQLException e) {
@@ -1103,11 +1407,11 @@ public class GetProductDAO extends DBContext {
         }
 
         try {
-            String sql = "SELECT p.product_id, p.name, p.category_id, p.price, p.created_at, p.updated_at"
+            String sql = "SELECT p.product_id, p.name, p.category_id, p.price, p.created_at, p.updated_at, p.sale_id"
                     + " FROM Products p"
                     + " JOIN Product_Size ps ON p.product_id = ps.product_id"
                     + " WHERE p.category_id = ? AND p.price >= ? AND p.price <= ?" + sizeFilter.toString()
-                    + " GROUP BY p.product_id, p.name, p.category_id, p.price, p.created_at, p.updated_at"
+                    + " GROUP BY p.product_id, p.name, p.category_id, p.price, p.created_at, p.updated_at, p.sale_id"
                     + " ORDER BY p.created_at DESC"
                     + " OFFSET ? ROWS FETCH NEXT ? ROWS ONLY;";
             PreparedStatement statement = connection.prepareStatement(sql);
@@ -1125,16 +1429,35 @@ public class GetProductDAO extends DBContext {
             ResultSet rs = statement.executeQuery();
 
             while (rs.next()) {
-                Product product = new Product(
-                        rs.getInt("product_id"),
-                        rs.getString("name"),
-                        "",
-                        rs.getInt("category_id"),
-                        rs.getBigDecimal("price"),
-                        rs.getTimestamp("created_at"),
-                        rs.getTimestamp("updated_at"),
-                        new ArrayList<>()
-                );
+                Integer saleId = null;
+                if (rs.getObject("sale_id") != null) {
+                    saleId = rs.getInt("sale_id");
+                }
+                Product product;
+                if (saleId != null) {
+                    product = new Product(
+                            rs.getInt("product_id"),
+                            rs.getString("name"),
+                            "",
+                            rs.getInt("category_id"),
+                            rs.getBigDecimal("price"),
+                            rs.getTimestamp("created_at"),
+                            rs.getTimestamp("updated_at"),
+                            new ArrayList<>(),
+                            saleId
+                    );
+                } else {
+                    product = new Product(
+                            rs.getInt("product_id"),
+                            rs.getString("name"),
+                            "",
+                            rs.getInt("category_id"),
+                            rs.getBigDecimal("price"),
+                            rs.getTimestamp("created_at"),
+                            rs.getTimestamp("updated_at"),
+                            new ArrayList<>()
+                    );
+                }
                 list.add(product);
             }
         } catch (SQLException e) {
@@ -1164,11 +1487,11 @@ public class GetProductDAO extends DBContext {
         }
 
         try {
-            String sql = "SELECT p.product_id, p.name, p.category_id, p.price, p.created_at, p.updated_at"
+            String sql = "SELECT p.product_id, p.name, p.category_id, p.price, p.created_at, p.updated_at, p.sale_id"
                     + " FROM Products p"
                     + " JOIN Product_Size ps ON p.product_id = ps.product_id"
                     + " WHERE p.category_id = ? AND p.price >= ? AND p.price <= ?" + sizeFilter.toString()
-                    + " GROUP BY p.product_id, p.name, p.category_id, p.price, p.created_at, p.updated_at"
+                    + " GROUP BY p.product_id, p.name, p.category_id, p.price, p.created_at, p.updated_at, p.sale_id"
                     + " ORDER BY p.created_at ASC"
                     + " OFFSET ? ROWS FETCH NEXT ? ROWS ONLY;";
             PreparedStatement statement = connection.prepareStatement(sql);
@@ -1186,16 +1509,35 @@ public class GetProductDAO extends DBContext {
             ResultSet rs = statement.executeQuery();
 
             while (rs.next()) {
-                Product product = new Product(
-                        rs.getInt("product_id"),
-                        rs.getString("name"),
-                        "",
-                        rs.getInt("category_id"),
-                        rs.getBigDecimal("price"),
-                        rs.getTimestamp("created_at"),
-                        rs.getTimestamp("updated_at"),
-                        new ArrayList<>()
-                );
+                Integer saleId = null;
+                if (rs.getObject("sale_id") != null) {
+                    saleId = rs.getInt("sale_id");
+                }
+                Product product;
+                if (saleId != null) {
+                    product = new Product(
+                            rs.getInt("product_id"),
+                            rs.getString("name"),
+                            "",
+                            rs.getInt("category_id"),
+                            rs.getBigDecimal("price"),
+                            rs.getTimestamp("created_at"),
+                            rs.getTimestamp("updated_at"),
+                            new ArrayList<>(),
+                            saleId
+                    );
+                } else {
+                    product = new Product(
+                            rs.getInt("product_id"),
+                            rs.getString("name"),
+                            "",
+                            rs.getInt("category_id"),
+                            rs.getBigDecimal("price"),
+                            rs.getTimestamp("created_at"),
+                            rs.getTimestamp("updated_at"),
+                            new ArrayList<>()
+                    );
+                }
                 list.add(product);
             }
         } catch (SQLException e) {
@@ -1225,11 +1567,11 @@ public class GetProductDAO extends DBContext {
         }
 
         try {
-            String sql = "SELECT p.product_id, p.name, p.category_id, p.price, p.created_at, p.updated_at"
+            String sql = "SELECT p.product_id, p.name, p.category_id, p.price, p.created_at, p.updated_at, p.sale_id"
                     + " FROM Products p"
                     + " JOIN Product_Size ps ON p.product_id = ps.product_id"
                     + " WHERE p.category_id = ? AND p.price >= ? AND p.price <= ?" + sizeFilter.toString()
-                    + " GROUP BY p.product_id, p.name, p.category_id, p.price, p.created_at, p.updated_at"
+                    + " GROUP BY p.product_id, p.name, p.category_id, p.price, p.created_at, p.updated_at, p.sale_id"
                     + " ORDER BY p.price DESC"
                     + " OFFSET ? ROWS FETCH NEXT ? ROWS ONLY;";
             PreparedStatement statement = connection.prepareStatement(sql);
@@ -1247,16 +1589,35 @@ public class GetProductDAO extends DBContext {
             ResultSet rs = statement.executeQuery();
 
             while (rs.next()) {
-                Product product = new Product(
-                        rs.getInt("product_id"),
-                        rs.getString("name"),
-                        "",
-                        rs.getInt("category_id"),
-                        rs.getBigDecimal("price"),
-                        rs.getTimestamp("created_at"),
-                        rs.getTimestamp("updated_at"),
-                        new ArrayList<>()
-                );
+                Integer saleId = null;
+                if (rs.getObject("sale_id") != null) {
+                    saleId = rs.getInt("sale_id");
+                }
+                Product product;
+                if (saleId != null) {
+                    product = new Product(
+                            rs.getInt("product_id"),
+                            rs.getString("name"),
+                            "",
+                            rs.getInt("category_id"),
+                            rs.getBigDecimal("price"),
+                            rs.getTimestamp("created_at"),
+                            rs.getTimestamp("updated_at"),
+                            new ArrayList<>(),
+                            saleId
+                    );
+                } else {
+                    product = new Product(
+                            rs.getInt("product_id"),
+                            rs.getString("name"),
+                            "",
+                            rs.getInt("category_id"),
+                            rs.getBigDecimal("price"),
+                            rs.getTimestamp("created_at"),
+                            rs.getTimestamp("updated_at"),
+                            new ArrayList<>()
+                    );
+                }
                 list.add(product);
             }
         } catch (SQLException e) {
@@ -1286,11 +1647,11 @@ public class GetProductDAO extends DBContext {
         }
 
         try {
-            String sql = "SELECT p.product_id, p.name, p.category_id, p.price, p.created_at, p.updated_at"
+            String sql = "SELECT p.product_id, p.name, p.category_id, p.price, p.created_at, p.updated_at, p.sale_id"
                     + " FROM Products p"
                     + " JOIN Product_Size ps ON p.product_id = ps.product_id"
                     + " WHERE p.category_id = ? AND p.price >= ? AND p.price <= ?" + sizeFilter.toString()
-                    + " GROUP BY p.product_id, p.name, p.category_id, p.price, p.created_at, p.updated_at"
+                    + " GROUP BY p.product_id, p.name, p.category_id, p.price, p.created_at, p.updated_at, p.sale_id"
                     + " ORDER BY p.price ASC"
                     + " OFFSET ? ROWS FETCH NEXT ? ROWS ONLY;";
             PreparedStatement statement = connection.prepareStatement(sql);
@@ -1308,16 +1669,35 @@ public class GetProductDAO extends DBContext {
             ResultSet rs = statement.executeQuery();
 
             while (rs.next()) {
-                Product product = new Product(
-                        rs.getInt("product_id"),
-                        rs.getString("name"),
-                        "",
-                        rs.getInt("category_id"),
-                        rs.getBigDecimal("price"),
-                        rs.getTimestamp("created_at"),
-                        rs.getTimestamp("updated_at"),
-                        new ArrayList<>()
-                );
+                Integer saleId = null;
+                if (rs.getObject("sale_id") != null) {
+                    saleId = rs.getInt("sale_id");
+                }
+                Product product;
+                if (saleId != null) {
+                    product = new Product(
+                            rs.getInt("product_id"),
+                            rs.getString("name"),
+                            "",
+                            rs.getInt("category_id"),
+                            rs.getBigDecimal("price"),
+                            rs.getTimestamp("created_at"),
+                            rs.getTimestamp("updated_at"),
+                            new ArrayList<>(),
+                            saleId
+                    );
+                } else {
+                    product = new Product(
+                            rs.getInt("product_id"),
+                            rs.getString("name"),
+                            "",
+                            rs.getInt("category_id"),
+                            rs.getBigDecimal("price"),
+                            rs.getTimestamp("created_at"),
+                            rs.getTimestamp("updated_at"),
+                            new ArrayList<>()
+                    );
+                }
                 list.add(product);
             }
         } catch (SQLException e) {

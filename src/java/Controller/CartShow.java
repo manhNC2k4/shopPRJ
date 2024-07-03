@@ -137,10 +137,11 @@ public class CartShow extends HttpServlet {
         ProductDAO pd = new ProductDAO();
         String[] checkedItemIds = request.getParameterValues("checkedItemIds");
         List<Integer> listItemChecked = new ArrayList<>();
+        request.getSession().removeAttribute("total");
+        request.getSession().removeAttribute("listItemChecked");
+        int total = 0;
+
         if (checkedItemIds != null) {
-            request.getSession().removeAttribute("total");
-            request.getSession().removeAttribute("listItemChecked");
-            int total = 0;
 
             for (String itemId : checkedItemIds) {
                 int id = Integer.parseInt(itemId);
@@ -150,9 +151,10 @@ public class CartShow extends HttpServlet {
                 Product product = pd.getProductById(ps.getProductId());
                 total += product.getPrice().intValue() * catitem.getQuantity();
             }
-            request.getSession().setAttribute("total", total);
-            request.getSession().setAttribute("listItemChecked", listItemChecked);
+
         }
+        request.getSession().setAttribute("total", total);
+        request.getSession().setAttribute("listItemChecked", listItemChecked);
 
         request.getSession().removeAttribute("productInfoList");
         Cookie[] cookies = request.getCookies();

@@ -34,7 +34,7 @@
   pageContext.setAttribute("countFavorite", countFavorite);
 %>
 <%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
-
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <!DOCTYPE html>
 <html lang="en">
     <head>
@@ -255,21 +255,24 @@
                                                 <c:set var="hasSale" value="false"/>
                                                 <c:forEach var="sale" items="${listSale}">
                                                     <c:if test="${p.sale_id == sale.id}">
-                                                        <c:set var="hasSale" value="true" />
-                                                        <c:choose>
-                                                            <c:when test="${sale.discountType == 'percentage'}">
-                                                                <p class="price has-sale">
-                                                                    <span class="original-price">$${p.price}</span>
-                                                                    <span>$${p.price - (p.price * sale.discountValue / 100)}</span>
-                                                                </p>
-                                                            </c:when>
-                                                            <c:when test="${sale.discountType == 'fixed_amount'}">
-                                                                <p class="price has-sale">
-                                                                    <span class="original-price">$${p.price}</span>
-                                                                    <span>$${p.price - sale.discountValue}</span>
-                                                                </p>
-                                                            </c:when>
-                                                        </c:choose>
+                                                        <c:set var="now" value="<%= new java.util.Date() %>" />
+                                                        <c:if test="${now >= sale.startDate && now <= sale.endDate && sale.status == 'active'}">
+                                                            <c:set var="hasSale" value="true" />
+                                                            <c:choose>
+                                                                <c:when test="${sale.discountType == 'percentage'}">
+                                                                    <p class="price has-sale">
+                                                                        <span class="original-price">$${p.price}</span>
+                                                                        <span>$${p.price - (p.price * sale.discountValue / 100)}</span>
+                                                                    </p>
+                                                                </c:when>
+                                                                <c:when test="${sale.discountType == 'fixed_amount'}">
+                                                                    <p class="price has-sale">
+                                                                        <span class="original-price">$${p.price}</span>
+                                                                        <span>$${p.price - sale.discountValue}</span>
+                                                                    </p>
+                                                                </c:when>
+                                                            </c:choose>
+                                                        </c:if> 
                                                     </c:if>
                                                 </c:forEach>
                                                 <c:if test="${!hasSale}">
