@@ -11,7 +11,10 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Date;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import model.OrderDetail;
+import model.Order_Info;
 import model.Product_Size;
 
 /**
@@ -118,7 +121,7 @@ public class OrderDAO extends DBContext {
         return details;
     }
 
-    public boolean insertOrder(Order order, List<OrderDetail> orderDetails) throws SQLException {
+    public boolean insertOrder(Order order, List<OrderDetail> orderDetails, Order_Info orderInfo) throws SQLException {
         connection.setAutoCommit(false);
         String sql = "INSERT INTO [dbo].[Orders]"
                 + "           ([user_id]"
@@ -130,7 +133,7 @@ public class OrderDAO extends DBContext {
                 + "     OUTPUT INSERTED.order_id"
                 + "     VALUES"
                 + "           (?, ?, ?, ?, ?, ?)";
-
+        int generatedOrderId = 0;
         try (PreparedStatement statement = connection.prepareStatement(sql)) {
             statement.setInt(1, order.getUserId());
             statement.setTimestamp(2, new java.sql.Timestamp(new Date().getTime()));
@@ -142,9 +145,14 @@ public class OrderDAO extends DBContext {
             // Thực thi và lấy order_id được tạo tự động
             try (ResultSet rs = statement.executeQuery()) {
                 if (rs.next()) {
-                    int generatedOrderId = rs.getInt(1); // Lấy order_id
+                    generatedOrderId = rs.getInt(1); // Lấy order_id
                     order.setOrderId(generatedOrderId);  // Gán lại cho đối tượng Order
                 }
+            }
+            orderInfo.setOrderId(generatedOrderId);
+            if(generatedOrderId == 0 || !insertOrderInfo(orderInfo)) {
+                connection.rollback(); // Rollback nếu thêm chi tiết đơn hàng thất bại
+                return false;
             }
             if (!insertOrderDetails(orderDetails)) {
                 connection.rollback(); // Rollback nếu thêm chi tiết đơn hàng thất bại
@@ -255,6 +263,27 @@ public class OrderDAO extends DBContext {
             System.out.println(e);
         }
         return null;
+    }
+    
+    public boolean insertOrderInfo(Order_Info orderInfo) {
+         String sql = "INSERT INTO Order_Infos (first_name, last_name, country, street, city, postcode, phone, email, payment, order_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setString(1, orderInfo.getFirstName());
+            ps.setString(2, orderInfo.getLastName());
+            ps.setString(3, orderInfo.getCountry());
+            ps.setString(4, orderInfo.getStreet());
+            ps.setString(5, orderInfo.getCity());
+            ps.setString(6, orderInfo.getPostcode());
+            ps.setString(7, orderInfo.getPhone());
+            ps.setString(8, orderInfo.getEmail());
+            ps.setString(9, orderInfo.getPayment());
+            ps.setInt(10, orderInfo.getOrderId());
+            int rowsAffected = ps.executeUpdate();
+            return rowsAffected > 0;
+        } catch (SQLException ex) {
+            Logger.getLogger(OrderDAO.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return false;
     }
     
 }

@@ -73,6 +73,8 @@ public class CartShow extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         request.getSession().removeAttribute("productInfoList");
+        request.getSession().removeAttribute("total");
+        request.getSession().removeAttribute("listItemChecked");
         Cookie[] cookies = request.getCookies();
         Cart c = null;
         if (cookies != null) {

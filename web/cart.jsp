@@ -249,10 +249,10 @@
                                 <span id="total">$${sessionScope.total}</span>
                             </p>
                         </div>
-                        <form action="checkout" method="POST"> <%-- Form để gửi dữ liệu --%>
-                            <input type="hidden" id="checkedItems" name="checkedItemIds" value=""> 
+                        <form action="checkout" method="GET"> <%-- Form để gửi dữ liệu --%>
+                            <input type="hidden" id="orderIds" name="orderIds" value=""> 
                             <p class="text-center">
-                                <button id="checkoutButton" class="btn btn-primary py-3 px-4" disabled>
+                                <button type="submit" id="checkoutButton" class="btn btn-primary py-3 px-4" disabled>
                                     Proceed to Checkout
                                 </button>
                             </p>
@@ -347,8 +347,8 @@
         <script src="js/jquery.animateNumber.min.js"></script>
         <script src="js/bootstrap-datepicker.js"></script>
         <script src="js/scrollax.min.js"></script>
-        <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBVWaKrjvy3MaE7SQ74_uJiULgl1JY0H2s&sensor=false"></script>
-        <script src="js/google-map.js"></script>
+<!--        <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBVWaKrjvy3MaE7SQ74_uJiULgl1JY0H2s&sensor=false"></script>
+        <script src="js/google-map.js"></script>-->
         <script src="js/main.js"></script>
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 
@@ -358,18 +358,19 @@
             function checkSelectedItems() {
                 const checkedItems = document.querySelectorAll('.product-checkbox:checked');
                 const checkoutButton = document.getElementById('checkoutButton');
-                const checkedItemsInput = document.getElementById('checkedItems');
+                const orderIds = document.getElementById('orderIds');
 
                 // Tạo mảng chứa các ID sản phẩm được chọn
-                let checkedItemIds = [];
+                let checkedItemIdsarr = [];
                 checkedItems.forEach(item => {
-                    checkedItemIds.push(item.getAttribute('data-id'));
+                    checkedItemIdsarr.push(item.getAttribute('data-id'));
                 });
 
                 // Cập nhật giá trị của input hidden
-                checkedItemsInput.value = checkedItemIds.join(',');
-
-                if (checkedItems.length > 0) {
+                console.log(checkedItemIdsarr.join(','));
+                orderIds.value = checkedItemIdsarr.join(',');
+                console.log(document.getElementById('orderIds').value);
+                if (checkedItemIdsarr.length > 0) {
                     checkoutButton.disabled = false;
                 } else {
                     checkoutButton.disabled = true;

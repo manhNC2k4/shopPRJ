@@ -17,6 +17,7 @@ import java.util.ArrayList;
 import java.util.List;
 import model.Cart_Item;
 import model.Product;
+import model.ProductInfo;
 import model.Product_Size;
 
 /**
@@ -64,7 +65,7 @@ public class CheckOut extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        processRequest(request, response);
+        response.sendRedirect("checkout.jsp");
     }
 
     /**
@@ -78,28 +79,56 @@ public class CheckOut extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        String[] checkedItemIds = request.getParameterValues("checkedItemIds");
-        List<Integer> listItemChecked = new ArrayList<>();
+        String checkedItems = request.getParameter("orderIds");
+        System.out.println(checkedItems + "aaaaaaaa");
         int totalBill = 0;
         CartDAO cd = new CartDAO();
         ProductDAO pd = new ProductDAO();
         request.getSession().removeAttribute("totalBill");
         request.getSession().removeAttribute("listOrder");
-        if (checkedItemIds != null && checkedItemIds.length > 0) { // Kiểm tra checkedItemIds != null và không rỗng
-            for (String itemId : checkedItemIds) {
-                int id = Integer.parseInt(itemId);
-                listItemChecked.add(id);
-                Cart_Item catitem = cd.getCart_ItemById(id);
-                Product_Size ps = pd.getProduct_SizeById(catitem.getProduct_size_id());
-                Product product = pd.getProductById(ps.getProductId());
-                totalBill += product.getPrice().intValue() * catitem.getQuantity();
-            }
-            request.getSession().setAttribute("totalBill", totalBill);
-            request.getSession().setAttribute("listOrder", listItemChecked);
+        if (checkedItems != null) {
+            // Tách chuỗi thành mảng các ID
+            String[] checkedItemIds = checkedItems.split(",");
 
+            if (checkedItemIds != null && checkedItemIds.length > 0) {
+                List<ProductInfo> productInfoList = new ArrayList<>();
+                for (String itemId : checkedItemIds) {
+                    try {
+
+                        int id = Integer.parseInt(itemId);
+
+                        Cart_Item catitem = cd.getCart_ItemById(id);
+                        if (catitem == null) {
+                            throw new Exception("Không tìm thấy sản phẩm trong giỏ hàng (ID: " + id + ")");
+                        }
+                        Product_Size ps = pd.getProduct_SizeById(catitem.getProduct_size_id());
+                        if (ps == null) {
+                            throw new Exception("Không tìm thấy kích thước sản phẩm (ID: " + catitem.getProduct_size_id() + ")");
+                        }
+                        Product product = pd.getProductById(ps.getProductId());
+                        if (product == null) {
+                            throw new Exception("Không tìm thấy sản phẩm (ID: " + ps.getProductId() + ")");
+                        }
+                        totalBill += product.getPrice().intValue() * catitem.getQuantity();
+                        int quantity = catitem.getQuantity();
+                        ProductInfo productInfo = new ProductInfo(product, ps, quantity, id);
+                        productInfoList.add(productInfo);
+                    } catch (Exception e) {
+                        // Xử lý lỗi chung (ví dụ: lỗi database)
+                        System.err.println("Lỗi: " + e.getMessage());
+                        response.sendRedirect("cartShow?error=generalError");
+                        return; // Thoát khỏi hàm sau khi xử lý lỗi
+                    }
+                }
+                request.getSession().setAttribute("totalBill", totalBill);
+                request.getSession().setAttribute("listOrder", productInfoList);
+                response.sendRedirect("checkout.jsp");
+            } else {
+                String message = "Something was wrong";
+                response.sendRedirect("cartShow");
+            }
         } else {
-            String message = "Something was wrong";
-            response.sendRedirect("cartShow");
+            response.sendRedirect("cartShow?error=noItemSelected");
         }
     }
 
