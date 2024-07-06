@@ -6,6 +6,7 @@ package Controller;
 
 import dal.CartDAO;
 import dal.ProductDAO;
+import dal.SaleDAO;
 import java.io.IOException;
 import java.io.PrintWriter;
 import jakarta.servlet.ServletException;
@@ -13,12 +14,15 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import model.Cart_Item;
 import model.Product;
 import model.ProductInfo;
 import model.Product_Size;
+import model.Sale;
 
 /**
  *
@@ -79,6 +83,7 @@ public class CheckOut extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+        SaleDAO sd = new SaleDAO();
         String checkedItems = request.getParameter("orderIds");
         System.out.println(checkedItems + "aaaaaaaa");
         int totalBill = 0;
@@ -89,7 +94,6 @@ public class CheckOut extends HttpServlet {
         if (checkedItems != null) {
             // Tách chuỗi thành mảng các ID
             String[] checkedItemIds = checkedItems.split(",");
-
             if (checkedItemIds != null && checkedItemIds.length > 0) {
                 List<ProductInfo> productInfoList = new ArrayList<>();
                 for (String itemId : checkedItemIds) {
@@ -109,6 +113,24 @@ public class CheckOut extends HttpServlet {
                         if (product == null) {
                             throw new Exception("Không tìm thấy sản phẩm (ID: " + ps.getProductId() + ")");
                         }
+                        if (product.getSale_id() != 0) {
+                        Sale sale = sd.getSaleById(product.getSale_id());
+                        Date currentDate = new Date();
+                        if ("active".equals(sale.getStatus()) && currentDate.after(sale.getStartDate()) && currentDate.before(sale.getEndDate())
+                                || currentDate.equals(sale.getStartDate()) || currentDate.equals(sale.getEndDate())) {
+                            if (sale.getDiscountType().equals("percentage")) {
+                                BigDecimal discountValue = BigDecimal.valueOf(sale.getDiscountValue());
+                                BigDecimal discountedPrice = BigDecimal.valueOf(100)
+                                        .subtract(discountValue)
+                                        .divide(BigDecimal.valueOf(100));
+                                product.setPrice(product.getPrice().multiply(discountedPrice));
+                            } else {
+                                BigDecimal discountValue = BigDecimal.valueOf(sale.getDiscountValue());
+                                product.setPrice(product.getPrice().subtract(discountValue));
+                            }
+                        }
+
+                    }
                         totalBill += product.getPrice().intValue() * catitem.getQuantity();
                         int quantity = catitem.getQuantity();
                         ProductInfo productInfo = new ProductInfo(product, ps, quantity, id);

@@ -31,7 +31,7 @@ public class SaleDAO extends DBContext {
     }
 
     // Lấy tất cả các chương trình giảm giá
-    public List<Sale> getAllSales() throws SQLException {
+    public List<Sale> getAllSales(){
         List<Sale> sales = new ArrayList<>();
         try {
             PreparedStatement stmt = connection.prepareStatement("SELECT * FROM Sales");
@@ -47,7 +47,7 @@ public class SaleDAO extends DBContext {
     }
 
     // Lấy chương trình giảm giá theo ID
-    public Sale getSaleById(int id) throws SQLException {
+    public Sale getSaleById(int id){
         Sale sale = null;
 
         try {

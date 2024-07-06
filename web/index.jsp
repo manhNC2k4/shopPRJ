@@ -232,7 +232,7 @@
                             <c:forEach var="p" items="${dataPro}">
                                 <div class="col-sm-12 col-md-6 col-lg-3 ftco-animate d-flex">
                                     <div class="product d-flex flex-column">
-                                        <a href="#" class="img-prod"><img class="img-fluid" src="${p.images[0]}" alt="${p.name}">
+                                        <a href="singleProduct?id=${p.id}" class="img-prod"><img class="img-fluid" src="${p.images[0]}" alt="${p.name}">
                                             <div class="overlay"></div>
                                         </a>
                                         <div class="text py-3 pb-4 px-3">
@@ -250,7 +250,7 @@
                                                     </p>
                                                 </div>
                                             </div>
-                                            <h3><a href="#">${p.name}</a></h3>
+                                            <h3><a href="singleProduct?id=${p.id}">${p.name}</a></h3>
                                             <div class="pricing">
                                                 <c:set var="hasSale" value="false"/>
                                                 <c:forEach var="sale" items="${listSale}">

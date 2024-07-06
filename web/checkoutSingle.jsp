@@ -135,7 +135,7 @@
             <div class="container">
                 <div class="row justify-content-center">
                     <div class="col-xl-10 ftco-animate">
-                        <form action="order" class="billing-form">
+                        <form action="orderSingle" class="billing-form">
                             <h3 class="mb-4 billing-heading">Billing Details</h3>
                             <div class="row align-items-end">
                                 <div class="col-md-6">
@@ -228,7 +228,7 @@
                                         <h3 class="billing-heading mb-4">Cart Total</h3>
                                         <p class="d-flex">
                                             <span>Subtotal</span>
-                                            <span>$${sessionScope.totalBill}</span>
+                                            <span>$${sessionScope.total}</span>
                                         </p>
                                         <p class="d-flex">
                                             <span>Delivery</span>
@@ -241,7 +241,7 @@
                                         <hr>
                                         <p class="d-flex total-price">
                                             <span>Total</span>
-                                            <span>$${sessionScope.totalBill + 10}</span>
+                                            <span>$${sessionScope.total + 10}</span>
                                         </p>
                                     </div>
                                 </div>
@@ -276,7 +276,7 @@
                                                 </div>
                                             </div>
                                         </div>
-                                        <input type="hidden" name="total" value="${sessionScope.totalBill + 10}">
+                                        <input type="hidden" name="total" value="${sessionScope.total + 10}">
                                         <p><button type="submit" class="btn btn-primary py-3 px-4">Place an order</button></p>                                    </div>
                                 </div>
                             </div>

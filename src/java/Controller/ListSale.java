@@ -62,13 +62,9 @@ public class ListSale extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
     throws ServletException, IOException {
         SaleDAO sd = new SaleDAO();
-        try {
-            List<Sale> listSale = sd.getAllSales();
-            request.setAttribute("listSale", listSale);
-            request.getRequestDispatcher("listSale.jsp").forward(request, response);
-        } catch (SQLException ex) {
-            Logger.getLogger(ListSale.class.getName()).log(Level.SEVERE, null, ex);
-        }
+        List<Sale> listSale = sd.getAllSales();
+        request.setAttribute("listSale", listSale);
+        request.getRequestDispatcher("listSale.jsp").forward(request, response);
         
     } 
 
@@ -83,13 +79,9 @@ public class ListSale extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
     throws ServletException, IOException {
         SaleDAO sd = new SaleDAO();
-        try {
-            List<Sale> listSale = sd.getAllSales();
-            request.setAttribute("listSale", listSale);
-            request.getRequestDispatcher("listSale.jsp").forward(request, response);
-        } catch (SQLException ex) {
-            Logger.getLogger(ListSale.class.getName()).log(Level.SEVERE, null, ex);
-        }
+        List<Sale> listSale = sd.getAllSales();
+        request.setAttribute("listSale", listSale);
+        request.getRequestDispatcher("listSale.jsp").forward(request, response);
         
     }
 

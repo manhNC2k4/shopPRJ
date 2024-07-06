@@ -130,11 +130,10 @@ public class OrderDAO extends DBContext {
                 + "           ,[total]"
                 + "           ,[created_at]"
                 + "           ,[updated_at])"
-                + "     OUTPUT INSERTED.order_id"
                 + "     VALUES"
                 + "           (?, ?, ?, ?, ?, ?)";
         int generatedOrderId = 0;
-        try (PreparedStatement statement = connection.prepareStatement(sql)) {
+        try (PreparedStatement statement = connection.prepareStatement(sql,PreparedStatement.RETURN_GENERATED_KEYS)) {
             statement.setInt(1, order.getUserId());
             statement.setTimestamp(2, new java.sql.Timestamp(new Date().getTime()));
             statement.setString(3, order.getStatus());
@@ -142,11 +141,11 @@ public class OrderDAO extends DBContext {
             statement.setTimestamp(5, new java.sql.Timestamp(new Date().getTime()));
             statement.setTimestamp(6, new java.sql.Timestamp(new Date().getTime()));
 
-            // Thực thi và lấy order_id được tạo tự động
-            try (ResultSet rs = statement.executeQuery()) {
-                if (rs.next()) {
-                    generatedOrderId = rs.getInt(1); // Lấy order_id
-                    order.setOrderId(generatedOrderId);  // Gán lại cho đối tượng Order
+            int row = statement.executeUpdate();
+            if (row > 0) {
+                ResultSet generatedKeys = statement.getGeneratedKeys();
+                if (generatedKeys.next()) {
+                    generatedOrderId = generatedKeys.getInt(1);
                 }
             }
             orderInfo.setOrderId(generatedOrderId);
@@ -154,14 +153,17 @@ public class OrderDAO extends DBContext {
                 connection.rollback(); // Rollback nếu thêm chi tiết đơn hàng thất bại
                 return false;
             }
+            for (OrderDetail orderDetail : orderDetails) {
+                orderDetail.setOrderId(generatedOrderId);
+            }
             if (!insertOrderDetails(orderDetails)) {
                 connection.rollback(); // Rollback nếu thêm chi tiết đơn hàng thất bại
                 return false;
             }
-            
+            ProductDAO pd = new ProductDAO();
             // Cập nhật số lượng sản phẩm trong kho
             for (OrderDetail detail : orderDetails) {
-                Product_Size ps = getProduct_SizeById(detail.getProductSizeId());
+                Product_Size ps = pd.getProduct_SizeById(detail.getProductSizeId());
                 // Lấy số lượng hiện tại
                 int currentStock = ps.getStock(); 
 

@@ -2,12 +2,12 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/Servlet.java to edit this template
  */
-
 package Controller;
 
 import DTO.UserDTO;
 import dal.CategoryDAO;
 import dal.FavoriteDAO;
+import dal.SaleDAO;
 import java.io.IOException;
 import java.io.PrintWriter;
 import jakarta.servlet.ServletException;
@@ -16,7 +16,9 @@ import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import java.math.BigDecimal;
 import java.sql.SQLException;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -24,41 +26,45 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import model.Category;
 import model.Product;
+import model.Sale;
 
 /**
  *
  * @author LNV
  */
-@WebServlet(name="FavoriteShow", urlPatterns={"/favoriteShow"})
+@WebServlet(name = "FavoriteShow", urlPatterns = {"/favoriteShow"})
 public class FavoriteShow extends HttpServlet {
-   
-    /** 
-     * Processes requests for both HTTP <code>GET</code> and <code>POST</code> methods.
+
+    /**
+     * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
+     * methods.
+     *
      * @param request servlet request
      * @param response servlet response
      * @throws ServletException if a servlet-specific error occurs
      * @throws IOException if an I/O error occurs
      */
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
-    throws ServletException, IOException {
+            throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
         try (PrintWriter out = response.getWriter()) {
             /* TODO output your page here. You may use following sample code. */
             out.println("<!DOCTYPE html>");
             out.println("<html>");
             out.println("<head>");
-            out.println("<title>Servlet FavoriteShow</title>");  
+            out.println("<title>Servlet FavoriteShow</title>");
             out.println("</head>");
             out.println("<body>");
-            out.println("<h1>Servlet FavoriteShow at " + request.getContextPath () + "</h1>");
+            out.println("<h1>Servlet FavoriteShow at " + request.getContextPath() + "</h1>");
             out.println("</body>");
             out.println("</html>");
         }
-    } 
+    }
 
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
-    /** 
+    /**
      * Handles the HTTP <code>GET</code> method.
+     *
      * @param request servlet request
      * @param response servlet response
      * @throws ServletException if a servlet-specific error occurs
@@ -66,8 +72,8 @@ public class FavoriteShow extends HttpServlet {
      */
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
-    throws ServletException, IOException {
-        
+            throws ServletException, IOException {
+
         CategoryDAO cd = new CategoryDAO();
         List<Category> listCat = cd.getALl();
         Map<Integer, String> categoryMap = new HashMap<>();
@@ -86,12 +92,34 @@ public class FavoriteShow extends HttpServlet {
                 }
             }
         }
+        SaleDAO sd = new SaleDAO();
         if (user != null) {
             int userId = user.getUser_id();
             FavoriteDAO favoriteDAO = new FavoriteDAO();
             List<Product> favoriteProducts = null;
             try {
                 favoriteProducts = favoriteDAO.getUserFavorites(userId);
+                for (Product favoriteProduct : favoriteProducts) {
+                    if (favoriteProduct.getSale_id() != 0) {
+                        System.out.println(favoriteProduct.getSale_id());
+                        Sale sale = sd.getSaleById(favoriteProduct.getSale_id());
+                        Date currentDate = new Date();
+                        
+                        if ( "active".equals(sale.getStatus()) &&  currentDate.after(sale.getStartDate()) && currentDate.before(sale.getEndDate()) || 
+            currentDate.equals(sale.getStartDate()) || currentDate.equals(sale.getEndDate())) {
+                            if (sale.getDiscountType().equals("percentage")) {
+                                BigDecimal discountValue = BigDecimal.valueOf(sale.getDiscountValue());
+                                BigDecimal discountedPrice = BigDecimal.valueOf(100)
+                                        .subtract(discountValue)
+                                        .divide(BigDecimal.valueOf(100));
+                                favoriteProduct.setPrice(favoriteProduct.getPrice().multiply(discountedPrice));
+                            } else {
+                                BigDecimal discountValue = BigDecimal.valueOf(sale.getDiscountValue());
+                                favoriteProduct.setPrice(favoriteProduct.getPrice().subtract(discountValue));
+                            }
+                        }
+                    }
+                }
             } catch (SQLException ex) {
                 Logger.getLogger(FavoriteShow.class.getName()).log(Level.SEVERE, null, ex);
             }
@@ -100,10 +128,11 @@ public class FavoriteShow extends HttpServlet {
         } else {
             response.sendRedirect("login.jsp");
         }
-    } 
+    }
 
-    /** 
+    /**
      * Handles the HTTP <code>POST</code> method.
+     *
      * @param request servlet request
      * @param response servlet response
      * @throws ServletException if a servlet-specific error occurs
@@ -111,8 +140,8 @@ public class FavoriteShow extends HttpServlet {
      */
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
-    throws ServletException, IOException {
-        
+            throws ServletException, IOException {
+
         CategoryDAO cd = new CategoryDAO();
         List<Category> listCat = cd.getALl();
         Map<Integer, String> categoryMap = new HashMap<>();
@@ -147,8 +176,9 @@ public class FavoriteShow extends HttpServlet {
         }
     }
 
-    /** 
+    /**
      * Returns a short description of the servlet.
+     *
      * @return a String containing servlet description
      */
     @Override

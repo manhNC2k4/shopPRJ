@@ -249,7 +249,7 @@
                                 <span id="total">$${sessionScope.total}</span>
                             </p>
                         </div>
-                        <form action="checkout" method="GET"> <%-- Form để gửi dữ liệu --%>
+                        <form action="checkout" method="POST"> <%-- Form để gửi dữ liệu --%>
                             <input type="hidden" id="orderIds" name="orderIds" value=""> 
                             <p class="text-center">
                                 <button type="submit" id="checkoutButton" class="btn btn-primary py-3 px-4" disabled>

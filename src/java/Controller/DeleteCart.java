@@ -96,7 +96,7 @@ public class DeleteCart extends HttpServlet {
                             }
                         }
                         if (user != null) {
-                            // Lấy số lượng sản phẩm yêu thích của user
+                            // Lấy số lượng sản phẩm torng giỏ hàng của user
                             CartDAO cartd = new CartDAO();
                             Cart c1;
                             c1 = cartd.getCartById(user.getUser_id());

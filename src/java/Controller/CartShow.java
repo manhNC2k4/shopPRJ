@@ -7,6 +7,7 @@ package Controller;
 import dal.CartDAO;
 import dal.CategoryDAO;
 import dal.ProductDAO;
+import dal.SaleDAO;
 import java.io.IOException;
 import java.io.PrintWriter;
 import jakarta.servlet.ServletException;
@@ -15,8 +16,9 @@ import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import java.lang.reflect.Type;
+import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -26,6 +28,7 @@ import model.Category;
 import model.Product;
 import model.ProductInfo;
 import model.Product_Size;
+import model.Sale;
 
 /**
  *
@@ -86,6 +89,7 @@ public class CartShow extends HttpServlet {
             }
         }
         if (c != null) {
+            SaleDAO sd = new SaleDAO();
             CartDAO cd = new CartDAO();
             ProductDAO pd = new ProductDAO();
             List<Cart_Item> listItem = cd.getAllCartItemsByCartId(c.getId());
@@ -94,6 +98,24 @@ public class CartShow extends HttpServlet {
                 for (Cart_Item cat : listItem) {
                     Product_Size ps = pd.getProduct_SizeById(cat.getProduct_size_id());
                     Product product = pd.getProductById(ps.getProductId());
+                    if (product.getSale_id() != 0) {
+                        Sale sale = sd.getSaleById(product.getSale_id());
+                        Date currentDate = new Date();
+                        if ("active".equals(sale.getStatus()) && currentDate.after(sale.getStartDate()) && currentDate.before(sale.getEndDate())
+                                || currentDate.equals(sale.getStartDate()) || currentDate.equals(sale.getEndDate())) {
+                            if (sale.getDiscountType().equals("percentage")) {
+                                BigDecimal discountValue = BigDecimal.valueOf(sale.getDiscountValue());
+                                BigDecimal discountedPrice = BigDecimal.valueOf(100)
+                                        .subtract(discountValue)
+                                        .divide(BigDecimal.valueOf(100));
+                                product.setPrice(product.getPrice().multiply(discountedPrice));
+                            } else {
+                                BigDecimal discountValue = BigDecimal.valueOf(sale.getDiscountValue());
+                                product.setPrice(product.getPrice().subtract(discountValue));
+                            }
+                        }
+
+                    }
                     int quantity = cat.getQuantity();
                     int id = cat.getId();
                     ProductInfo productInfo = new ProductInfo(product, ps, quantity, id);
@@ -135,6 +157,7 @@ public class CartShow extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+        SaleDAO sd = new SaleDAO();
         CartDAO cd = new CartDAO();
         ProductDAO pd = new ProductDAO();
         String[] checkedItemIds = request.getParameterValues("checkedItemIds");
@@ -144,13 +167,30 @@ public class CartShow extends HttpServlet {
         int total = 0;
 
         if (checkedItemIds != null) {
-
             for (String itemId : checkedItemIds) {
                 int id = Integer.parseInt(itemId);
                 listItemChecked.add(id);
                 Cart_Item catitem = cd.getCart_ItemById(id);
                 Product_Size ps = pd.getProduct_SizeById(catitem.getProduct_size_id());
                 Product product = pd.getProductById(ps.getProductId());
+                if (product.getSale_id() != 0) {
+                        Sale sale = sd.getSaleById(product.getSale_id());
+                        Date currentDate = new Date();
+                        if ("active".equals(sale.getStatus()) && currentDate.after(sale.getStartDate()) && currentDate.before(sale.getEndDate())
+                                || currentDate.equals(sale.getStartDate()) || currentDate.equals(sale.getEndDate())) {
+                            if (sale.getDiscountType().equals("percentage")) {
+                                BigDecimal discountValue = BigDecimal.valueOf(sale.getDiscountValue());
+                                BigDecimal discountedPrice = BigDecimal.valueOf(100)
+                                        .subtract(discountValue)
+                                        .divide(BigDecimal.valueOf(100));
+                                product.setPrice(product.getPrice().multiply(discountedPrice));
+                            } else {
+                                BigDecimal discountValue = BigDecimal.valueOf(sale.getDiscountValue());
+                                product.setPrice(product.getPrice().subtract(discountValue));
+                            }
+                        }
+
+                    }
                 total += product.getPrice().intValue() * catitem.getQuantity();
             }
 
@@ -170,13 +210,31 @@ public class CartShow extends HttpServlet {
             }
         }
         if (c != null) {
-
+            
             List<Cart_Item> listItem = cd.getAllCartItemsByCartId(c.getId());
             if (listItem != null && !listItem.isEmpty()) {
                 List<ProductInfo> productInfoList = new ArrayList<>();
                 for (Cart_Item cat : listItem) {
                     Product_Size ps = pd.getProduct_SizeById(cat.getProduct_size_id());
                     Product product = pd.getProductById(ps.getProductId());
+                    if (product.getSale_id() != 0) {
+                        Sale sale = sd.getSaleById(product.getSale_id());
+                        Date currentDate = new Date();
+                        if ("active".equals(sale.getStatus()) && currentDate.after(sale.getStartDate()) && currentDate.before(sale.getEndDate())
+                                || currentDate.equals(sale.getStartDate()) || currentDate.equals(sale.getEndDate())) {
+                            if (sale.getDiscountType().equals("percentage")) {
+                                BigDecimal discountValue = BigDecimal.valueOf(sale.getDiscountValue());
+                                BigDecimal discountedPrice = BigDecimal.valueOf(100)
+                                        .subtract(discountValue)
+                                        .divide(BigDecimal.valueOf(100));
+                                product.setPrice(product.getPrice().multiply(discountedPrice));
+                            } else {
+                                BigDecimal discountValue = BigDecimal.valueOf(sale.getDiscountValue());
+                                product.setPrice(product.getPrice().subtract(discountValue));
+                            }
+                        }
+
+                    }
                     int quantity = cat.getQuantity();
                     int id = cat.getId();
                     ProductInfo productInfo = new ProductInfo(product, ps, quantity, id);

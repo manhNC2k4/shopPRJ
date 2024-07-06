@@ -55,7 +55,7 @@ public class FavoriteDAO extends DBContext {
 
     public List<Product> getUserFavorites(int userId) throws SQLException {
         List<Product> favorites = new ArrayList<>();
-        String sql = "SELECT p.product_id, p.name, p.description, p.category_id, p.price, p.created_at, p.updated_at, pi.image_url "
+        String sql = "SELECT p.product_id, p.name, p.description, p.category_id, p.price, p.created_at, p.updated_at, p.sale_id, pi.image_url "
                 + "FROM Products p "
                 + "LEFT JOIN ProductImages pi ON p.product_id = pi.product_id "
                 + "JOIN Favorite f ON p.product_id = f.product_id "
@@ -65,19 +65,37 @@ public class FavoriteDAO extends DBContext {
             ps.setInt(1, userId);
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
+                    Integer saleId = null;
+                    if (rs.getObject("sale_id") != null) {
+                        saleId = rs.getInt("sale_id");
+                    }
                     int productId = rs.getInt("product_id");
                     Product product = findProductById(favorites, productId);
                     if (product == null) {
-                        product = new Product(
-                                productId,
-                                rs.getString("name"),
-                                rs.getString("description"),
-                                rs.getInt("category_id"),
-                                rs.getBigDecimal("price"),
-                                rs.getTimestamp("created_at"),
-                                rs.getTimestamp("updated_at"),
-                                new ArrayList<>()
-                        );
+                        if (saleId != null) {
+                            product = new Product(
+                                    productId,
+                                    rs.getString("name"),
+                                    rs.getString("description"),
+                                    rs.getInt("category_id"),
+                                    rs.getBigDecimal("price"),
+                                    rs.getTimestamp("created_at"),
+                                    rs.getTimestamp("updated_at"),
+                                    new ArrayList<>(),
+                                    saleId
+                            );
+                        } else {
+                            product = new Product(
+                                    productId,
+                                    rs.getString("name"),
+                                    rs.getString("description"),
+                                    rs.getInt("category_id"),
+                                    rs.getBigDecimal("price"),
+                                    rs.getTimestamp("created_at"),
+                                    rs.getTimestamp("updated_at"),
+                                    new ArrayList<>()
+                            );
+                        }
                         favorites.add(product);
                     }
                     String imageUrl = rs.getString("image_url");

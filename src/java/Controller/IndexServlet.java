@@ -84,12 +84,8 @@ public class IndexServlet extends HttpServlet {
         request.getSession().setAttribute("categoryMap", categoryMap);
         request.getSession().setAttribute("dataPro", listPro);
         SaleDAO sd = new SaleDAO();
-        try {
-            List<Sale> listSale = sd.getAllSales();
-            request.getSession().setAttribute("listSale", listSale);
-        } catch (SQLException ex) {
-            Logger.getLogger(ListSale.class.getName()).log(Level.SEVERE, null, ex);
-        }
+        List<Sale> listSale = sd.getAllSales();
+        request.getSession().setAttribute("listSale", listSale);
         // Lấy thông tin user từ session hoặc cookie
         Cookie[] cookies = request.getCookies();
         UserDTO user = null;
@@ -139,12 +135,8 @@ public class IndexServlet extends HttpServlet {
         request.getSession().setAttribute("categoryMap", categoryMap);
         request.getSession().setAttribute("dataPro", listPro);
         SaleDAO sd = new SaleDAO();
-        try {
-            List<Sale> listSale = sd.getAllSales();
-            request.getSession().setAttribute("listSale", listSale);
-        } catch (SQLException ex) {
-            Logger.getLogger(ListSale.class.getName()).log(Level.SEVERE, null, ex);
-        }
+        List<Sale> listSale = sd.getAllSales();
+        request.getSession().setAttribute("listSale", listSale);
         // Lấy thông tin user từ session hoặc cookie
         Cookie[] cookies = request.getCookies();
         UserDTO user = null;

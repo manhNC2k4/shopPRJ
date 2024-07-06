@@ -65,7 +65,7 @@ public class DetailSale extends HttpServlet {
             Sale sale = sd.getSaleById(id);
             request.setAttribute("sale", sale);
             request.getRequestDispatcher("saleDetail.jsp").forward(request, response);
-        } catch (NumberFormatException | SQLException e) {
+        } catch (NumberFormatException e) {
         }
     } 
 

@@ -32,8 +32,8 @@ import model.ProductInfo;
  *
  * @author LNV
  */
-@WebServlet(name = "OrderServlet", urlPatterns = {"/order"})
-public class OrderServlet extends HttpServlet {
+@WebServlet(name = "OrderSingleServlet", urlPatterns = {"/orderSingle"})
+public class OrderSingleServlet extends HttpServlet {
 
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
@@ -85,7 +85,7 @@ public class OrderServlet extends HttpServlet {
         String email = request.getParameter("email");
         String rtotal = request.getParameter("total");
         String paymentMethod = request.getParameter("paymentMethod");
-        if (street2 != null) {
+        if (!"".equals(street2)) {
             street = street + "-" + street2;
         }
         Order_Info orderInfo = new Order_Info(0, firstName, lastName, country, street, city, postcode, phone, email, paymentMethod, 0);
@@ -108,45 +108,16 @@ public class OrderServlet extends HttpServlet {
             if (user != null && c != null) {
                 int userId = user.getUser_id();
                 Order order = new Order(0, userId, null, "Pending", total, null, null);
-                List<OrderDetail> orderDetails = new ArrayList<>();
-                List<ProductInfo> orderList = (List<ProductInfo>) request.getSession().getAttribute("listOrder");
-                if (orderList == null) {
-                    String error = "something was wrong";
-                    request.setAttribute("message", error);
-                    request.getRequestDispatcher("checkout").forward(request, response);
-                }
-                ProductDAO pd = new ProductDAO();
-                for (ProductInfo pi : orderList) {
-                    OrderDetail od = new OrderDetail(0, 0, pi.getQuantity(), pi.getProduct().getPrice(), pd.getProduct_Size_Id(pi.getProduct().getId(), pi.getSize().getSize()));
-                    orderDetails.add(od);
-                }
-
+                Integer psid = (Integer) request.getSession().getAttribute("psid");
+                Integer quantity = (Integer) request.getSession().getAttribute("quantity");
+                OrderDetail oderDetail = new OrderDetail(0, 0, quantity, BigDecimal.valueOf(total), psid);
                 OrderDAO orderdao = new OrderDAO();
+                List<OrderDetail> orderDetails = new ArrayList<>();
+                orderDetails.add(oderDetail);
                 boolean check = orderdao.insertOrder(order, orderDetails, orderInfo);
                 if (check) {
-                    request.getSession().removeAttribute("listOrder");
-                    CartDAO cartDAO = new CartDAO();
-                    String result0 = cartDAO.updateCart(c.getId(), c.getNums_items() - orderList.size());
-                    if ("Update successfull!".equals(result0)) {
-                        for (ProductInfo pi : orderList) {
-                            int id = pi.getCart_item_id();
-
-                            String result = cartDAO.deleteCartItem(id);
-                            if ("Delete successful".equals(result)) {
-                                CartDAO cartd = new CartDAO();
-                                Cart c1;
-                                c1 = cartd.getCartById(user.getUser_id());
-                                Cookie cookie1 = new Cookie("cart", c1.toString());
-                                cookie1.setMaxAge(60 * 60 * 24 * 60);
-                                response.addCookie(cookie1);
-                            } else {
-                                System.out.println("delete cart item is reject!");
-                            }
-                        }
-                    } else {
-                        System.out.println("update cart is reject!");
-                    }
-                    response.sendRedirect("cartShow");
+                    
+                    response.sendRedirect("index");
                 } else {
                     String error = "something was wrong";
                     System.out.println(error);
@@ -157,7 +128,7 @@ public class OrderServlet extends HttpServlet {
             }
         } catch (NumberFormatException e) {
         } catch (SQLException ex) {
-            Logger.getLogger(OrderServlet.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(OrderSingleServlet.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 

@@ -177,7 +177,9 @@
                                         <div class="icon"><span class="ion-ios-arrow-down"></span></div>
                                         <select name="size" id="size" class="form-control">
                                             <c:forEach var="size" items="${product.sizes}">
+                                                <c:if test="${size.stock > 0}"> 
                                                 <option value="${size.size}" data-stock="${size.stock}">${size.size}</option>     
+                                                 </c:if>
                                             </c:forEach>
                                         </select>
                                     </div>
@@ -206,7 +208,7 @@
 
                             <a href="#" id="addToCartBtn" class="btn btn-black py-3 px-5 mr-2">Add to Cart</a>
 
-                            <a href="cart.html" class="btn btn-primary py-3 px-5">Buy now</a></p>
+                            <a href="#" id="buySingleBtn" class="btn btn-primary py-3 px-5">Buy now</a></p>
                     </div>
                 </div>
                 <div class="row mt-5">
@@ -513,7 +515,7 @@
                     // If is not undefined
 
                     // Increment
-                    if (quantity > 0) {
+                    if (quantity > 1) {
                         $('#quantity').val(quantity - 1);
                     }
                 });
@@ -528,6 +530,14 @@
                     var quantity = $("#quantity").val();
                     var size = $("#size").val();
                     var addToCartUrl = "addToCart?productId=" + productId + "&quantity=" + quantity + "&size=" + size;
+                    window.location.href = addToCartUrl;
+                });
+                $("#buySingleBtn").click(function (e) {
+                    e.preventDefault();
+                    var productId = "${product.id}";
+                    var quantity = $("#quantity").val();
+                    var size = $("#size").val();
+                    var addToCartUrl = "buySingle?productId=" + productId + "&quantity=" + quantity + "&size=" + size;
                     window.location.href = addToCartUrl;
                 });
             });
