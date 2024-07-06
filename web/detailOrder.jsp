@@ -1,6 +1,6 @@
 <%-- 
-    Document   : listProducts
-    Created on : Jun 23, 2024, 3:09:18 PM
+    Document   : listSale
+    Created on : Jul 2, 2024, 3:41:23 PM
     Author     : LNV
 --%>
 
@@ -16,11 +16,10 @@
         <meta name="description" content="">
         <meta name="author" content="">
         <link href="img/logo/logo.png" rel="icon">
-        <title>RuangAdmin - DataTables</title>
+        <title>RuangAdmin - Simple Tables</title>
         <link href="vendor/fontawesome-free/css/all.min.css" rel="stylesheet" type="text/css">
         <link href="vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet" type="text/css">
         <link href="css/ruang-admin.min.css" rel="stylesheet">
-        <link href="vendor/datatables/dataTables.bootstrap4.min.css" rel="stylesheet">
     </head>
 
     <body id="page-top">
@@ -134,60 +133,8 @@
                         </div>
                     </div>
                 </li>
-                <li class="nav-item">
-                    <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseForm" aria-expanded="true"
-                       aria-controls="collapseForm">
-                        <i class="fab fa-fw fa-wpforms"></i>
-                        <span>Forms</span>
-                    </a>
-                    <div id="collapseForm" class="collapse" aria-labelledby="headingForm" data-parent="#accordionSidebar">
-                        <div class="bg-white py-2 collapse-inner rounded">
-                            <h6 class="collapse-header">Forms</h6>
-                            <a class="collapse-item" href="form_basics.html">Form Basics</a>
-                            <a class="collapse-item" href="form_advanceds.html">Form Advanceds</a>
-                        </div>
-                    </div>
-                </li>
-                <li class="nav-item active">
-                    <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseTable" aria-expanded="true"
-                       aria-controls="collapseTable">
-                        <i class="fas fa-fw fa-table"></i>
-                        <span>Tables</span>
-                    </a>
-                    <div id="collapseTable" class="collapse show" aria-labelledby="headingTable" data-parent="#accordionSidebar">
-                        <div class="bg-white py-2 collapse-inner rounded">
-                            <h6 class="collapse-header">Tables</h6>
-                            <a class="collapse-item" href="simple-tables.html">Simple Tables</a>
-                            <a class="collapse-item active" href="datatables.html">DataTables</a>
-                        </div>
-                    </div>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="ui-colors.html">
-                        <i class="fas fa-fw fa-palette"></i>
-                        <span>UI Colors</span>
-                    </a>
-                </li>
-                <hr class="sidebar-divider">
-                <div class="sidebar-heading">
-                    Examples
-                </div>
-                <li class="nav-item">
-                    <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapsePage" aria-expanded="true"
-                       aria-controls="collapsePage">
-                        <i class="fas fa-fw fa-columns"></i>
-                        <span>Pages</span>
-                    </a>
-                    <div id="collapsePage" class="collapse" aria-labelledby="headingPage" data-parent="#accordionSidebar">
-                        <div class="bg-white py-2 collapse-inner rounded">
-                            <h6 class="collapse-header">Example Pages</h6>
-                            <a class="collapse-item" href="login.html">Login</a>
-                            <a class="collapse-item" href="register.html">Register</a>
-                            <a class="collapse-item" href="404.html">404 Page</a>
-                            <a class="collapse-item" href="blank.html">Blank Page</a>
-                        </div>
-                    </div>
-                </li>
+
+
                 <li class="nav-item">
                     <a class="nav-link" href="charts.html">
                         <i class="fas fa-fw fa-chart-area"></i>
@@ -389,81 +336,108 @@
                     <!-- Container Fluid-->
                     <div class="container-fluid" id="container-wrapper">
                         <div class="d-sm-flex align-items-center justify-content-between mb-4">
-                            <h1 class="h3 mb-0 text-gray-800">List Users</h1>
+                            <h1 class="h3 mb-0 text-gray-800">Simple Orders</h1>
                             <ol class="breadcrumb">
                                 <li class="breadcrumb-item"><a href="./">Home</a></li>
-                                <li class="breadcrumb-item">Users</li>
-                                <li class="breadcrumb-item active" aria-current="page">Users</li>
+                                <li class="breadcrumb-item">Orders</li>
+                                <li class="breadcrumb-item active" aria-current="page">Order</li>
                             </ol>
                         </div>
+
+                        <div class="row">
+                            <div class="col-lg-12 mb-4">
+                                <!-- Simple Tables -->
+                                <div class="card">
+                                    <div class="table-responsive">
+                                        <table class="table align-items-center table-flush">
+                                            <thead class="thead-light">
+                                                <tr>
+                                                    <th>ID</th>
+                                                    <th>User Id</th>
+                                                    <th>Order Time</th>
+                                                    <th>Total</th>
+                                                    <th>Status</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <c:set var="j" value="${requestScope.order}"/>
+                                                <tr>
+                                                    <td>${j.orderId}</td>
+                                                    <td>${j.userId}</td>
+                                                    <td>
+                                                        ${j.orderDate}
+                                                    </td>
+                                                    <td>${j.total}</td>
+                                                    <td>
+                                                        <span 
+                                                            <c:choose>
+                                                                <c:when test="${j.status == 'Delivered'}">class="badge badge-success"</c:when>
+                                                                <c:when test="${j.status == 'Pending'}">class="badge badge-danger"</c:when>
+                                                                <c:when test="${j.status == 'Shipping'}">class="badge badge-warning"</c:when>
+                                                                <c:when test="${j.status == 'Processing'}">class="badge badge-info"</c:when>
+                                                                <c:otherwise>class="badge badge-secondary"</c:otherwise> 
+                                                            </c:choose>
+                                                            >
+                                                            ${j.status}
+                                                        </span>
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                    <div class="card-footer"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <!--Row-->
 
                         <!-- Row -->
                         <div class="row">
                             <!-- DataTable with Hover -->
                             <div class="col-lg-12">
                                 <div class="card mb-4">
-                                    <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-                                        <h6 class="m-0 font-weight-bold text-primary">
-                                            <a href="addUser" class="text-primary" style="text-decoration: none;">Add User</a>
-                                        </h6>
-                                    </div>
                                     <div class="table-responsive p-3">
+
                                         <table class="table align-items-center table-flush table-hover" id="dataTableHover">
                                             <thead class="thead-light">
                                                 <tr>
-                                                    <th>Username</th>
-                                                    <th>Email</th>
-                                                    <th>First name</th>
-                                                    <th>Last name</th>
-                                                    <th>Phone</th>
-                                                    <th>Address</th>
-                                                    <th>Action</th>
+                                                    <th>Name</th>
+                                                    <th>Size</th>
+                                                    <th>Quantity</th>
+                                                    <th>Total</th>
                                                 </tr>
                                             </thead>
                                             <tfoot>
                                                 <tr>
-                                                    <th>Username</th>
-                                                    <th>Email</th>
-                                                    <th>First name</th>
-                                                    <th>Last name</th>
-                                                    <th>Phone</th>
-                                                    <th>Address</th>
-                                                    <th>Action</th>
+                                                    <th>Name</th>
+                                                    <th>Size</th>
+                                                    <th>Quantity</th>
+                                                    <th>Total</th>
                                                 </tr>
                                             </tfoot>
                                             <tbody>
-                                                <c:forEach var="j" items="${requestScope.data}">
+                                                <c:forEach var="p" items="${requestScope.productInfoList}">
                                                     <tr>
-                                                        <td>${j.username}</td>
-                                                        <td>${j.email}</td>
-                                                        <td>${j.first_name}</td>
-                                                        <td>${j.last_name}</td>
-                                                        <td>${j.phone}</td>
-                                                        <td>${j.address}</td>
-                                                        <td class="btn-group">
-                                                            <a href="newPass?id=${j.user_id}" class="btn btn-primary btn-sm" title="New password">
-                                                                <i class="fas fa-key"></i>
-                                                            </a>
-                                                            <a href="deleteUser?id=${j.user_id}" class="btn btn-danger btn-sm" onclick="return confirmDelete()" title="Delete">
-                                                                <i class="fas fa-trash-alt"></i>
-                                                            </a>
+                                                        <td>${p.product.name}</td>
+                                                        <td>${p.size.size}</td>
+                                                        <td>${p.quantity}</td>
+                                                        <td>
+                                                            ${p.totalPrice * p.quantity}
                                                         </td>
                                                     </tr>
                                                 </c:forEach>
+                                                    <tr>
+                                                        <td>Delivery</td>
+                                                        <td></td>
+                                                        <td></td>
+                                                        <td>
+                                                            10
+                                                        </td>
+                                                    </tr>
                                             </tbody>
                                         </table>
                                     </div>
                                 </div>
-                            </div>
-                        </div>
-                        <!--Row-->
-
-                        <!-- Documentation Link -->
-                        <div class="row">
-                            <div class="col-lg-12">
-                                <p>DataTables is a third party plugin that is used to generate the demo table below. For more information
-                                    about DataTables, please visit the official <a href="https://datatables.net/" target="_blank">DataTables
-                                        documentation.</a></p>
                             </div>
                         </div>
 
@@ -492,7 +466,6 @@
                     </div>
                     <!---Container Fluid-->
                 </div>
-
                 <!-- Footer -->
                 <footer class="sticky-footer bg-white">
                     <div class="container my-auto">
@@ -516,21 +489,9 @@
         <script src="vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
         <script src="vendor/jquery-easing/jquery.easing.min.js"></script>
         <script src="js/ruang-admin.min.js"></script>
-        <!-- Page level plugins -->
-        <script src="vendor/datatables/jquery.dataTables.min.js"></script>
-        <script src="vendor/datatables/dataTables.bootstrap4.min.js"></script>
 
-        <!-- Page level custom scripts -->
         <script>
-                      $(document).ready(function () {
-                          $('#dataTable').DataTable(); // ID From dataTable 
-                          $('#dataTableHover').DataTable(); // ID From dataTable with Hover
-                      });
-                      function confirmDelete() {
-                          return confirm('Are you sure you want to delete this user?');
-                      }
         </script>
-
     </body>
 
 </html>

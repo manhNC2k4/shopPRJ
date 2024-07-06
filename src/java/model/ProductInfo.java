@@ -4,6 +4,8 @@
  */
 package model;
 
+import java.math.BigDecimal;
+
 /**
  *
  * @author LNV
@@ -13,7 +15,23 @@ public class ProductInfo {
     private Product_Size size;
     private int quantity;
     private int cart_item_id;
+    private BigDecimal totalPrice;
 
+    public void setTotalPrice(BigDecimal totalPrice) {
+        this.totalPrice = totalPrice;
+    }
+
+    public BigDecimal getTotalPrice() {
+        return totalPrice;
+    }
+
+    public ProductInfo(Product product, Product_Size size, int quantity, int cart_item_id, BigDecimal totalPrice) {
+        this.product = product;
+        this.size = size;
+        this.quantity = quantity;
+        this.cart_item_id = cart_item_id;
+        this.totalPrice = totalPrice;
+    }
     public int getCart_item_id() {
         return cart_item_id;
     }

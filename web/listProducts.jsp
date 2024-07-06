@@ -55,7 +55,7 @@
         <div id="wrapper">
             <!-- Sidebar -->
             <ul class="navbar-nav sidebar sidebar-light accordion" id="accordionSidebar">
-                <a class="sidebar-brand d-flex align-items-center justify-content-center" href="index1.html">
+                <a class="sidebar-brand d-flex align-items-center justify-content-center" href="dashboard.jsp">
                     <div class="sidebar-brand-icon">
                         <img src="img/logo/logo2.png">
                     </div>
@@ -63,7 +63,7 @@
                 </a>
                 <hr class="sidebar-divider my-0">
                 <li class="nav-item">
-                    <a class="nav-link" href="index1.html">
+                    <a class="nav-link" href="dashboard.jsp">
                         <i class="fas fa-fw fa-tachometer-alt"></i>
                         <span>Dashboard</span></a>
                 </li>
@@ -124,6 +124,23 @@
                             <h6 class="collapse-header">Sales</h6>
                             <a class="collapse-item" href="listSale">List Sales</a>
                             <a class="collapse-item" href="addSale">Add Sales</a>
+                        </div>
+                    </div>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseOrder" aria-expanded="true"
+                       aria-controls="collapseOrder">
+                        <i class="fab fa-fw fa-wpforms"></i>
+                        <span>Orders</span>
+                    </a>
+                    <div id="collapseOrder" class="collapse" aria-labelledby="headingSale" data-parent="#accordionSidebar">
+                        <div class="bg-white py-2 collapse-inner rounded">
+                            <h6 class="collapse-header">Orders</h6>
+                            <a class="collapse-item" href="listOrder">List Orders</a>
+                            <a class="collapse-item" href="listOrderPending">List Orders Pending</a>
+                            <a class="collapse-item" href="listOrderProcessing">List Orders Processing</a>
+                            <a class="collapse-item" href="listOrderShipping">List Orders Shipping</a>
+                            <a class="collapse-item" href="listOrderDelivered">List Orders Delivered</a>
                         </div>
                     </div>
                 </li>

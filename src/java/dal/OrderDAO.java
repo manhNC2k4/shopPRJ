@@ -55,7 +55,144 @@ public class OrderDAO extends DBContext {
         }
         return orders;
     }
+    
+    public List<Order> getAllOrdersPending() {
+        List<Order> orders = new ArrayList<>();
+        String sql = "SELECT [order_id]"
+                + "      ,[user_id]"
+                + "      ,[order_date]"
+                + "      ,[status]"
+                + "      ,[total]"
+                + "      ,[created_at]"
+                + "      ,[updated_at]"
+                + "  FROM [dbo].[Orders]"
+                + " WHERE [status] = 'Pending'";
 
+        try {
+            PreparedStatement statement = connection.prepareStatement(sql);
+            ResultSet rs = statement.executeQuery();
+
+            while (rs.next()) {
+                Order order = new Order();
+                order.setOrderId(rs.getInt("order_id"));
+                order.setUserId(rs.getInt("user_id"));
+                order.setOrderDate(rs.getTimestamp("order_date"));
+                order.setStatus(rs.getString("status"));
+                order.setTotal(rs.getDouble("total"));
+                order.setCreatedAt(rs.getTimestamp("created_at"));
+                order.setUpdateAt(rs.getTimestamp("updated_at"));
+
+                orders.add(order);
+            }
+        } catch (SQLException ex) {
+            System.out.println("Error at getAllOrders of OrderDAO" + ex.getMessage());
+        }
+        return orders;
+    }
+
+     public List<Order> getAllOrdersProcessing() {
+        List<Order> orders = new ArrayList<>();
+        String sql = "SELECT [order_id]"
+                + "      ,[user_id]"
+                + "      ,[order_date]"
+                + "      ,[status]"
+                + "      ,[total]"
+                + "      ,[created_at]"
+                + "      ,[updated_at]"
+                + "  FROM [dbo].[Orders]"
+                + " WHERE [status] = 'Processing'";
+
+        try {
+            PreparedStatement statement = connection.prepareStatement(sql);
+            ResultSet rs = statement.executeQuery();
+
+            while (rs.next()) {
+                Order order = new Order();
+                order.setOrderId(rs.getInt("order_id"));
+                order.setUserId(rs.getInt("user_id"));
+                order.setOrderDate(rs.getTimestamp("order_date"));
+                order.setStatus(rs.getString("status"));
+                order.setTotal(rs.getDouble("total"));
+                order.setCreatedAt(rs.getTimestamp("created_at"));
+                order.setUpdateAt(rs.getTimestamp("updated_at"));
+
+                orders.add(order);
+            }
+        } catch (SQLException ex) {
+            System.out.println("Error at getAllOrders of OrderDAO" + ex.getMessage());
+        }
+        return orders;
+    }
+
+    public List<Order> getAllOrdersShipping() {
+        List<Order> orders = new ArrayList<>();
+        String sql = "SELECT [order_id]"
+                + "      ,[user_id]"
+                + "      ,[order_date]"
+                + "      ,[status]"
+                + "      ,[total]"
+                + "      ,[created_at]"
+                + "      ,[updated_at]"
+                + "  FROM [dbo].[Orders]"
+                + " WHERE [status] = 'Shipping'";
+
+        try {
+            PreparedStatement statement = connection.prepareStatement(sql);
+            ResultSet rs = statement.executeQuery();
+
+            while (rs.next()) {
+                Order order = new Order();
+                order.setOrderId(rs.getInt("order_id"));
+                order.setUserId(rs.getInt("user_id"));
+                order.setOrderDate(rs.getTimestamp("order_date"));
+                order.setStatus(rs.getString("status"));
+                order.setTotal(rs.getDouble("total"));
+                order.setCreatedAt(rs.getTimestamp("created_at"));
+                order.setUpdateAt(rs.getTimestamp("updated_at"));
+
+                orders.add(order);
+            }
+        } catch (SQLException ex) {
+            System.out.println("Error at getAllOrders of OrderDAO" + ex.getMessage());
+        }
+        return orders;
+    }
+     
+     public List<Order> getAllOrdersDelivered() {
+        List<Order> orders = new ArrayList<>();
+        String sql = "SELECT [order_id]"
+                + "      ,[user_id]"
+                + "      ,[order_date]"
+                + "      ,[status]"
+                + "      ,[total]"
+                + "      ,[created_at]"
+                + "      ,[updated_at]"
+                + "  FROM [dbo].[Orders]"
+                + " WHERE [status] = 'Delivered'";
+
+        try {
+            PreparedStatement statement = connection.prepareStatement(sql);
+            ResultSet rs = statement.executeQuery();
+
+            while (rs.next()) {
+                Order order = new Order();
+                order.setOrderId(rs.getInt("order_id"));
+                order.setUserId(rs.getInt("user_id"));
+                order.setOrderDate(rs.getTimestamp("order_date"));
+                order.setStatus(rs.getString("status"));
+                order.setTotal(rs.getDouble("total"));
+                order.setCreatedAt(rs.getTimestamp("created_at"));
+                order.setUpdateAt(rs.getTimestamp("updated_at"));
+
+                orders.add(order);
+            }
+        } catch (SQLException ex) {
+            System.out.println("Error at getAllOrders of OrderDAO" + ex.getMessage());
+        }
+        return orders;
+    }
+     
+    
     public Order getOrderById(int orderId) {
         String sql = "SELECT [order_id]"
                 + "      ,[user_id]"
@@ -80,7 +217,6 @@ public class OrderDAO extends DBContext {
                     order.setTotal(rs.getDouble("total"));
                     order.setCreatedAt(rs.getTimestamp("created_at"));
                     order.setUpdateAt(rs.getTimestamp("updated_at"));
-
                     return order;
                 }
             }
@@ -284,6 +420,24 @@ public class OrderDAO extends DBContext {
             return rowsAffected > 0;
         } catch (SQLException ex) {
             Logger.getLogger(OrderDAO.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return false;
+    }
+    
+    public boolean updateOrderStatus(String status, int orderId) {
+        String sql = "UPDATE [dbo].[Orders] " +
+                           "SET status = ?, updated_at = GETDATE() " +
+                           "WHERE order_id = ?";
+        try {
+            PreparedStatement st = connection.prepareCall(sql);
+            st.setString(1, status);
+            st.setInt(2, orderId);
+            int rowAffected = st.executeUpdate();
+            if(rowAffected > 0) {
+                return true;
+            }
+        } catch (SQLException e) {
+            System.out.println(e);
         }
         return false;
     }
