@@ -2,24 +2,32 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/Servlet.java to edit this template
  */
-package Controller;
 
+import dal.CategoryDAO;
+import dal.OrderDAO;
+import dal.ProductDAO;
+import dal.UserDAO;
 import java.io.IOException;
 import java.io.PrintWriter;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
-import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import jakarta.servlet.http.HttpSession;
+import java.util.Calendar;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import model.CateSaleData;
+import model.Order;
+import model.ProductSaleData;
 
 /**
  *
  * @author LNV
  */
-@WebServlet(name = "LogoutServlet", urlPatterns = {"/logout"})
-public class LogoutServlet extends HttpServlet {
+@WebServlet(urlPatterns = {"/dashBoard"})
+public class DashBoard extends HttpServlet {
 
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
@@ -38,10 +46,10 @@ public class LogoutServlet extends HttpServlet {
             out.println("<!DOCTYPE html>");
             out.println("<html>");
             out.println("<head>");
-            out.println("<title>Servlet LogoutServlet</title>");
+            out.println("<title>Servlet DashBoard</title>");
             out.println("</head>");
             out.println("<body>");
-            out.println("<h1>Servlet LogoutServlet at " + request.getContextPath() + "</h1>");
+            out.println("<h1>Servlet DashBoard at " + request.getContextPath() + "</h1>");
             out.println("</body>");
             out.println("</html>");
         }
@@ -59,28 +67,36 @@ public class LogoutServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        Cookie[] cookies = request.getCookies();
-        if (cookies != null) {
-            for (Cookie cookie : cookies) {
-                if (cookie.getName().equals("account")) {
-                    // Xóa cookie
-                    cookie.setMaxAge(0); // Hạn sử dụng là 0 giây (xóa ngay lập tức)
-                    response.addCookie(cookie);
-                }
-                if (cookie.getName().equals("cart")) {
-                    // Xóa cookie
-                    cookie.setMaxAge(0); // Hạn sử dụng là 0 giây (xóa ngay lập tức)
-                    response.addCookie(cookie);
-                }
-                if (cookie.getName().equals("favoriteCount")) {
-                    // Xóa cookie
-                    cookie.setMaxAge(0); // Hạn sử dụng là 0 giây (xóa ngay lập tức)
-                    response.addCookie(cookie);
-                }
-            }
+        OrderDAO orderDAO = new OrderDAO();
+        UserDAO userDAO = new UserDAO();
+        CategoryDAO cd = new CategoryDAO();
+        ProductDAO pd = new ProductDAO();
+        Map<Integer, Double> monthlyRevenue = orderDAO.getTotalRevenueByMonthForYear();
+        Map<Integer, List<Double>> revenueData = orderDAO.getTotalRevenueByWeekForYear();
+        Map<Integer, Integer> monthlySale = orderDAO.getTotalProductsSoldByMonthForYear();
+        Map<Integer, Integer> monthlyUserNew = userDAO.getTotalUsersCreatedPerMonthForCurrentYear();
+        int countPending = orderDAO.countPendingOrders();
+        int currentMonth = Calendar.getInstance().get(Calendar.MONTH) + 1; // Lấy tháng hiện tại (1-12)
+        int previousMonth = (currentMonth - 2 + 12) % 12 + 1;
+        List<ProductSaleData> listProduct = pd.getProductSaleDataTop5();
+        List<Order> listOrder = orderDAO.getAllOrders();
+        List<CateSaleData> listCateSaleData = cd.getCategorySalesData();
+        Map<String, Double> namePercentageMap = new HashMap<>();
+        for (CateSaleData data : listCateSaleData) {
+            namePercentageMap.put(data.getName(), data.getPercentage());
         }
-        request.getSession().setAttribute("message", "Logout successful!");
-        response.sendRedirect("index.jsp");
+        
+        request.setAttribute("namePercentageMap", namePercentageMap);
+        request.setAttribute("listOrder", listOrder);
+        request.setAttribute("monthlyRevenue", monthlyRevenue);
+        request.setAttribute("revenueData", revenueData);
+        request.setAttribute("monthlyUserNew", monthlyUserNew);
+        request.setAttribute("monthlySale", monthlySale);
+        request.setAttribute("countPending", countPending);
+        request.setAttribute("listProduct", listProduct);
+        request.setAttribute("currentMonth", currentMonth);
+        request.setAttribute("previousMonth", previousMonth);
+        request.getRequestDispatcher("dashboard.jsp").forward(request, response);
     }
 
     /**

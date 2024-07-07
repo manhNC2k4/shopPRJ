@@ -66,6 +66,34 @@
                 overflow: hidden; /* Hide the overflow text */
                 text-overflow: ellipsis; /* Add the ellipsis (...) */
             }
+            .search-container {
+                display: none;
+                align-items: center;
+                position: relative;
+            }
+            .search-container input {
+                border: none;
+                border-bottom: 1px solid rgba(0, 0, 0, 1); /* 100% opacity */
+                outline: none;
+                padding: 5px;
+                height: 35px !important;
+                margin-top: 15px;
+                background-color: transparent !important;
+                width: 250px;
+                font-size: 10px;
+                padding-top: 1rem;
+                padding-bottom: 1rem;
+                padding-left: 20px;
+                padding-right: 20px;
+                font-weight: 400;
+                color: #000000;
+                text-transform: uppercase;
+                letter-spacing: 2px;
+                opacity: 1 !important;
+            }
+            .search-container input::placeholder {
+                color: rgba(0, 0, 0, 1); /* 100% opacity */
+            }
         </style>
     </head>
     <body class="goto-here">
@@ -99,6 +127,14 @@
 
                 <div class="collapse navbar-collapse" id="ftco-nav">
                     <ul class="navbar-nav ml-auto">
+                        <li class="nav-item search-container" id="searchContainer">
+                            <form action="shop" method="GET">
+                                <input type="text" name="query" class="form-control" placeholder="Search...">
+                            </form>
+                        </li>
+                        <li class="nav-item cta cta-colored">
+                            <a href="#" class="nav-link" id="searchIcon"><span class="icon-search"></span></a>
+                        </li>
                         <li class="nav-item active"><a href="index" class="nav-link">Home</a></li>
                         <li class="nav-item"><a href="shop" class="nav-link">Shop</a></li>
                         <li class="nav-item"><a href="about.html" class="nav-link">About</a></li>
@@ -114,6 +150,7 @@
                                 <a class="nav-link dropdown-toggle" href="#" id="dropdown04" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">${user.username}</a>
                                 <div class="dropdown-menu" aria-labelledby="dropdown04">
                                     <a class="dropdown-item" href="viewProfile">View profile</a>
+                                    <a class="dropdown-item" href="viewOrder">View Order</a>
                                     <a class="dropdown-item" href="changePass">Change password</a>
                                     <a class="dropdown-item" href="logout">Log out</a>
                                 </div>
@@ -353,7 +390,34 @@
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 
         <script>
-
+            .search-container {
+                display: none;
+                align-items: center;
+                position: relative;
+            }
+            .search-container input {
+                border: none;
+                border-bottom: 1px solid rgba(0, 0, 0, 1); /* 100% opacity */
+                outline: none;
+                padding: 5px;
+                height: 35px !important;
+                margin-top: 15px;
+                background-color: transparent !important;
+                width: 250px;
+                font-size: 10px;
+                padding-top: 1rem;
+                padding-bottom: 1rem;
+                padding-left: 20px;
+                padding-right: 20px;
+                font-weight: 400;
+                color: #000000;
+                text-transform: uppercase;
+                letter-spacing: 2px;
+                opacity: 1 !important;
+            }
+            .search-container input::placeholder {
+                color: rgba(0, 0, 0, 1); /* 100% opacity */
+            }
             // Hàm kiểm tra có item nào được chọn hay chưa
             function checkSelectedItems() {
                 const checkedItems = document.querySelectorAll('.product-checkbox:checked');

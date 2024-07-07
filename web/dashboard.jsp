@@ -5,6 +5,7 @@
 --%>
 
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
+<%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <!DOCTYPE html>
 <html lang="en">
 
@@ -401,9 +402,12 @@
                                         <div class="row align-items-center">
                                             <div class="col mr-2">
                                                 <div class="text-xs font-weight-bold text-uppercase mb-1">Earnings (Monthly)</div>
-                                                <div class="h5 mb-0 font-weight-bold text-gray-800">$40,000</div>
+                                                <div class="h5 mb-0 font-weight-bold text-gray-800">$${monthlyRevenue.getOrDefault(currentMonth, 0.0)} </div>
                                                 <div class="mt-2 mb-0 text-muted text-xs">
-                                                    <span class="text-success mr-2"><i class="fa fa-arrow-up"></i> 3.48%</span>
+                                                    <c:set var="percentageChange" value="${(monthlyRevenue.getOrDefault(currentMonth, 0.0) - monthlyRevenue.getOrDefault(previousMonth, 0.0)) / monthlyRevenue.getOrDefault(previousMonth, 1.0) * 100}" />
+                                                    <span class="${percentageChange >= 0 ? 'text-success' : 'text-danger'} mr-2">
+                                                        <i class="fa ${percentageChange >= 0 ? 'fa-arrow-up' : 'fa-arrow-down'}"></i>  ${percentageChange} %
+                                                    </span>
                                                     <span>Since last month</span>
                                                 </div>
                                             </div>
@@ -421,10 +425,13 @@
                                         <div class="row no-gutters align-items-center">
                                             <div class="col mr-2">
                                                 <div class="text-xs font-weight-bold text-uppercase mb-1">Sales</div>
-                                                <div class="h5 mb-0 font-weight-bold text-gray-800">650</div>
+                                                <div class="h5 mb-0 font-weight-bold text-gray-800">${monthlySale.getOrDefault(currentMonth, 0.0)}</div>
                                                 <div class="mt-2 mb-0 text-muted text-xs">
-                                                    <span class="text-success mr-2"><i class="fas fa-arrow-up"></i> 12%</span>
-                                                    <span>Since last years</span>
+                                                    <c:set var="percentageChange" value="${(monthlySale.getOrDefault(currentMonth, 0.0) - monthlySale.getOrDefault(previousMonth, 0.0)) / monthlySale.getOrDefault(previousMonth, 1.0) * 100}" />
+                                                    <span class="${percentageChange >= 0 ? 'text-success' : 'text-danger'} mr-2">
+                                                        <i class="fa ${percentageChange >= 0 ? 'fa-arrow-up' : 'fa-arrow-down'}"></i>  ${percentageChange} %
+                                                    </span>
+                                                    <span>Since last month</span>
                                                 </div>
                                             </div>
                                             <div class="col-auto">
@@ -441,9 +448,12 @@
                                         <div class="row no-gutters align-items-center">
                                             <div class="col mr-2">
                                                 <div class="text-xs font-weight-bold text-uppercase mb-1">New User</div>
-                                                <div class="h5 mb-0 mr-3 font-weight-bold text-gray-800">366</div>
+                                                <div class="h5 mb-0 mr-3 font-weight-bold text-gray-800">${monthlyUserNew.getOrDefault(currentMonth, 0.0)}</div>
                                                 <div class="mt-2 mb-0 text-muted text-xs">
-                                                    <span class="text-success mr-2"><i class="fas fa-arrow-up"></i> 20.4%</span>
+                                                    <c:set var="percentageChange" value="${(monthlyUserNew.getOrDefault(currentMonth, 0.0) - monthlyUserNew.getOrDefault(previousMonth, 0.0)) / monthlyUserNew.getOrDefault(previousMonth, 1.0) * 100}" />
+                                                    <span class="${percentageChange >= 0 ? 'text-success' : 'text-danger'} mr-2">
+                                                        <i class="fa ${percentageChange >= 0 ? 'fa-arrow-up' : 'fa-arrow-down'}"></i>  ${percentageChange} %
+                                                    </span>
                                                     <span>Since last month</span>
                                                 </div>
                                             </div>
@@ -461,11 +471,7 @@
                                         <div class="row no-gutters align-items-center">
                                             <div class="col mr-2">
                                                 <div class="text-xs font-weight-bold text-uppercase mb-1">Pending Requests</div>
-                                                <div class="h5 mb-0 font-weight-bold text-gray-800">18</div>
-                                                <div class="mt-2 mb-0 text-muted text-xs">
-                                                    <span class="text-danger mr-2"><i class="fas fa-arrow-down"></i> 1.10%</span>
-                                                    <span>Since yesterday</span>
-                                                </div>
+                                                <div class="h5 mb-0 font-weight-bold text-gray-800">${countPending}</div>
                                             </div>
                                             <div class="col-auto">
                                                 <i class="fas fa-comments fa-2x text-warning"></i>
@@ -523,51 +529,25 @@
                                         </div>
                                     </div>
                                     <div class="card-body">
-                                        <div class="mb-3">
-                                            <div class="small text-gray-500">Oblong T-Shirt
-                                                <div class="small float-right"><b>600 of 800 Items</b></div>
+                                        <c:forEach var="c" items="${listProduct}">
+                                            <div class="mb-3">
+                                                <div class="small text-gray-500">${c.name}
+                                                    <div class="small float-right"><b>${c.sold} of ${c.sold + c.stock} Items</b></div>
+                                                </div>
+                                                <div class="progress" style="height: 12px;">
+                                                    <c:choose>
+                                                        <c:when test="${c.sold / (c.sold + c.stock) < 0.01}">
+                                                            <div class="progress-bar bg-warning" role="progressbar" style="width: 1%" 
+                                                                 aria-valuenow="${c.sold}" aria-valuemin="0" aria-valuemax="${c.sold + c.stock}"></div>
+                                                        </c:when>
+                                                        <c:otherwise>
+                                                            <div class="progress-bar bg-warning" role="progressbar" style="width: ${c.sold / (c.sold + c.stock) * 100}%" 
+                                                                 aria-valuenow="${c.sold}" aria-valuemin="0" aria-valuemax="${c.sold + c.stock}"></div>
+                                                        </c:otherwise>
+                                                    </c:choose>
+                                                </div>
                                             </div>
-                                            <div class="progress" style="height: 12px;">
-                                                <div class="progress-bar bg-warning" role="progressbar" style="width: 80%" aria-valuenow="80"
-                                                     aria-valuemin="0" aria-valuemax="100"></div>
-                                            </div>
-                                        </div>
-                                        <div class="mb-3">
-                                            <div class="small text-gray-500">Gundam 90'Editions
-                                                <div class="small float-right"><b>500 of 800 Items</b></div>
-                                            </div>
-                                            <div class="progress" style="height: 12px;">
-                                                <div class="progress-bar bg-success" role="progressbar" style="width: 70%" aria-valuenow="70"
-                                                     aria-valuemin="0" aria-valuemax="100"></div>
-                                            </div>
-                                        </div>
-                                        <div class="mb-3">
-                                            <div class="small text-gray-500">Rounded Hat
-                                                <div class="small float-right"><b>455 of 800 Items</b></div>
-                                            </div>
-                                            <div class="progress" style="height: 12px;">
-                                                <div class="progress-bar bg-danger" role="progressbar" style="width: 55%" aria-valuenow="55"
-                                                     aria-valuemin="0" aria-valuemax="100"></div>
-                                            </div>
-                                        </div>
-                                        <div class="mb-3">
-                                            <div class="small text-gray-500">Indomie Goreng
-                                                <div class="small float-right"><b>400 of 800 Items</b></div>
-                                            </div>
-                                            <div class="progress" style="height: 12px;">
-                                                <div class="progress-bar bg-info" role="progressbar" style="width: 50%" aria-valuenow="50"
-                                                     aria-valuemin="0" aria-valuemax="100"></div>
-                                            </div>
-                                        </div>
-                                        <div class="mb-3">
-                                            <div class="small text-gray-500">Remote Control Car Racing
-                                                <div class="small float-right"><b>200 of 800 Items</b></div>
-                                            </div>
-                                            <div class="progress" style="height: 12px;">
-                                                <div class="progress-bar bg-success" role="progressbar" style="width: 30%" aria-valuenow="30"
-                                                     aria-valuemin="0" aria-valuemax="100"></div>
-                                            </div>
-                                        </div>
+                                        </c:forEach>
                                     </div>
                                     <div class="card-footer text-center">
                                         <a class="m-0 small text-primary card-link" href="#">View More <i
@@ -580,56 +560,48 @@
                                 <div class="card">
                                     <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
                                         <h6 class="m-0 font-weight-bold text-primary">Invoice</h6>
-                                        <a class="m-0 float-right btn btn-danger btn-sm" href="#">View More <i
+                                        <a class="m-0 float-right btn btn-danger btn-sm" href="listOrder">View More <i
                                                 class="fas fa-chevron-right"></i></a>
                                     </div>
                                     <div class="table-responsive">
                                         <table class="table align-items-center table-flush">
                                             <thead class="thead-light">
                                                 <tr>
-                                                    <th>Order ID</th>
-                                                    <th>Customer</th>
-                                                    <th>Item</th>
+                                                    <th>ID</th>
+                                                    <th>User Id</th>
+                                                    <th>Order Time</th>
+                                                    <th>Total</th>
                                                     <th>Status</th>
                                                     <th>Action</th>
                                                 </tr>
                                             </thead>
                                             <tbody>
-                                                <tr>
-                                                    <td><a href="#">RA0449</a></td>
-                                                    <td>Udin Wayang</td>
-                                                    <td>Nasi Padang</td>
-                                                    <td><span class="badge badge-success">Delivered</span></td>
-                                                    <td><a href="#" class="btn btn-sm btn-primary">Detail</a></td>
-                                                </tr>
-                                                <tr>
-                                                    <td><a href="#">RA5324</a></td>
-                                                    <td>Jaenab Bajigur</td>
-                                                    <td>Gundam 90' Edition</td>
-                                                    <td><span class="badge badge-warning">Shipping</span></td>
-                                                    <td><a href="#" class="btn btn-sm btn-primary">Detail</a></td>
-                                                </tr>
-                                                <tr>
-                                                    <td><a href="#">RA8568</a></td>
-                                                    <td>Rivat Mahesa</td>
-                                                    <td>Oblong T-Shirt</td>
-                                                    <td><span class="badge badge-danger">Pending</span></td>
-                                                    <td><a href="#" class="btn btn-sm btn-primary">Detail</a></td>
-                                                </tr>
-                                                <tr>
-                                                    <td><a href="#">RA1453</a></td>
-                                                    <td>Indri Junanda</td>
-                                                    <td>Hat Rounded</td>
-                                                    <td><span class="badge badge-info">Processing</span></td>
-                                                    <td><a href="#" class="btn btn-sm btn-primary">Detail</a></td>
-                                                </tr>
-                                                <tr>
-                                                    <td><a href="#">RA1998</a></td>
-                                                    <td>Udin Cilok</td>
-                                                    <td>Baby Powder</td>
-                                                    <td><span class="badge badge-success">Delivered</span></td>
-                                                    <td><a href="#" class="btn btn-sm btn-primary">Detail</a></td>
-                                                </tr>
+                                                <c:forEach var="j" items="${requestScope.listOrder}" varStatus="loop">
+                                                    <c:if test="${loop.index < 5}">
+                                                        <tr>
+                                                            <td>${j.orderId}</td>
+                                                            <td>${j.userId}</td>
+                                                            <td>
+                                                                ${j.orderDate}
+                                                            </td>
+                                                            <td>${j.total}</td>
+                                                            <td>
+                                                                <span 
+                                                                    <c:choose>
+                                                                        <c:when test="${j.status == 'Delivered'}">class="badge badge-success"</c:when>
+                                                                        <c:when test="${j.status == 'Pending'}">class="badge badge-danger"</c:when>
+                                                                        <c:when test="${j.status == 'Shipping'}">class="badge badge-warning"</c:when>
+                                                                        <c:when test="${j.status == 'Processing'}">class="badge badge-info"</c:when>
+                                                                        <c:otherwise>class="badge badge-secondary"</c:otherwise> 
+                                                                    </c:choose>
+                                                                    >
+                                                                    ${j.status}
+                                                                </span>
+                                                            </td>
+                                                            <td><a href="detailOrder?id=${j.orderId}" class="btn btn-sm btn-info">Detail</a></td>
+                                                        </tr>
+                                                    </c:if>
+                                                </c:forEach>
                                             </tbody>
                                         </table>
                                     </div>
@@ -638,115 +610,370 @@
                             </div>
                             <!--             Message From Customer-->
                             <div class="col-xl-4 col-lg-5 ">
-                                <div class="card">
-                                    <div class="card-header py-4 bg-primary d-flex flex-row align-items-center justify-content-between">
-                                        <h6 class="m-0 font-weight-bold text-light">Message From Customer</h6>
+                                <div class="card shadow mb-4">
+                                    <div class="card-header py-3">
+                                        <h6 class="m-0 font-weight-bold text-primary">Category Revenue</h6>
                                     </div>
-                                    <div>
-                                        <div class="customer-message align-items-center">
-                                            <a class="font-weight-bold" href="#">
-                                                <div class="text-truncate message-title">Hi there! I am wondering if you can help me with a
-                                                    problem I've been having.</div>
-                                                <div class="small text-gray-500 message-time font-weight-bold">Udin Cilok · 58m</div>
-                                            </a>
+                                    <div class="card-body">
+                                        <div class="chart-pie pt-4">
+                                            <canvas id="myPieChart"></canvas>
                                         </div>
-                                        <div class="customer-message align-items-center">
-                                            <a href="#">
-                                                <div class="text-truncate message-title">But I must explain to you how all this mistaken idea
-                                                </div>
-                                                <div class="small text-gray-500 message-time">Nana Haminah · 58m</div>
-                                            </a>
-                                        </div>
-                                        <div class="customer-message align-items-center">
-                                            <a class="font-weight-bold" href="#">
-                                                <div class="text-truncate message-title">Lorem ipsum dolor sit amet, consectetur adipiscing elit
-                                                </div>
-                                                <div class="small text-gray-500 message-time font-weight-bold">Jajang Cincau · 25m</div>
-                                            </a>
-                                        </div>
-                                        <div class="customer-message align-items-center">
-                                            <a class="font-weight-bold" href="#">
-                                                <div class="text-truncate message-title">At vero eos et accusamus et iusto odio dignissimos
-                                                    ducimus qui blanditiis
-                                                </div>
-                                                <div class="small text-gray-500 message-time font-weight-bold">Udin Wayang · 54m</div>
-                                            </a>
-                                        </div>
-                                        <div class="card-footer text-center">
-                                            <a class="m-0 small text-primary card-link" href="#">View More <i
-                                                    class="fas fa-chevron-right"></i></a>
-                                        </div>
+                                        <hr>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                        <!--          Row-->
-
-                        <div class="row">
-                            <div class="col-lg-12 text-center">
-                                <p>Do you like this template ? you can download from <a href="https://github.com/indrijunanda/RuangAdmin"
-                                                                                        class="btn btn-primary btn-sm" target="_blank"><i class="fab fa-fw fa-github"></i>&nbsp;GitHub</a></p>
-                            </div>
-                        </div>
-
-                        <!--           Modal Logout -->
-                        <div class="modal fade" id="logoutModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabelLogout"
-                             aria-hidden="true">
-                            <div class="modal-dialog" role="document">
-                                <div class="modal-content">
-                                    <div class="modal-header">
-                                        <h5 class="modal-title" id="exampleModalLabelLogout">Ohh No!</h5>
-                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                            <span aria-hidden="true">&times;</span>
-                                        </button>
-                                    </div>
-                                    <div class="modal-body">
-                                        <p>Are you sure you want to logout?</p>
-                                    </div>
-                                    <div class="modal-footer">
-                                        <button type="button" class="btn btn-outline-primary" data-dismiss="modal">Cancel</button>
-                                        <a href="login.html" class="btn btn-primary">Logout</a>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
                     </div>
-                    <!--        -Container Fluid-->
+                    <!--          Row-->
+
+                    <div class="row">
+                        <div class="col-lg-12 text-center">
+                            <p>Do you like this template ? you can download from <a href="https://github.com/indrijunanda/RuangAdmin"
+                                                                                    class="btn btn-primary btn-sm" target="_blank"><i class="fab fa-fw fa-github"></i>&nbsp;GitHub</a></p>
+                        </div>
+                    </div>
+
+                    <!--           Modal Logout -->
+                    <div class="modal fade" id="logoutModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabelLogout"
+                         aria-hidden="true">
+                        <div class="modal-dialog" role="document">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="exampleModalLabelLogout">Ohh No!</h5>
+                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                        <span aria-hidden="true">&times;</span>
+                                    </button>
+                                </div>
+                                <div class="modal-body">
+                                    <p>Are you sure you want to logout?</p>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-outline-primary" data-dismiss="modal">Cancel</button>
+                                    <a href="login.html" class="btn btn-primary">Logout</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
                 </div>
-                <!--       Footer -->
-                <footer class="sticky-footer bg-white">
-                    <div class="container my-auto">
-                        <div class="copyright text-center my-auto">
-                            <span>copyright &copy; <script> document.write(new Date().getFullYear());</script> - developed by
-                                <b><a href="https://indrijunanda.gitlab.io/" target="_blank">indrijunanda</a></b>
-                            </span>
-                        </div>
-                    </div>
-
-                    <div class="container my-auto py-2">
-                        <div class="copyright text-center my-auto">
-                            <span>copyright &copy; <script> document.write(new Date().getFullYear());</script> - distributed by
-                                <b><a href="https://themewagon.com/" target="_blank">themewagon</a></b>
-                            </span>
-                        </div>
-                    </div>
-                </footer>
-                <!--       Footer -->
+                <!--        -Container Fluid-->
             </div>
+
         </div>
+    </div>
 
-        <!--   Scroll to top -->
-        <a class="scroll-to-top rounded" href="#page-top">
-            <i class="fas fa-angle-up"></i>
-        </a>
+    <!--   Scroll to top -->
+    <a class="scroll-to-top rounded" href="#page-top">
+        <i class="fas fa-angle-up"></i>
+    </a>
 
-        <script src="vendor/jquery/jquery.min.js"></script>
-        <script src="vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
-        <script src="vendor/jquery-easing/jquery.easing.min.js"></script>
-        <script src="js/ruang-admin.min.js"></script>
-        <script src="vendor/chart.js/Chart.min.js"></script>
-        <script src="js/demo/chart-area-demo.js"></script>  
-    </body>
+    <script src="vendor/jquery/jquery.min.js"></script>
+    <script src="vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <script src="vendor/jquery-easing/jquery.easing.min.js"></script>
+    <script src="js/ruang-admin.min.js"></script>
+    <script src="vendor/chart.js/Chart.min.js"></script>
+    <script>
+        let namePercentageData = {
+        <c:forEach var="entry" items="${namePercentageMap}" varStatus="loop">
+        "${entry.key}": ${entry.value} ${!loop.last ? ',' : ''}
+        </c:forEach>
+        };
+        let labels1 = Object.keys(namePercentageData);
+        let percentages1 = Object.values(namePercentageData);
+        Chart.defaults.global.defaultFontFamily = 'Nunito', '-apple-system,system-ui,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif';
+        Chart.defaults.global.defaultFontColor = '#858796';
+// Pie Chart Example
+        var ctx = document.getElementById("myPieChart");
+        var myPieChart = new Chart(ctx, {
+        type: 'doughnut',
+                data: {
+                labels: labels1,
+                        datasets: [{
+                        data: percentages1,
+                                backgroundColor: ['#4e73df', '#1cc88a', '#36b9cc'],
+                                hoverBackgroundColor: ['#2e59d9', '#17a673', '#2c9faf'],
+                                hoverBorderColor: "rgba(234, 236, 244, 1)",
+                        }],
+                },
+                options: {
+                maintainAspectRatio: false,
+                        tooltips: {
+                        backgroundColor: "rgb(255,255,255)",
+                                bodyFontColor: "#858796",
+                                borderColor: '#dddfeb',
+                                borderWidth: 1,
+                                xPadding: 15,
+                                yPadding: 15,
+                                displayColors: false,
+                                caretPadding: 10,
+                        },
+                        legend: {
+                        display: false
+                        },
+                        cutoutPercentage: 80,
+                },
+        });
+        function number_format(number, decimals, dec_point, thousands_sep) {
+        // *     example: number_format(1234.56, 2, ',', ' ');
+        // *     return: '1 234,56'
+        number = (number + '').replace(',', '').replace(' ', '');
+        var n = !isFinite( + number) ? 0 : + number,
+                prec = !isFinite( + decimals) ? 0 : Math.abs(decimals),
+                sep = (typeof thousands_sep === 'undefined') ? ',' : thousands_sep,
+                dec = (typeof dec_point === 'undefined') ? '.' : dec_point,
+                s = '',
+                toFixedFix = function (n, prec) {
+                var k = Math.pow(10, prec);
+                return '' + Math.round(n * k) / k;
+                };
+        // Fix for IE parseFloat(0.55).toFixed(0) = 0;
+        s = (prec ? toFixedFix(n, prec) : '' + Math.round(n)).split('.');
+        if (s[0].length > 3) {
+        s[0] = s[0].replace(/\B(?=(?:\d{3})+(?!\d))/g, sep);
+        }
+        if ((s[1] || '').length < prec) {
+        s[1] = s[1] || '';
+        s[1] += new Array(prec - s[1].length + 1).join('0');
+        }
+        return s.join(dec);
+        }
+
+        // Area Chart Example               
+
+        let monthlyRevenueData = {
+        <c:forEach var="entry" items="${monthlyRevenue}" varStatus="loop">
+        "${entry.key}": ${entry.value} ${!loop.last ? ',' : ''}
+        </c:forEach>
+        };
+        let labels = [];
+        let data = [];
+        for (let month = 1; month <= 12; month++) {
+        labels.push(month); // Hoặc bạn có thể format lại tên tháng cho đẹp hơn
+        data.push(monthlyRevenueData[month] || 0); // Lấy doanh thu, nếu không có thì gán là 0
+        }
+
+        var ctx = document.getElementById("myAreaChart");
+        var myLineChart = new Chart(ctx, {
+        type: 'line',
+                data: {
+                labels: labels, // Sử dụng labels đã tạo từ dữ liệu JSP
+                        datasets: [{
+                        label: "Earnings",
+                                lineTension: 0.3,
+                                backgroundColor: "rgba(78, 115, 223, 0.5)",
+                                borderColor: "rgba(78, 115, 223, 1)",
+                                pointRadius: 3,
+                                pointBackgroundColor: "rgba(78, 115, 223, 1)",
+                                pointBorderColor: "rgba(78, 115, 223, 1)",
+                                pointHoverRadius: 3,
+                                pointHoverBackgroundColor: "rgba(78, 115, 223, 1)",
+                                pointHoverBorderColor: "rgba(78, 115, 223, 1)",
+                                pointHitRadius: 10,
+                                pointBorderWidth: 2,
+                                data: data, // Sử dụng data đã tạo từ dữ liệu JSP
+                        }],
+                },
+                options: {
+                maintainAspectRatio: false,
+                        layout: {
+                        padding: {
+                        left: 10,
+                                right: 25,
+                                top: 25,
+                                bottom: 0
+                        }
+                        },
+                        scales: {
+                        xAxes: [{
+                        time: {
+                        unit: 'date'
+                        },
+                                gridLines: {
+                                display: false,
+                                        drawBorder: false
+                                },
+                                ticks: {
+                                maxTicksLimit: 7
+                                }
+                        }],
+                                yAxes: [{
+                                ticks: {
+                                maxTicksLimit: 5,
+                                        padding: 10,
+                                        // Include a dollar sign in the ticks
+                                        callback: function (value, index, values) {
+                                        return '$' + number_format(value);
+                                        }
+                                },
+                                        gridLines: {
+                                        color: "rgb(234, 236, 244)",
+                                                zeroLineColor: "rgb(234, 236, 244)",
+                                                drawBorder: false,
+                                                borderDash: [2],
+                                                zeroLineBorderDash: [2]
+                                        }
+                                }],
+                        },
+                        legend: {
+                        display: false
+                        },
+                        tooltips: {
+                        backgroundColor: "rgb(255,255,255)",
+                                bodyFontColor: "#858796",
+                                titleMarginBottom: 10,
+                                titleFontColor: '#6e707e',
+                                titleFontSize: 14,
+                                borderColor: '#dddfeb',
+                                borderWidth: 1,
+                                xPadding: 15,
+                                yPadding: 15,
+                                displayColors: false,
+                                intersect: false,
+                                mode: 'index',
+                                caretPadding: 10,
+                                callbacks: {
+                                label: function (tooltipItem, chart) {
+                                var datasetLabel = chart.datasets[tooltipItem.datasetIndex].label || '';
+                                return datasetLabel + ': $' + number_format(tooltipItem.yLabel);
+                                }
+                                }
+                        }
+                }
+        });
+    </script>
+    <!--    <script>
+            // Set new default font family and font color to mimic Bootstrap's default styling
+            Chart.defaults.global.defaultFontFamily = 'Nunito', '-apple-system,system-ui,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif';
+            Chart.defaults.global.defaultFontColor = '#858796';
+            function number_format(number, decimals, dec_point, thousands_sep) {
+            // *     example: number_format(1234.56, 2, ',', ' ');
+            // *     return: '1 234,56'
+            number = (number + '').replace(',', '').replace(' ', '');
+            var n = !isFinite( + number) ? 0 : + number,
+                    prec = !isFinite( + decimals) ? 0 : Math.abs(decimals),
+                    sep = (typeof thousands_sep === 'undefined') ? ',' : thousands_sep,
+                    dec = (typeof dec_point === 'undefined') ? '.' : dec_point,
+                    s = '',
+                    toFixedFix = function (n, prec) {
+                    var k = Math.pow(10, prec);
+                    return '' + Math.round(n * k) / k;
+                    };
+            // Fix for IE parseFloat(0.55).toFixed(0) = 0;
+            s = (prec ? toFixedFix(n, prec) : '' + Math.round(n)).split('.');
+            if (s[0].length > 3) {
+            s[0] = s[0].replace(/\B(?=(?:\d{3})+(?!\d))/g, sep);
+            }
+            if ((s[1] || '').length < prec) {
+            s[1] = s[1] || '';
+            s[1] += new Array(prec - s[1].length + 1).join('0');
+            }
+            return s.join(dec);
+            }
+    
+            // Area Chart Example               
+    
+            let monthlyRevenueData = {
+    <c:forEach var="entry" items="${monthlyRevenue}" varStatus="loop">
+    "${entry.key}": ${entry.value} ${!loop.last ? ',' : ''}
+    </c:forEach>
+    };
+    let labels = [];
+    let data = [];
+    for (let month = 1; month <= 12; month++) {
+    labels.push(month); // Hoặc bạn có thể format lại tên tháng cho đẹp hơn
+    data.push(monthlyRevenueData[month] || 0); // Lấy doanh thu, nếu không có thì gán là 0
+    }
+
+    var ctx = document.getElementById("myAreaChart");
+    var myLineChart = new Chart(ctx, {
+    type: 'line',
+            data: {
+            labels: labels, // Sử dụng labels đã tạo từ dữ liệu JSP
+                    datasets: [{
+                    label: "Earnings",
+                            lineTension: 0.3,
+                            backgroundColor: "rgba(78, 115, 223, 0.5)",
+                            borderColor: "rgba(78, 115, 223, 1)",
+                            pointRadius: 3,
+                            pointBackgroundColor: "rgba(78, 115, 223, 1)",
+                            pointBorderColor: "rgba(78, 115, 223, 1)",
+                            pointHoverRadius: 3,
+                            pointHoverBackgroundColor: "rgba(78, 115, 223, 1)",
+                            pointHoverBorderColor: "rgba(78, 115, 223, 1)",
+                            pointHitRadius: 10,
+                            pointBorderWidth: 2,
+                            data: data, // Sử dụng data đã tạo từ dữ liệu JSP
+                    }],
+            },
+            options: {
+            maintainAspectRatio: false,
+                    layout: {
+                    padding: {
+                    left: 10,
+                            right: 25,
+                            top: 25,
+                            bottom: 0
+                    }
+                    },
+                    scales: {
+                    xAxes: [{
+                    time: {
+                    unit: 'date'
+                    },
+                            gridLines: {
+                            display: false,
+                                    drawBorder: false
+                            },
+                            ticks: {
+                            maxTicksLimit: 7
+                            }
+                    }],
+                            yAxes: [{
+                            ticks: {
+                            maxTicksLimit: 5,
+                                    padding: 10,
+                                    // Include a dollar sign in the ticks
+                                    callback: function (value, index, values) {
+                                    return '$' + number_format(value);
+                                    }
+                            },
+                                    gridLines: {
+                                    color: "rgb(234, 236, 244)",
+                                            zeroLineColor: "rgb(234, 236, 244)",
+                                            drawBorder: false,
+                                            borderDash: [2],
+                                            zeroLineBorderDash: [2]
+                                    }
+                            }],
+                    },
+                    legend: {
+                    display: false
+                    },
+                    tooltips: {
+                    backgroundColor: "rgb(255,255,255)",
+                            bodyFontColor: "#858796",
+                            titleMarginBottom: 10,
+                            titleFontColor: '#6e707e',
+                            titleFontSize: 14,
+                            borderColor: '#dddfeb',
+                            borderWidth: 1,
+                            xPadding: 15,
+                            yPadding: 15,
+                            displayColors: false,
+                            intersect: false,
+                            mode: 'index',
+                            caretPadding: 10,
+                            callbacks: {
+                            label: function (tooltipItem, chart) {
+                            var datasetLabel = chart.datasets[tooltipItem.datasetIndex].label || '';
+                            return datasetLabel + ': $' + number_format(tooltipItem.yLabel);
+                            }
+                            }
+                    }
+            }
+    });
+
+</script>  -->
+</body>
 
 </html>

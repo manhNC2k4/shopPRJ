@@ -65,34 +65,6 @@
                 overflow: hidden; /* Hide the overflow text */
                 text-overflow: ellipsis; /* Add the ellipsis (...) */
             }
-            .search-container {
-                display: none;
-                align-items: center;
-                position: relative;
-            }
-            .search-container input {
-                border: none;
-                border-bottom: 1px solid rgba(0, 0, 0, 1); /* 100% opacity */
-                outline: none;
-                padding: 5px;
-                height: 35px !important;
-                margin-top: 15px;
-                background-color: transparent !important;
-                width: 250px;
-                font-size: 10px;
-                padding-top: 1rem;
-                padding-bottom: 1rem;
-                padding-left: 20px;
-                padding-right: 20px;
-                font-weight: 400;
-                color: #000000;
-                text-transform: uppercase;
-                letter-spacing: 2px;
-                opacity: 1 !important;
-            }
-            .search-container input::placeholder {
-                color: rgba(0, 0, 0, 1); /* 100% opacity */
-            }
         </style>
     </head>
     <body class="goto-here">
@@ -126,14 +98,6 @@
 
                 <div class="collapse navbar-collapse" id="ftco-nav">
                     <ul class="navbar-nav ml-auto">
-                        <li class="nav-item search-container" id="searchContainer">
-                            <form action="shop" method="GET">
-                                <input type="text" name="query" class="form-control" placeholder="Search...">
-                            </form>
-                        </li>
-                        <li class="nav-item cta cta-colored">
-                            <a href="#" class="nav-link" id="searchIcon"><span class="icon-search"></span></a>
-                        </li>
                         <li class="nav-item active"><a href="index" class="nav-link">Home</a></li>
                         <li class="nav-item"><a href="shop" class="nav-link">Shop</a></li>
                         <li class="nav-item"><a href="about.html" class="nav-link">About</a></li>
@@ -149,7 +113,6 @@
                                 <a class="nav-link dropdown-toggle" href="#" id="dropdown04" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">${user.username}</a>
                                 <div class="dropdown-menu" aria-labelledby="dropdown04">
                                     <a class="dropdown-item" href="viewProfile">View profile</a>
-                                    <a class="dropdown-item" href="viewOrder">View Order</a>
                                     <a class="dropdown-item" href="changePass">Change password</a>
                                     <a class="dropdown-item" href="logout">Log out</a>
                                 </div>
@@ -165,8 +128,8 @@
             <div class="container">
                 <div class="row no-gutters slider-text align-items-center justify-content-center">
                     <div class="col-md-9 ftco-animate text-center">
-                        <p class="breadcrumbs"><span class="mr-2"><a href="index">Home</a></span> <span>Cart</span></p>
-                        <h1 class="mb-0 bread">My Favorite</h1>
+                        <p class="breadcrumbs"><span class="mr-2"><a href="index">Home</a></span></p>
+                        <h1 class="mb-0 bread">My Order</h1>
                     </div>
                 </div>
             </div>
@@ -180,33 +143,27 @@
                             <table class="table">
                                 <thead class="thead-primary">
                                     <tr class="text-center">
+                                        <th>Name</th>
                                         <th>&nbsp;</th>
-                                        <th>&nbsp;</th>
-                                        <th>Product</th>
+                                        <th>Quantity</th>
+                                        <th>Size</th>
                                         <th>Price</th>
-                                        <th>Category</th>
-                                        <th>Action</th>
+                                        <th>Status</th>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <c:forEach var="p" items="${requestScope.favoriteProducts}">
+                                    <c:forEach var="p" items="${requestScope.myOrder}">
                                         <tr class="text-center">
-                                            <td class="product-remove"><a href="deleteFavoriteItem?product_id=${p.id}"><span class="ion-ios-close"></span></a></td>
-
-                                            <td class="image-prod"><div class="img" style="background-image:url(${p.images[0]}); width: 150px;"></div></td>
-
                                             <td class="product-name">
                                                 <h3>${p.name}</h3>
-                                                <p class="description">${p.description}</p>
                                             </td>
-
+                                            <td class="image-prod"><div class="img" style="background-image:url(${p.image}); width: 150px;"></div></td>
+                                            <td class="size">${p.quantity}</td>
+                                            <td class="size">${p.size}</td>
                                             <td class="price">$${p.price}</td>
+                                            <td "sex id="
+                                                "classstatus>${p.status}</td>
 
-                                            <td class="category">${categoryMap[p.categoryId]}</td>
-
-                                            <td class="action">
-                                                <a href="singleProduct?id=${p.id}" class="buy-now text-center py-2">Buy now<span><i class="ion-ios-cart ml-1"></i></span></a>
-                                            </td>
                                         </tr><!-- END TR-->
                                     </c:forEach>
                                 </tbody>
@@ -307,14 +264,6 @@
         <script src="js/main.js"></script>
 
         <script>
-            document.getElementById('searchIcon').addEventListener('click', function () {
-                var searchContainer = document.getElementById('searchContainer');
-                if (searchContainer.style.display === 'none' || searchContainer.style.display === '') {
-                    searchContainer.style.display = 'block';
-                } else {
-                    searchContainer.style.display = 'none';
-                }
-            });
             $(document).ready(function () {
 
                 var quantitiy = 0;

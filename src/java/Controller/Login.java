@@ -119,6 +119,7 @@ public class Login extends HttpServlet {
                     Cookie favoriteCookie = new Cookie("favoriteCount", String.valueOf(favoriteCount));
                     favoriteCookie.setMaxAge(60 * 60 * 24 * 60);
                     response.addCookie(favoriteCookie);
+                    
                     request.getRequestDispatcher("index").forward(request, response);
                 }
             } else {

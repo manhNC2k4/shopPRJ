@@ -20,7 +20,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import model.CateSaleData;
 import model.Image;
+import model.ProductSaleData;
 import model.Product_Size;
 
 /**
@@ -354,31 +356,31 @@ public class ProductDAO extends DBContext {
                     saleId = productRs.getInt("sale_id");
                 }
                 if (saleId != null) {
-                        product = new Product(
-                                productId,
-                                productRs.getString("name"),
-                                productRs.getString("description"),
-                                productRs.getInt("category_id"),
-                                productRs.getBigDecimal("price"),
-                                productRs.getTimestamp("created_at"),
-                                productRs.getTimestamp("updated_at"),
-                                new ArrayList<>(),
-                                new ArrayList<>(),
-                                saleId
-                        );
-                    } else {
-                        product = new Product(
-                                productId,
-                                productRs.getString("name"),
-                                productRs.getString("description"),
-                                productRs.getInt("category_id"),
-                                productRs.getBigDecimal("price"),
-                                productRs.getTimestamp("created_at"),
-                                productRs.getTimestamp("updated_at"),
-                                new ArrayList<>(),
-                                new ArrayList<>()
-                        );
-                    }
+                    product = new Product(
+                            productId,
+                            productRs.getString("name"),
+                            productRs.getString("description"),
+                            productRs.getInt("category_id"),
+                            productRs.getBigDecimal("price"),
+                            productRs.getTimestamp("created_at"),
+                            productRs.getTimestamp("updated_at"),
+                            new ArrayList<>(),
+                            new ArrayList<>(),
+                            saleId
+                    );
+                } else {
+                    product = new Product(
+                            productId,
+                            productRs.getString("name"),
+                            productRs.getString("description"),
+                            productRs.getInt("category_id"),
+                            productRs.getBigDecimal("price"),
+                            productRs.getTimestamp("created_at"),
+                            productRs.getTimestamp("updated_at"),
+                            new ArrayList<>(),
+                            new ArrayList<>()
+                    );
+                }
             }
             if (product != null) {
                 // Lấy danh sách các hình ảnh sản phẩm
@@ -644,23 +646,57 @@ public class ProductDAO extends DBContext {
         return null;
     }
 
-   public void updateSaleForProduct(int pid, Integer sid) {
-    String sql = "UPDATE Products SET sale_id = ? WHERE product_id = ?";
-    try (PreparedStatement st = connection.prepareStatement(sql)) {
-        if (sid != null) {
-            st.setInt(1, sid); 
-        } else {
-            st.setNull(1, java.sql.Types.INTEGER); // Set sale_id là NULL
-        }
-        st.setInt(2, pid);
+    public void updateSaleForProduct(int pid, Integer sid) {
+        String sql = "UPDATE Products SET sale_id = ? WHERE product_id = ?";
+        try (PreparedStatement st = connection.prepareStatement(sql)) {
+            if (sid != null) {
+                st.setInt(1, sid);
+            } else {
+                st.setNull(1, java.sql.Types.INTEGER); // Set sale_id là NULL
+            }
+            st.setInt(2, pid);
 
-        int rowsAffected = st.executeUpdate();
-        if (rowsAffected == 0) {
-            throw new SQLException("Updating sale_id failed, no rows affected.");
+            int rowsAffected = st.executeUpdate();
+            if (rowsAffected == 0) {
+                throw new SQLException("Updating sale_id failed, no rows affected.");
+            }
+        } catch (SQLException e) {
+            System.out.println(e);
         }
-    } catch (SQLException e) {
-        System.out.println(e);
     }
-}
+
+    public List<ProductSaleData> getProductSaleDataTop5() {
+        List<ProductSaleData> listProduct = new ArrayList<>();
+        String sql = "SELECT ProductName, TotalSold, TotalStockRemaining\n"
+                + "FROM (\n"
+                + "    SELECT \n"
+                + "        p.name AS ProductName, \n"
+                + "        SUM(od.quatity) AS TotalSold,\n"
+                + "        SUM(ps.stock) AS TotalStockRemaining,\n"
+                + "        ROW_NUMBER() OVER (ORDER BY SUM(od.quatity) DESC) AS rn\n"
+                + "    FROM Products p\n"
+                + "    JOIN Product_Size ps ON p.product_id = ps.product_id\n"
+                + "    LEFT JOIN Order_Details od ON ps.product_size_id = od.product_size_id\n"
+                + "    GROUP BY p.name\n"
+                + "    HAVING SUM(od.quatity) > 0 \n"
+                + ") AS RankedProducts\n"
+                + "WHERE rn <= 5;";
+        try (PreparedStatement st = connection.prepareStatement(sql); ResultSet rs = st.executeQuery()) {
+
+            while (rs.next()) {
+                String Name = rs.getString("ProductName");
+                int totalSold = rs.getInt("TotalSold");
+                int totalStock = rs.getInt("TotalStockRemaining");
+
+                ProductSaleData categorySalesData = new ProductSaleData(Name, totalSold, totalStock);
+                listProduct.add(categorySalesData);
+            }
+        } catch (SQLException e) {
+            System.out.println(e);
+        }
+
+        return listProduct;
+
+    }
 
 }

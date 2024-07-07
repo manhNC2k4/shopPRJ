@@ -96,19 +96,20 @@ public class Register extends HttpServlet {
                 try {
                     String result = rd.insertUser(user);
                     if (result.equals("success")) {
+                        request.getSession().setAttribute("message", "Register successful!");
                         request.getRequestDispatcher("login.jsp").forward(request, response);
                     } else {
                         message = result; // Lấy message lỗi từ hàm insertUser
-                        request.setAttribute("error", message);
+                        request.getSession().setAttribute("error", message);
                         request.getRequestDispatcher("register.jsp").forward(request, response);
                     }
                 } catch (IOException e) {
                     message = "Something was wrong!";
-                    request.setAttribute("error", message);
+                    request.getSession().setAttribute("error", message);
                     request.getRequestDispatcher("register.jsp").forward(request, response);
                 }
             } else {
-                request.setAttribute("error", message);
+                request.getSession().setAttribute("error", message);
                 request.getRequestDispatcher("register.jsp").forward(request, response);
             }
 

@@ -17,12 +17,9 @@ import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import model.Category;
 import model.Product;
 import model.Sale;
@@ -108,7 +105,6 @@ public class IndexServlet extends HttpServlet {
             favoriteCookie.setMaxAge(60 * 60 * 24 * 60); // 2 tháng (tính bằng giây)
             response.addCookie(favoriteCookie);
         }
-
         response.sendRedirect("index.jsp");
     }
 
@@ -159,7 +155,7 @@ public class IndexServlet extends HttpServlet {
             favoriteCookie.setMaxAge(60 * 60 * 24 * 60); // 2 tháng (tính bằng giây)
             response.addCookie(favoriteCookie);
         }
-
+        request.getSession().setAttribute("message", "Login successful!");
         response.sendRedirect("index.jsp");
     }
 

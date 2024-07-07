@@ -4,6 +4,8 @@
  */
 package Controller;
 
+import DTO.UserDTO;
+import dal.OrderDAO;
 import java.io.IOException;
 import java.io.PrintWriter;
 import jakarta.servlet.ServletException;
@@ -12,14 +14,16 @@ import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import jakarta.servlet.http.HttpSession;
+import java.util.List;
+import model.Cart;
+import model.MyOrder;
 
 /**
  *
  * @author LNV
  */
-@WebServlet(name = "LogoutServlet", urlPatterns = {"/logout"})
-public class LogoutServlet extends HttpServlet {
+@WebServlet(name = "ViewOrder", urlPatterns = {"/viewOrder"})
+public class ViewOrder extends HttpServlet {
 
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
@@ -38,10 +42,10 @@ public class LogoutServlet extends HttpServlet {
             out.println("<!DOCTYPE html>");
             out.println("<html>");
             out.println("<head>");
-            out.println("<title>Servlet LogoutServlet</title>");
+            out.println("<title>Servlet ViewOrder</title>");
             out.println("</head>");
             out.println("<body>");
-            out.println("<h1>Servlet LogoutServlet at " + request.getContextPath() + "</h1>");
+            out.println("<h1>Servlet ViewOrder at " + request.getContextPath() + "</h1>");
             out.println("</body>");
             out.println("</html>");
         }
@@ -60,27 +64,21 @@ public class LogoutServlet extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         Cookie[] cookies = request.getCookies();
+        UserDTO user = null;
         if (cookies != null) {
             for (Cookie cookie : cookies) {
                 if (cookie.getName().equals("account")) {
-                    // Xóa cookie
-                    cookie.setMaxAge(0); // Hạn sử dụng là 0 giây (xóa ngay lập tức)
-                    response.addCookie(cookie);
-                }
-                if (cookie.getName().equals("cart")) {
-                    // Xóa cookie
-                    cookie.setMaxAge(0); // Hạn sử dụng là 0 giây (xóa ngay lập tức)
-                    response.addCookie(cookie);
-                }
-                if (cookie.getName().equals("favoriteCount")) {
-                    // Xóa cookie
-                    cookie.setMaxAge(0); // Hạn sử dụng là 0 giây (xóa ngay lập tức)
-                    response.addCookie(cookie);
+                    user = new UserDTO(cookie.getValue());
+                    break;
                 }
             }
         }
-        request.getSession().setAttribute("message", "Logout successful!");
-        response.sendRedirect("index.jsp");
+        if(user != null) {
+            OrderDAO od = new OrderDAO();
+            List<MyOrder> myOrder = od.getMyOrder(user.getUser_id());
+            request.setAttribute("myOrder", myOrder);
+            request.getRequestDispatcher("myOrder.jsp").forward(request, response);
+        }
     }
 
     /**

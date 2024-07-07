@@ -10,7 +10,9 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.ResultSet;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import model.User;
 
 /**
@@ -181,6 +183,29 @@ public class UserDAO extends DBContext {
             System.out.println("Error: " + e.getMessage());
             return "Error: " + e.getMessage();
         }
+    }
+
+    public Map<Integer, Integer> getTotalUsersCreatedPerMonthForCurrentYear() {
+        Map<Integer, Integer> usersCreatedPerMonth = new HashMap<>();
+        String sql = "SELECT MONTH(created_at) AS month, COUNT(*) AS totalUsers "
+                + "FROM Users "
+                + "WHERE YEAR(created_at) = YEAR(GETDATE()) "
+                + "GROUP BY MONTH(created_at)";
+
+        try {
+            PreparedStatement st = connection.prepareStatement(sql);
+            ResultSet rs = st.executeQuery();
+
+            while (rs.next()) {
+                int month = rs.getInt("month");
+                int totalUsers = rs.getInt("totalUsers");
+                usersCreatedPerMonth.put(month, totalUsers);
+            }
+        } catch (SQLException e) {
+            System.out.println("Error: " + e.getMessage());
+        }
+
+        return usersCreatedPerMonth;
     }
 
     public static void main(String[] args) {

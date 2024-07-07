@@ -171,6 +171,35 @@
                 color: red;
             }
 
+            .search-container {
+                display: none;
+                align-items: center;
+                position: relative;
+            }
+            .search-container input {
+                border: none;
+                border-bottom: 1px solid rgba(0, 0, 0, 1); /* 100% opacity */
+                outline: none;
+                padding: 5px;
+                height: 35px !important;
+                margin-top: 15px;
+                background-color: transparent !important;
+                width: 250px;
+                font-size: 10px;
+                padding-top: 1rem;
+                padding-bottom: 1rem;
+                padding-left: 20px;
+                padding-right: 20px;
+                font-weight: 400;
+                color: #000000;
+                text-transform: uppercase;
+                letter-spacing: 2px;
+                opacity: 1 !important;
+            }
+            .search-container input::placeholder {
+                color: rgba(0, 0, 0, 1); /* 100% opacity */
+            }
+
         </style>
     </head>
     <body class="goto-here">
@@ -204,6 +233,14 @@
 
                 <div class="collapse navbar-collapse" id="ftco-nav">
                     <ul class="navbar-nav ml-auto">
+                        <li class="nav-item search-container" id="searchContainer">
+                            <form action="shop" method="GET">
+                                <input type="text" name="query" class="form-control" placeholder="Search...">
+                            </form>
+                        </li>
+                        <li class="nav-item cta cta-colored">
+                            <a href="#" class="nav-link" id="searchIcon"><span class="icon-search"></span></a>
+                        </li>
                         <li class="nav-item active"><a href="index" class="nav-link">Home</a></li>
                         <li class="nav-item"><a href="shop" class="nav-link">Shop</a></li>
                         <li class="nav-item"><a href="about.html" class="nav-link">About</a></li>
@@ -219,6 +256,7 @@
                                 <a class="nav-link dropdown-toggle" href="#" id="dropdown04" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">${user.username}</a>
                                 <div class="dropdown-menu" aria-labelledby="dropdown04">
                                     <a class="dropdown-item" href="viewProfile">View profile</a>
+                                    <a class="dropdown-item" href="viewOrder">View Order</a>
                                     <a class="dropdown-item" href="changePass">Change password</a>
                                     <a class="dropdown-item" href="logout">Log out</a>
                                 </div>
@@ -444,6 +482,11 @@
                                     </div>
                                 </form>
                             </div>
+                            <div class="sidebar-box-2">
+                                <c:if test="${not empty sessionScope.keyword}">
+                                    <a class="btn btn-outline-danger" href="shop?clearKeyword=true">Delete search</a>
+                                </c:if>
+                            </div>               
                         </div>
                     </div>
                 </div>
@@ -643,6 +686,17 @@
         <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBVWaKrjvy3MaE7SQ74_uJiULgl1JY0H2s&sensor=false"></script>
         <script src="js/google-map.js"></script>
         <script src="js/main.js"></script>
+        <script src="js/bootstrap-notify.min.js"></script>
+        <script>
+            document.getElementById('searchIcon').addEventListener('click', function () {
+                var searchContainer = document.getElementById('searchContainer');
+                if (searchContainer.style.display === 'none' || searchContainer.style.display === '') {
+                    searchContainer.style.display = 'block';
+                } else {
+                    searchContainer.style.display = 'none';
+                }
+            });
 
+        </script>
     </body>
 </html>

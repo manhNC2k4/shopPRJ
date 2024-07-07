@@ -228,6 +228,29 @@ public class GetProductDAO extends DBContext {
         return totalProducts;
     }
 
+    public int getTotalProductsSearch(BigDecimal minPrice, BigDecimal maxPrice, String keyword) {
+        int totalProducts = 0;
+
+        try {
+            String sql = "SELECT COUNT(DISTINCT p.product_id) "
+                    + "FROM Products p JOIN Categories c ON p.category_id = c.category_id "
+                    + "WHERE (p.name LIKE ? OR c.name LIKE ?) AND p.price >= ? AND p.price <= ?";
+            PreparedStatement statement = connection.prepareStatement(sql);
+            statement.setString(1, "%" + keyword + "%");
+            statement.setString(2, "%" + keyword + "%");
+            statement.setBigDecimal(3, minPrice);
+            statement.setBigDecimal(4, maxPrice);
+            ResultSet resultSet = statement.executeQuery();
+            if (resultSet.next()) {
+                totalProducts = resultSet.getInt(1);
+            }
+
+        } catch (SQLException e) {
+            System.out.println(e);
+        }
+        return totalProducts;
+    }
+
     //get list product per page
     public List<Product> getProductsPerPage(int page, int productsPerPage, BigDecimal minPrice, BigDecimal maxPrice) {
         List<Product> list = new ArrayList<>();
@@ -288,23 +311,87 @@ public class GetProductDAO extends DBContext {
         return list;
     }
 
+    //get list product per page
+    public List<Product> getProductsPerPageSearch(int page, int productsPerPage, BigDecimal minPrice, BigDecimal maxPrice, String keyword) {
+        List<Product> list = new ArrayList<>();
+        int start = (page - 1) * productsPerPage;
+
+        try {
+            String sql = "SELECT p.product_id, p.name, p.description, p.category_id, p.price, p.created_at, p.updated_at, p.sale_id "
+                    + "FROM Products p JOIN Categories c ON p.category_id = c.category_id "
+                    + "WHERE (p.name LIKE ? OR c.name LIKE ?) AND p.price >= ? AND p.price <= ? "
+                    + "ORDER BY p.product_id "
+                    + "OFFSET ? ROWS "
+                    + "FETCH NEXT ? ROWS ONLY;";
+            PreparedStatement statement = connection.prepareStatement(sql);
+            statement.setString(1, "%" + keyword + "%");
+            statement.setString(2, "%" + keyword + "%");
+            statement.setBigDecimal(3, minPrice);
+            statement.setBigDecimal(4, maxPrice);
+            statement.setInt(5, start);
+            statement.setInt(6, productsPerPage);
+            ResultSet rs = statement.executeQuery();
+
+            while (rs.next()) {
+                Integer saleId = null;
+                if (rs.getObject("sale_id") != null) {
+                    saleId = rs.getInt("sale_id");
+                }
+                Product product;
+                if (saleId != null) {
+                    product = new Product(
+                            rs.getInt("product_id"),
+                            rs.getString("name"),
+                            rs.getString("description"),
+                            rs.getInt("category_id"),
+                            rs.getBigDecimal("price"),
+                            rs.getTimestamp("created_at"),
+                            rs.getTimestamp("updated_at"),
+                            new ArrayList<>(),
+                            saleId
+                    );
+                } else {
+                    product = new Product(
+                            rs.getInt("product_id"),
+                            rs.getString("name"),
+                            rs.getString("description"),
+                            rs.getInt("category_id"),
+                            rs.getBigDecimal("price"),
+                            rs.getTimestamp("created_at"),
+                            rs.getTimestamp("updated_at"),
+                            new ArrayList<>()
+                    );
+                }
+                list.add(product);
+            }
+        } catch (SQLException e) {
+            System.err.println("Error fetching latest products: " + e.getMessage());
+            // Ghi log lỗi hoặc xử lý lỗi theo logic của ứng dụng
+            return Collections.emptyList(); // Trả về danh sách rỗng
+        }
+
+        return list;
+    }
+
     //get list product per page newest
-    public List<Product> getProductsPerPageNewest(int page, int productsPerPage, BigDecimal minPrice, BigDecimal maxPrice) {
+    public List<Product> getProductsPerPageNewestSearch(int page, int productsPerPage, BigDecimal minPrice, BigDecimal maxPrice, String keyword) {
         List<Product> list = new ArrayList<>();
         int start = (page - 1) * productsPerPage;
 
         try {
             String sql = "SELECT p.product_id, p.name, p.description, p.category_id, p.price, p.created_at, p.updated_at, p.sale_id"
-                    + " FROM Products p"
-                    + " WHERE p.price >= ? AND p.price <= ?"
+                    + " FROM Products p JOIN Categories c ON p.category_id = c.category_id "
+                    + " WHERE (p.name LIKE ? OR c.name LIKE ?) AND p.price >= ? AND p.price <= ?"
                     + " ORDER BY p.created_at DESC"
                     + " OFFSET ? ROWS"
                     + " FETCH NEXT ? ROWS ONLY;";
             PreparedStatement statement = connection.prepareStatement(sql);
-            statement.setBigDecimal(1, minPrice);
-            statement.setBigDecimal(2, maxPrice);
-            statement.setInt(3, start);
-            statement.setInt(4, productsPerPage);
+            statement.setString(1, "%" + keyword + "%");
+            statement.setString(2, "%" + keyword + "%");
+            statement.setBigDecimal(3, minPrice);
+            statement.setBigDecimal(4, maxPrice);
+            statement.setInt(5, start);
+            statement.setInt(6, productsPerPage);
             ResultSet rs = statement.executeQuery();
 
             while (rs.next()) {
@@ -349,22 +436,24 @@ public class GetProductDAO extends DBContext {
     }
 
     //get list product per page oldest
-    public List<Product> getProductsPerPageOldest(int page, int productsPerPage, BigDecimal minPrice, BigDecimal maxPrice) {
+    public List<Product> getProductsPerPageOldestSearch(int page, int productsPerPage, BigDecimal minPrice, BigDecimal maxPrice, String keyword) {
         List<Product> list = new ArrayList<>();
         int start = (page - 1) * productsPerPage;
 
         try {
             String sql = "SELECT p.product_id, p.name, p.description, p.category_id, p.price, p.created_at, p.updated_at, p.sale_id"
-                    + " FROM Products p"
-                    + " WHERE p.price >= ? AND p.price <= ?"
+                    + " FROM Products p JOIN Categories c ON p.category_id = c.category_id "
+                    + " WHERE (p.name LIKE ? OR c.name LIKE ?) AND p.price >= ? AND p.price <= ?"
                     + " ORDER BY p.created_at ASC"
                     + " OFFSET ? ROWS"
                     + " FETCH NEXT ? ROWS ONLY;";
             PreparedStatement statement = connection.prepareStatement(sql);
-            statement.setBigDecimal(1, minPrice);
-            statement.setBigDecimal(2, maxPrice);
-            statement.setInt(3, start);
-            statement.setInt(4, productsPerPage);
+            statement.setString(1, "%" + keyword + "%");
+            statement.setString(2, "%" + keyword + "%");
+            statement.setBigDecimal(3, minPrice);
+            statement.setBigDecimal(4, maxPrice);
+            statement.setInt(5, start);
+            statement.setInt(6, productsPerPage);
             ResultSet rs = statement.executeQuery();
 
             while (rs.next()) {
@@ -409,22 +498,24 @@ public class GetProductDAO extends DBContext {
     }
 
     //get list product per page price high to low
-    public List<Product> getProductsPerPagePriceDesc(int page, int productsPerPage, BigDecimal minPrice, BigDecimal maxPrice) {
+    public List<Product> getProductsPerPagePriceDescSearch(int page, int productsPerPage, BigDecimal minPrice, BigDecimal maxPrice, String keyword) {
         List<Product> list = new ArrayList<>();
         int start = (page - 1) * productsPerPage;
 
         try {
             String sql = "SELECT p.product_id, p.name, p.description, p.category_id, p.price, p.created_at, p.updated_at, p.sale_id"
-                    + " FROM Products p"
-                    + " WHERE p.price >= ? AND p.price <= ?"
+                    + " FROM Products p JOIN Categories c ON p.category_id = c.category_id "
+                    + " WHERE (p.name LIKE ? OR c.name LIKE ?) AND p.price >= ? AND p.price <= ?"
                     + " ORDER BY p.price DESC"
                     + " OFFSET ? ROWS"
                     + " FETCH NEXT ? ROWS ONLY;";
             PreparedStatement statement = connection.prepareStatement(sql);
-            statement.setBigDecimal(1, minPrice);
-            statement.setBigDecimal(2, maxPrice);
-            statement.setInt(3, start);
-            statement.setInt(4, productsPerPage);
+            statement.setString(1, "%" + keyword + "%");
+            statement.setString(2, "%" + keyword + "%");
+            statement.setBigDecimal(3, minPrice);
+            statement.setBigDecimal(4, maxPrice);
+            statement.setInt(5, start);
+            statement.setInt(6, productsPerPage);
             ResultSet rs = statement.executeQuery();
 
             while (rs.next()) {
@@ -469,22 +560,24 @@ public class GetProductDAO extends DBContext {
     }
 
     //get list product per page price low to high
-    public List<Product> getProductsPerPagePriceAsc(int page, int productsPerPage, BigDecimal minPrice, BigDecimal maxPrice) {
+    public List<Product> getProductsPerPagePriceAscSearch(int page, int productsPerPage, BigDecimal minPrice, BigDecimal maxPrice, String keyword) {
         List<Product> list = new ArrayList<>();
         int start = (page - 1) * productsPerPage;
 
         try {
             String sql = "SELECT p.product_id, p.name, p.description, p.category_id, p.price, p.created_at, p.updated_at, p.sale_id"
-                    + " FROM Products p"
-                    + " WHERE p.price >= ? AND p.price <= ?"
+                    + " FROM Products p JOIN Categories c ON p.category_id = c.category_id "
+                    + " WHERE (p.name LIKE ? OR c.name LIKE ?) AND p.price >= ? AND p.price <= ?"
                     + " ORDER BY p.price ASC"
                     + " OFFSET ? ROWS"
                     + " FETCH NEXT ? ROWS ONLY;";
             PreparedStatement statement = connection.prepareStatement(sql);
-            statement.setBigDecimal(1, minPrice);
-            statement.setBigDecimal(2, maxPrice);
-            statement.setInt(3, start);
-            statement.setInt(4, productsPerPage);
+            statement.setString(1, "%" + keyword + "%");
+            statement.setString(2, "%" + keyword + "%");
+            statement.setBigDecimal(3, minPrice);
+            statement.setBigDecimal(4, maxPrice);
+            statement.setInt(5, start);
+            statement.setInt(6, productsPerPage);
             ResultSet rs = statement.executeQuery();
 
             while (rs.next()) {
@@ -831,8 +924,8 @@ public class GetProductDAO extends DBContext {
         return list;
     }
 
-    ////get list product per page in size
-    public List<Product> getProductsPerPageInSize(int page, int productsPerPage, List<Integer> sizes, BigDecimal minPrice, BigDecimal maxPrice) {
+    //get list product per page in size
+    public List<Product> getProductsPerPageInSize(int page, int productsPerPage, List<Integer> sizes, BigDecimal minPrice, BigDecimal maxPrice, String keyword) {
         List<Product> list = new ArrayList<>();
         int start = (page - 1) * productsPerPage;
 
@@ -852,14 +945,17 @@ public class GetProductDAO extends DBContext {
             String sql = "SELECT p.product_id, p.name, p.category_id, p.price, p.created_at, p.updated_at, p.sale_id"
                     + " FROM Products p"
                     + " JOIN Product_Size ps ON p.product_id = ps.product_id"
-                    + " WHERE p.price >= ? AND p.price <= ?" + sizeFilter.toString()
+                    + " JOIN Categories c ON p.category_id = c.category_id "
+                    + " WHERE (p.name LIKE ? OR c.name LIKE ?) AND p.price >= ? AND p.price <= ?" + sizeFilter.toString()
                     + " GROUP BY p.product_id, p.name, p.category_id, p.price, p.created_at, p.updated_at, p.sale_id"
                     + " ORDER BY p.product_id"
                     + " OFFSET ? ROWS FETCH NEXT ? ROWS ONLY;";
             PreparedStatement statement = connection.prepareStatement(sql);
-            statement.setBigDecimal(1, minPrice);
-            statement.setBigDecimal(2, maxPrice);
-            int paramIndex = 3;
+            statement.setString(1, "%" + keyword + "%");
+            statement.setString(2, "%" + keyword + "%");
+            statement.setBigDecimal(3, minPrice);
+            statement.setBigDecimal(4, maxPrice);
+            int paramIndex = 5;
             if (sizes != null && !sizes.isEmpty()) {
                 for (Integer size : sizes) {
                     statement.setInt(paramIndex++, size);
@@ -911,7 +1007,7 @@ public class GetProductDAO extends DBContext {
     }
 
     //count product in sizes
-    public int getTotalProductsInSize(List<Integer> sizes, BigDecimal minPrice, BigDecimal maxPrice) {
+    public int getTotalProductsInSizeSearch(List<Integer> sizes, BigDecimal minPrice, BigDecimal maxPrice, String keyword) {
         int totalProducts = 0;
 
         StringBuilder sizeFilter = new StringBuilder();
@@ -930,11 +1026,14 @@ public class GetProductDAO extends DBContext {
             String sql = "SELECT COUNT(DISTINCT p.product_id) FROM products p "
                     + "JOIN Product_Size ps "
                     + "ON p.product_id = ps.product_id "
-                    + "WHERE p.price >= ? AND p.price <= ?" + sizeFilter.toString();
+                    + "JOIN Categories c ON p.category_id = c.category_id "
+                    + "WHERE (p.name LIKE ? OR c.name LIKE ?) AND p.price >= ? AND p.price <= ?" + sizeFilter.toString();
             PreparedStatement statement = connection.prepareStatement(sql);
-            statement.setBigDecimal(1, minPrice);
-            statement.setBigDecimal(2, maxPrice);
-            int paramIndex = 3;
+            statement.setString(1, "%" + keyword + "%");
+            statement.setString(2, "%" + keyword + "%");
+            statement.setBigDecimal(3, minPrice);
+            statement.setBigDecimal(4, maxPrice);
+            int paramIndex = 5;
             if (sizes != null && !sizes.isEmpty()) {
                 for (Integer size : sizes) {
                     statement.setInt(paramIndex++, size);
@@ -994,7 +1093,7 @@ public class GetProductDAO extends DBContext {
     }
 
     //get list product per page newest in size
-    public List<Product> getProductsPerPageNewestInSize(int page, int productsPerPage, List<Integer> sizes, BigDecimal minPrice, BigDecimal maxPrice) {
+    public List<Product> getProductsPerPageNewestInSize(int page, int productsPerPage, List<Integer> sizes, BigDecimal minPrice, BigDecimal maxPrice, String keyword) {
         List<Product> list = new ArrayList<>();
         int start = (page - 1) * productsPerPage;
 
@@ -1014,14 +1113,17 @@ public class GetProductDAO extends DBContext {
             String sql = "SELECT p.product_id, p.name, p.category_id, p.price, p.created_at, p.updated_at, p.sale_id"
                     + " FROM Products p"
                     + " JOIN Product_Size ps ON p.product_id = ps.product_id"
-                    + " WHERE p.price >= ? AND p.price <= ? " + sizeFilter.toString()
+                    + " JOIN Categories c ON p.category_id = c.category_id "
+                    + " WHERE (p.name LIKE ? OR c.name LIKE ?) AND p.price >= ? AND p.price <= ? " + sizeFilter.toString()
                     + " GROUP BY p.product_id, p.name, p.category_id, p.price, p.created_at, p.updated_at, p.sale_id"
                     + " ORDER BY p.created_at DESC"
                     + " OFFSET ? ROWS FETCH NEXT ? ROWS ONLY;";
             PreparedStatement statement = connection.prepareStatement(sql);
-            statement.setBigDecimal(1, minPrice);
-            statement.setBigDecimal(2, maxPrice);
-            int paramIndex = 3;
+            statement.setString(1, "%" + keyword + "%");
+            statement.setString(2, "%" + keyword + "%");
+            statement.setBigDecimal(3, minPrice);
+            statement.setBigDecimal(4, maxPrice);
+            int paramIndex = 5;
             if (sizes != null && !sizes.isEmpty()) {
                 for (Integer size : sizes) {
                     statement.setInt(paramIndex++, size);
@@ -1073,7 +1175,7 @@ public class GetProductDAO extends DBContext {
     }
 
     //get list product per page oldest in size
-    public List<Product> getProductsPerPageOldestInSize(int page, int productsPerPage, List<Integer> sizes, BigDecimal minPrice, BigDecimal maxPrice) {
+    public List<Product> getProductsPerPageOldestInSize(int page, int productsPerPage, List<Integer> sizes, BigDecimal minPrice, BigDecimal maxPrice, String keyword) {
         List<Product> list = new ArrayList<>();
         int start = (page - 1) * productsPerPage;
 
@@ -1093,14 +1195,17 @@ public class GetProductDAO extends DBContext {
             String sql = "SELECT p.product_id, p.name, p.category_id, p.price, p.created_at, p.updated_at, p.sale_id"
                     + " FROM Products p"
                     + " JOIN Product_Size ps ON p.product_id = ps.product_id"
-                    + " WHERE p.price >= ? AND p.price <= ?" + sizeFilter.toString()
+                    + "JOIN Categories c ON p.category_id = c.category_id "
+                    + " WHERE (p.name LIKE ? OR c.name LIKE ?) AND p.price >= ? AND p.price <= ?" + sizeFilter.toString()
                     + " GROUP BY p.product_id, p.name, p.category_id, p.price, p.created_at, p.updated_at, p.sale_id"
                     + " ORDER BY p.created_at ASC"
                     + " OFFSET ? ROWS FETCH NEXT ? ROWS ONLY;";
             PreparedStatement statement = connection.prepareStatement(sql);
-            statement.setBigDecimal(1, minPrice);
-            statement.setBigDecimal(2, maxPrice);
-            int paramIndex = 3;
+            statement.setString(1, "%" + keyword + "%");
+            statement.setString(2, "%" + keyword + "%");
+            statement.setBigDecimal(3, minPrice);
+            statement.setBigDecimal(4, maxPrice);
+            int paramIndex = 5;
             if (sizes != null && !sizes.isEmpty()) {
                 for (Integer size : sizes) {
                     statement.setInt(paramIndex++, size);
@@ -1152,7 +1257,7 @@ public class GetProductDAO extends DBContext {
     }
 
     //get list product per page price high-low in size
-    public List<Product> getProductsPerPagePriceDescInSize(int page, int productsPerPage, List<Integer> sizes, BigDecimal minPrice, BigDecimal maxPrice) {
+    public List<Product> getProductsPerPagePriceDescInSize(int page, int productsPerPage, List<Integer> sizes, BigDecimal minPrice, BigDecimal maxPrice, String keyword) {
         List<Product> list = new ArrayList<>();
         int start = (page - 1) * productsPerPage;
 
@@ -1172,14 +1277,17 @@ public class GetProductDAO extends DBContext {
             String sql = "SELECT p.product_id, p.name, p.category_id, p.price, p.created_at, p.updated_at, p.sale_id"
                     + " FROM Products p"
                     + " JOIN Product_Size ps ON p.product_id = ps.product_id"
-                    + " WHERE p.price >= ? AND p.price <= ?" + sizeFilter.toString()
+                    + " JOIN Categories c ON p.category_id = c.category_id "
+                    + " WHERE (p.name LIKE ? OR c.name LIKE ?) AND p.price >= ? AND p.price <= ?" + sizeFilter.toString()
                     + " GROUP BY p.product_id, p.name, p.category_id, p.price, p.created_at, p.updated_at, p.sale_id"
                     + " ORDER BY p.price DESC"
                     + " OFFSET ? ROWS FETCH NEXT ? ROWS ONLY;";
             PreparedStatement statement = connection.prepareStatement(sql);
-            statement.setBigDecimal(1, minPrice);
-            statement.setBigDecimal(2, maxPrice);
-            int paramIndex = 3;
+            statement.setString(1, "%" + keyword + "%");
+            statement.setString(2, "%" + keyword + "%");
+            statement.setBigDecimal(3, minPrice);
+            statement.setBigDecimal(4, maxPrice);
+            int paramIndex = 5;
             if (sizes != null && !sizes.isEmpty()) {
                 for (Integer size : sizes) {
                     statement.setInt(paramIndex++, size);
@@ -1231,7 +1339,7 @@ public class GetProductDAO extends DBContext {
     }
 
     //get list product per page price low-high in size
-    public List<Product> getProductsPerPagePriceAscInSize(int page, int productsPerPage, List<Integer> sizes, BigDecimal minPrice, BigDecimal maxPrice) {
+    public List<Product> getProductsPerPagePriceAscInSize(int page, int productsPerPage, List<Integer> sizes, BigDecimal minPrice, BigDecimal maxPrice, String keyword) {
         List<Product> list = new ArrayList<>();
         int start = (page - 1) * productsPerPage;
 
@@ -1251,14 +1359,17 @@ public class GetProductDAO extends DBContext {
             String sql = "SELECT p.product_id, p.name, p.category_id, p.price, p.created_at, p.updated_at, p.sale_id"
                     + " FROM Products p"
                     + " JOIN Product_Size ps ON p.product_id = ps.product_id"
-                    + " WHERE p.price >= ? AND p.price <= ?" + sizeFilter.toString()
+                    + " JOIN Categories c ON p.category_id = c.category_id "
+                    + " WHERE (p.name LIKE ? OR c.name LIKE ?) AND p.price >= ? AND p.price <= ?" + sizeFilter.toString()
                     + " GROUP BY p.product_id, p.name, p.category_id, p.price, p.created_at, p.updated_at, p.sale_id"
                     + " ORDER BY p.price ASC"
                     + " OFFSET ? ROWS FETCH NEXT ? ROWS ONLY;";
             PreparedStatement statement = connection.prepareStatement(sql);
-            statement.setBigDecimal(1, minPrice);
-            statement.setBigDecimal(2, maxPrice);
-            int paramIndex = 3;
+            statement.setString(1, "%" + keyword + "%");
+            statement.setString(2, "%" + keyword + "%");
+            statement.setBigDecimal(3, minPrice);
+            statement.setBigDecimal(4, maxPrice);
+            int paramIndex = 5;
             if (sizes != null && !sizes.isEmpty()) {
                 for (Integer size : sizes) {
                     statement.setInt(paramIndex++, size);

@@ -11,8 +11,11 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import model.MyOrder;
 import model.OrderDetail;
 import model.Order_Info;
 import model.Product_Size;
@@ -55,7 +58,7 @@ public class OrderDAO extends DBContext {
         }
         return orders;
     }
-    
+
     public List<Order> getAllOrdersPending() {
         List<Order> orders = new ArrayList<>();
         String sql = "SELECT [order_id]"
@@ -90,7 +93,7 @@ public class OrderDAO extends DBContext {
         return orders;
     }
 
-     public List<Order> getAllOrdersProcessing() {
+    public List<Order> getAllOrdersProcessing() {
         List<Order> orders = new ArrayList<>();
         String sql = "SELECT [order_id]"
                 + "      ,[user_id]"
@@ -157,8 +160,8 @@ public class OrderDAO extends DBContext {
         }
         return orders;
     }
-     
-     public List<Order> getAllOrdersDelivered() {
+
+    public List<Order> getAllOrdersDelivered() {
         List<Order> orders = new ArrayList<>();
         String sql = "SELECT [order_id]"
                 + "      ,[user_id]"
@@ -191,8 +194,7 @@ public class OrderDAO extends DBContext {
         }
         return orders;
     }
-     
-    
+
     public Order getOrderById(int orderId) {
         String sql = "SELECT [order_id]"
                 + "      ,[user_id]"
@@ -269,7 +271,7 @@ public class OrderDAO extends DBContext {
                 + "     VALUES"
                 + "           (?, ?, ?, ?, ?, ?)";
         int generatedOrderId = 0;
-        try (PreparedStatement statement = connection.prepareStatement(sql,PreparedStatement.RETURN_GENERATED_KEYS)) {
+        try (PreparedStatement statement = connection.prepareStatement(sql, PreparedStatement.RETURN_GENERATED_KEYS)) {
             statement.setInt(1, order.getUserId());
             statement.setTimestamp(2, new java.sql.Timestamp(new Date().getTime()));
             statement.setString(3, order.getStatus());
@@ -285,7 +287,7 @@ public class OrderDAO extends DBContext {
                 }
             }
             orderInfo.setOrderId(generatedOrderId);
-            if(generatedOrderId == 0 || !insertOrderInfo(orderInfo)) {
+            if (generatedOrderId == 0 || !insertOrderInfo(orderInfo)) {
                 connection.rollback(); // Rollback nếu thêm chi tiết đơn hàng thất bại
                 return false;
             }
@@ -301,15 +303,15 @@ public class OrderDAO extends DBContext {
             for (OrderDetail detail : orderDetails) {
                 Product_Size ps = pd.getProduct_SizeById(detail.getProductSizeId());
                 // Lấy số lượng hiện tại
-                int currentStock = ps.getStock(); 
+                int currentStock = ps.getStock();
 
                 // Tính số lượng mới
-                int newStock = currentStock - detail.getQuantity(); 
-                
+                int newStock = currentStock - detail.getQuantity();
+
                 // Cập nhật kho
                 if (!updateProductSize(newStock, detail.getProductSizeId())) {
                     connection.rollback();
-                    return false; 
+                    return false;
                 }
             }
             connection.commit(); // Commit transaction
@@ -383,7 +385,7 @@ public class OrderDAO extends DBContext {
         return false;
     }
 
-     //get a product size by id
+    //get a product size by id
     public Product_Size getProduct_SizeById(int psid) {
         Product_Size ps;
         String getProductSizesSql = "SELECT * FROM [dbo].[Product_Size] "
@@ -402,9 +404,9 @@ public class OrderDAO extends DBContext {
         }
         return null;
     }
-    
+
     public boolean insertOrderInfo(Order_Info orderInfo) {
-         String sql = "INSERT INTO Order_Infos (first_name, last_name, country, street, city, postcode, phone, email, payment, order_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO Order_Infos (first_name, last_name, country, street, city, postcode, phone, email, payment, order_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setString(1, orderInfo.getFirstName());
             ps.setString(2, orderInfo.getLastName());
@@ -423,17 +425,17 @@ public class OrderDAO extends DBContext {
         }
         return false;
     }
-    
+
     public boolean updateOrderStatus(String status, int orderId) {
-        String sql = "UPDATE [dbo].[Orders] " +
-                           "SET status = ?, updated_at = GETDATE() " +
-                           "WHERE order_id = ?";
+        String sql = "UPDATE [dbo].[Orders] "
+                + "SET status = ?, updated_at = GETDATE() "
+                + "WHERE order_id = ?";
         try {
             PreparedStatement st = connection.prepareCall(sql);
             st.setString(1, status);
             st.setInt(2, orderId);
             int rowAffected = st.executeUpdate();
-            if(rowAffected > 0) {
+            if (rowAffected > 0) {
                 return true;
             }
         } catch (SQLException e) {
@@ -441,5 +443,144 @@ public class OrderDAO extends DBContext {
         }
         return false;
     }
-    
+
+    public Map<Integer, Double> getTotalRevenueByMonthForYear() {
+        Map<Integer, Double> monthlyRevenue = new HashMap<>();
+
+        // Khởi tạo doanh thu cho tất cả các tháng là 0.0
+        for (int month = 1; month <= 12; month++) {
+            monthlyRevenue.put(month, 0.0);
+        }
+
+        String sql = "SELECT MONTH(o.order_date) AS Month, "
+                + "       SUM(o.total) AS TotalRevenue "
+                + "FROM Orders o "
+                + "WHERE o.status = 'Delivered' "
+                + "AND YEAR(o.order_date) = YEAR(GETDATE()) "
+                + "GROUP BY MONTH(o.order_date)";
+
+        try (PreparedStatement statement = connection.prepareStatement(sql); ResultSet rs = statement.executeQuery()) {
+
+            while (rs.next()) {
+                int month = rs.getInt("Month");
+                double revenue = rs.getDouble("TotalRevenue");
+                monthlyRevenue.put(month, revenue);
+            }
+
+        } catch (SQLException ex) {
+            System.out.println("Error at getTotalRevenueByMonthForYear of OrderDAO: " + ex.getMessage());
+        }
+
+        return monthlyRevenue;
+    }
+
+    public Map<Integer, List<Double>> getTotalRevenueByWeekForYear() {
+        Map<Integer, List<Double>> revenueByWeekForYear = new HashMap<>();
+        String sql = "SELECT MONTH(o.order_date) AS Month, "
+                + "       DATEPART(WEEK, o.order_date) AS WeekOfMonth, "
+                + "       SUM(o.total) AS TotalRevenue "
+                + "FROM Orders o "
+                + "WHERE o.status = 'Delivered' "
+                + "AND YEAR(o.order_date) = YEAR(GETDATE()) "
+                + "GROUP BY MONTH(o.order_date), DATEPART(WEEK, o.order_date) "
+                + "ORDER BY MONTH(o.order_date), DATEPART(WEEK, o.order_date)";
+
+        try (PreparedStatement statement = connection.prepareStatement(sql); ResultSet rs = statement.executeQuery()) {
+
+            while (rs.next()) {
+                int month = rs.getInt("Month");
+                double weekRevenue = rs.getDouble("TotalRevenue");
+
+                revenueByWeekForYear.computeIfAbsent(month, k -> new ArrayList<>())
+                        .add(weekRevenue);
+            }
+
+        } catch (SQLException ex) {
+            System.out.println("Error at getTotalRevenueByWeekForYear of OrderDAO: " + ex.getMessage());
+        }
+
+        return revenueByWeekForYear;
+    }
+
+    public Map<Integer, Integer> getTotalProductsSoldByMonthForYear() {
+        Map<Integer, Integer> monthlyProductsSold = new HashMap<>();
+
+        // Khởi tạo số lượng sản phẩm bán ra cho tất cả các tháng là 0
+        for (int month = 1; month <= 12; month++) {
+            monthlyProductsSold.put(month, 0);
+        }
+
+        String sql = "SELECT MONTH(o.order_date) AS Month, "
+                + "       SUM(od.quatity) AS TotalProductsSold "
+                + "FROM Orders o "
+                + "JOIN Order_Details od ON o.order_id = od.order_id "
+                + "WHERE o.status = 'Delivered' "
+                + "AND YEAR(o.order_date) = YEAR(GETDATE()) "
+                + "GROUP BY MONTH(o.order_date)";
+
+        try (PreparedStatement statement = connection.prepareStatement(sql); ResultSet rs = statement.executeQuery()) {
+
+            while (rs.next()) {
+                int month = rs.getInt("Month");
+                int productsSold = rs.getInt("TotalProductsSold");
+                monthlyProductsSold.put(month, productsSold);
+            }
+
+        } catch (SQLException ex) {
+            System.out.println("Error at getTotalProductsSoldByMonthForYear of OrderDAO: " + ex.getMessage());
+        }
+
+        return monthlyProductsSold;
+    }
+
+    public int countPendingOrders() {
+        String sql = "SELECT COUNT(*) AS PendingOrderCount "
+                + "FROM Orders "
+                + "WHERE status = 'Pending'";
+
+        try (PreparedStatement statement = connection.prepareStatement(sql); ResultSet rs = statement.executeQuery()) {
+
+            if (rs.next()) {
+                return rs.getInt("PendingOrderCount");
+            }
+        } catch (SQLException ex) {
+            System.out.println("Error at countPendingOrders of OrderDAO: " + ex.getMessage());
+        }
+        return 0; // Trả về 0 nếu có lỗi hoặc không có đơn hàng nào
+    }
+
+    public List<MyOrder> getMyOrder(int userId) {
+        List<MyOrder> myOrder = new ArrayList<>();
+        String sql = "SELECT\n"
+                + "    OD.order_detail_id,\n"
+                + "    P.name AS product_name,\n"
+                + "    OD.quatity,\n"
+                + "    PS.size,\n"
+                + "    OD.price,\n"
+                + "    (SELECT TOP 1 PI.image_url FROM ProductImages PI WHERE PI.product_id = P.product_id) AS first_image,\n"
+                + "    O.status\n"
+                + "FROM Orders AS O\n"
+                + "JOIN Users AS U\n"
+                + "    ON O.user_id = U.user_id\n"
+                + "JOIN Order_Details AS OD\n"
+                + "    ON O.order_id = OD.order_id\n"
+                + "JOIN Product_Size AS PS\n"
+                + "    ON OD.product_size_id = PS.product_size_id\n"
+                + "JOIN Products AS P\n"
+                + "    ON PS.product_id = P.product_id\n"
+                + "WHERE\n"
+                + "    U.user_id = ?;";
+        try {
+            PreparedStatement st = connection.prepareStatement(sql);
+            st.setInt(1, userId);
+            ResultSet rs = st.executeQuery();
+            while(rs.next()){
+                MyOrder mod = new MyOrder(rs.getInt("order_detail_id"), rs.getString("product_name"), rs.getString("first_image"), rs.getInt("quatity"), rs.getInt("size"), rs.getInt("price"), rs.getString("status"));
+                myOrder.add(mod);
+            }
+        } catch (SQLException e) {
+            System.out.println(e);
+        }
+        return myOrder;
+    }
 }

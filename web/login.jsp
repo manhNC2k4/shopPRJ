@@ -5,6 +5,7 @@
 --%>
 
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
+<%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <!DOCTYPE html>
 <html>
     <head>
@@ -72,5 +73,42 @@
             </div>
         </div>
         <script src="js/bootstrap.min.js"></script>
-    </body>
+        <script src="js/jquery.min.js"></script>
+        <script src="js/popper.min.js"></script>
+        <script src="js/bootstrap-notify.min.js"></script>
+        <script>
+            $(document).ready(function () {
+            <c:if test="${not empty message}">
+        $.notify({
+                    message: '${message}'
+        }, {
+                    type: 'success',
+                    placement: {
+                    from: 'top',
+                            align: 'right'
+                    },
+                    delay: 2000
+                });
+                
+                <c:remove var="message" scope="session" />
+                <%-- Xóa message sau khi hiển thị --%>
+        </c:if>
+        <c:if test="${not empty error}">
+            $.notify({
+                    message: '${error}'
+            }, {
+                    type: 'danger',
+                    placement: {
+                    from: 'top',
+                            align: 'right'
+                    },
+                    delay: 2000
+                        });
+                        
+                        <c:remove var="error" scope="session" />
+                        <%-- Xóa message sau khi hiển thị --%>
+        </c:if>
+            });
+    </script>
+</body>
 </html>
