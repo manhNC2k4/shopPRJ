@@ -308,7 +308,7 @@
                                                         </div>
                                                     </div>
                                                     <h3><a href="singleProduct?id=${p.id}">${p.name}</a></h3>
-                                                    <div class="pricing">
+                                                    <div class="pricing row">
                                                         <c:set var="hasSale" value="false"/>
                                                         <c:forEach var="sale" items="${listSale}">
                                                             <c:if test="${p.sale_id == sale.id}">
@@ -317,24 +317,36 @@
                                                                     <c:set var="hasSale" value="true" />
                                                                     <c:choose>
                                                                         <c:when test="${sale.discountType == 'percentage'}">
-                                                                            <p class="price has-sale">
-                                                                                <span class="original-price">$${p.price}</span>
-                                                                                <span>$${p.price - (p.price * sale.discountValue / 100)}</span>
-                                                                            </p>
+                                                                            <div class="col-8">
+                                                                                <p class="price has-sale">
+                                                                                    <span class="original-price">$${p.price}</span>
+                                                                                    <span>$${p.price - (p.price * sale.discountValue / 100)}</span>
+                                                                                </p>
+                                                                            </div>
                                                                         </c:when>
                                                                         <c:when test="${sale.discountType == 'fixed_amount'}">
-                                                                            <p class="price has-sale">
-                                                                                <span class="original-price">$${p.price}</span>
-                                                                                <span>$${p.price - sale.discountValue}</span>
-                                                                            </p>
+                                                                            <div class="col-8">
+                                                                                <p class="price has-sale">
+                                                                                    <span class="original-price">$${p.price}</span>
+                                                                                    <span>$${p.price - sale.discountValue}</span>
+                                                                                </p>
+                                                                            </div>
                                                                         </c:when>
                                                                     </c:choose>
                                                                 </c:if> 
                                                             </c:if>
                                                         </c:forEach>
                                                         <c:if test="${!hasSale}">
-                                                            <p class="price"><span>$${p.price}</span></p>
+                                                            <div class="col-8">
+                                                                <p class="price"><span>$${p.price}</span></p>
+                                                            </div>
                                                         </c:if>
+                                                        <c:if test="${p.sold != 0}">
+                                                            <div class="col-4">
+                                                                <p class="sold-out">${p.sold} Sold</p>
+                                                            </div>
+                                                        </c:if>    
+
                                                     </div>
                                                     <p class="bottom-area d-flex px-3">
                                                         <a href="addFavorite?product_id=${p.id}" class="add-to-cart text-center py-2 mr-1"><span>Favorite <i class="ion-ios-add ml-1"></i></span></a>
@@ -483,7 +495,7 @@
                                 </form>
                             </div>
                             <div class="sidebar-box-2">
-                                <c:if test="${not empty sessionScope.keyword}">
+                                <c:if test="${not empty sessionScope.keyword or not empty sessionScope.saleId}">
                                     <a class="btn btn-outline-danger" href="shop?clearKeyword=true">Delete search</a>
                                 </c:if>
                             </div>               

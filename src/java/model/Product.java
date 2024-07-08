@@ -23,6 +23,29 @@ public class Product {
     private List<String> images;
     private List<Product_Size> sizes;
     private int sale_id;
+    private int sold;
+
+    public void setSold(int sold) {
+        this.sold = sold;
+    }
+
+    public int getSold() {
+        return sold;
+    }
+
+    public Product(int id, String name, String description, int categoryId, BigDecimal price, Date createdAt, Date updatedAt, List<String> images, List<Product_Size> sizes, int sale_id, int sold) {
+        this.id = id;
+        this.name = name;
+        this.description = description;
+        this.categoryId = categoryId;
+        this.price = price;
+        this.createdAt = createdAt;
+        this.updatedAt = updatedAt;
+        this.images = images;
+        this.sizes = sizes;
+        this.sale_id = sale_id;
+        this.sold = sold;
+    }
     // Constructor không tham số
     public Product() {
     }

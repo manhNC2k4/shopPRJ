@@ -6,8 +6,8 @@ package Controller;
 
 import dal.CategoryDAO;
 import dal.GetProductDAO;
+import dal.GetProductSaleDAO;
 import java.io.IOException;
-import java.io.PrintWriter;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -40,7 +40,23 @@ public class ShopServlet extends HttpServlet {
         String[] sizes;
         if (request.getParameter("clearKeyword") != null) {
             session.removeAttribute("keyword"); // Xóa keyword khỏi session
+            session.removeAttribute("saleId");
         }
+        int saleId = 0;
+        String rsaleId = request.getParameter("saleId"); // Ưu tiên lấy từ request
+        if (rsaleId != null && !rsaleId.equals("")) {
+            try {
+                saleId = Integer.parseInt(rsaleId);
+                session.setAttribute("saleId", saleId); // Lưu vào session nếu parse thành công
+            } catch (NumberFormatException e) {
+                System.err.println("Invalid saleId parameter: " + rsaleId);
+            }
+        } else {
+            if (session.getAttribute("saleId") != null) {
+                saleId = (Integer) session.getAttribute("saleId");
+            }
+        }
+        System.out.println(saleId);
         String keyword = request.getParameter("query"); // Ưu tiên lấy từ request
         if (keyword != null && !keyword.equals("")) {
             session.setAttribute("keyword", keyword); // Cập nhật session
@@ -64,175 +80,272 @@ public class ShopServlet extends HttpServlet {
         }
 //        // init price from
         GetProductDAO gpd = new GetProductDAO();
+        GetProductSaleDAO gpds = new GetProductSaleDAO();
         int priceFrom = gpd.getMinPrice();
 
 //        // init price to
         int priceTo = gpd.getMaxPrice();
 
         System.out.println(priceFrom + " " + priceTo);
+        try {
 
-        //init page
-        int page = 1;
-        if (request.getParameter("page") != null) {
-            sizes = (String[]) session.getAttribute("sizes");
-            priceFrom = (Integer) session.getAttribute("priceFrom");
-            priceTo = (Integer) session.getAttribute("priceTo");
-            page = Integer.parseInt(request.getParameter("page"));
-        } else if (request.getParameterValues("nosize") != null) {
-            if (request.getParameterValues("size") != null) {
-                sizes = request.getParameterValues("size");
-                priceFrom = (Integer) session.getAttribute("priceFrom");
-                priceTo = (Integer) session.getAttribute("priceTo");
-            } else {
-                sizes = null;
-                priceFrom = (Integer) session.getAttribute("priceFrom");
-                priceTo = (Integer) session.getAttribute("priceTo");
-            }
-        } else if (request.getParameter("priceFrom") != null) {
-            sizes = (String[]) session.getAttribute("sizes");
-            String fstr = request.getParameter("priceFrom");
-            String kq = fstr.substring(1);
-            priceFrom = Integer.parseInt(kq);
-            String fstr1 = request.getParameter("priceTo");
-            String kq1 = fstr1.substring(1);
-            priceTo = Integer.parseInt(kq1);
-        } else {
-            if (session.getAttribute("sizes") == null) {
-                sizes = null;
-            } else {
+            //init page
+            int page = 1;
+            if (request.getParameter("page") != null) {
                 sizes = (String[]) session.getAttribute("sizes");
+                priceFrom = (Integer) session.getAttribute("priceFrom");
+                priceTo = (Integer) session.getAttribute("priceTo");
+                page = Integer.parseInt(request.getParameter("page"));
+            } else if (request.getParameterValues("nosize") != null) {
+                if (request.getParameterValues("size") != null) {
+                    sizes = request.getParameterValues("size");
+                    priceFrom = (Integer) session.getAttribute("priceFrom");
+                    priceTo = (Integer) session.getAttribute("priceTo");
+                } else {
+                    sizes = null;
+                    priceFrom = (Integer) session.getAttribute("priceFrom");
+                    priceTo = (Integer) session.getAttribute("priceTo");
+                }
+            } else if (request.getParameter("priceFrom") != null) {
+                sizes = (String[]) session.getAttribute("sizes");
+                String fstr = request.getParameter("priceFrom");
+                String kq = fstr.substring(1);
+                priceFrom = Integer.parseInt(kq);
+                String fstr1 = request.getParameter("priceTo");
+                String kq1 = fstr1.substring(1);
+                priceTo = Integer.parseInt(kq1);
+            } else {
+                if (session.getAttribute("sizes") == null) {
+                    sizes = null;
+                } else {
+                    sizes = (String[]) session.getAttribute("sizes");
+                }
+                if (session.getAttribute("priceFrom") != null) {
+                    priceFrom = (Integer) session.getAttribute("priceFrom");
+                }
+                if (session.getAttribute("priceTo") != null) {
+                    priceTo = (Integer) session.getAttribute("priceTo");
+                }
+            }
+            List<Product> products;
+
+            int totalProducts = 0;
+            if (saleId == 0) {
+                
+                if (sizes == null) {
+                    if (cid != 0) {
+                        
+                        totalProducts = gpd.getTotalProductsByCate(cid, new BigDecimal(priceFrom), new BigDecimal(priceTo));
+                        switch (sort) {
+                            case 0 ->
+                                products = gpd.getProductsPerPageByCate(page, PRODUCTS_PER_PAGE, cid, new BigDecimal(priceFrom), new BigDecimal(priceTo));
+                            case 1 ->
+                                products = gpd.getProductsPerPageByCateNewest(page, PRODUCTS_PER_PAGE, cid, new BigDecimal(priceFrom), new BigDecimal(priceTo));
+                            case 2 ->
+                                products = gpd.getProductsPerPageByCateOldest(page, PRODUCTS_PER_PAGE, cid, new BigDecimal(priceFrom), new BigDecimal(priceTo));
+                            case 3 ->
+                                products = gpd.getProductsPerPageByCateAndSold(page, PRODUCTS_PER_PAGE, cid, new BigDecimal(priceFrom), new BigDecimal(priceTo));
+                            case 4 ->
+                                products = gpd.getProductsPerPageByCatePriceDesc(page, PRODUCTS_PER_PAGE, cid, new BigDecimal(priceFrom), new BigDecimal(priceTo));
+                            case 5 ->
+                                products = gpd.getProductsPerPageByCatePriceAsc(page, PRODUCTS_PER_PAGE, cid, new BigDecimal(priceFrom), new BigDecimal(priceTo));
+                            default ->
+                                throw new AssertionError();
+                        }
+                    } else {
+                        totalProducts = gpd.getTotalProductsSearch(new BigDecimal(priceFrom), new BigDecimal(priceTo), keyword);
+                        switch (sort) {
+                            case 0 ->
+                                products = gpd.getProductsPerPageSearch(page, PRODUCTS_PER_PAGE, new BigDecimal(priceFrom), new BigDecimal(priceTo), keyword);
+                            case 1 ->
+                                products = gpd.getProductsPerPageNewestSearch(page, PRODUCTS_PER_PAGE, new BigDecimal(priceFrom), new BigDecimal(priceTo), keyword);
+                            case 2 ->
+                                products = gpd.getProductsPerPageOldestSearch(page, PRODUCTS_PER_PAGE, new BigDecimal(priceFrom), new BigDecimal(priceTo), keyword);
+                            case 3 ->
+                                products = gpd.getProductsPerPageSearchAndSold(page, PRODUCTS_PER_PAGE, new BigDecimal(priceFrom), new BigDecimal(priceTo), keyword);
+                            case 4 ->
+                                products = gpd.getProductsPerPagePriceDescSearch(page, PRODUCTS_PER_PAGE, new BigDecimal(priceFrom), new BigDecimal(priceTo), keyword);
+                            case 5 ->
+                                products = gpd.getProductsPerPagePriceAscSearch(page, PRODUCTS_PER_PAGE, new BigDecimal(priceFrom), new BigDecimal(priceTo), keyword);
+                            default ->
+                                throw new AssertionError();
+                        }
+                    }
+                } else {
+                    for (String rid : sizes) {
+                        try {
+                            int id = Integer.parseInt(rid);
+                            sizeInt.add(id);
+                        } catch (NumberFormatException e) {
+                            System.out.println(e);
+                        }
+                    }
+                    if (cid != 0) {
+                        totalProducts = gpd.getTotalProductsInSizeByCate(sizeInt, cid, new BigDecimal(priceFrom), new BigDecimal(priceTo));
+                        switch (sort) {
+                            case 0 ->
+                                products = gpd.getProductsPerPageByCateInSize(page, PRODUCTS_PER_PAGE, cid, sizeInt, new BigDecimal(priceFrom), new BigDecimal(priceTo));
+                            case 1 ->
+                                products = gpd.getProductsPerPageByCateNewestInSize(page, PRODUCTS_PER_PAGE, cid, sizeInt, new BigDecimal(priceFrom), new BigDecimal(priceTo));
+                            case 2 ->
+                                products = gpd.getProductsPerPageByCateOldestInSize(page, PRODUCTS_PER_PAGE, cid, sizeInt, new BigDecimal(priceFrom), new BigDecimal(priceTo));
+                            case 3 ->
+                                products = gpd.getProductsPerPageByCateInSize(page, PRODUCTS_PER_PAGE, cid, sizeInt, new BigDecimal(priceFrom), new BigDecimal(priceTo));
+                            case 4 ->
+                                products = gpd.getProductsPerPageByCatePriceDescInSize(page, PRODUCTS_PER_PAGE, cid, sizeInt, new BigDecimal(priceFrom), new BigDecimal(priceTo));
+                            case 5 ->
+                                products = gpd.getProductsPerPageByCatePriceAscInSize(page, PRODUCTS_PER_PAGE, cid, sizeInt, new BigDecimal(priceFrom), new BigDecimal(priceTo));
+                            default ->
+                                throw new AssertionError();
+                        }
+                    } else {
+                        totalProducts = gpd.getTotalProductsInSizeSearch(sizeInt, new BigDecimal(priceFrom), new BigDecimal(priceTo), keyword);
+                        switch (sort) {
+                            case 0 ->
+                                products = gpd.getProductsPerPageInSize(page, PRODUCTS_PER_PAGE, sizeInt, new BigDecimal(priceFrom), new BigDecimal(priceTo), keyword);
+                            case 1 ->
+                                products = gpd.getProductsPerPageNewestInSize(page, PRODUCTS_PER_PAGE, sizeInt, new BigDecimal(priceFrom), new BigDecimal(priceTo), keyword);
+                            case 2 ->
+                                products = gpd.getProductsPerPageOldestInSize(page, PRODUCTS_PER_PAGE, sizeInt, new BigDecimal(priceFrom), new BigDecimal(priceTo), keyword);
+                            case 3 ->
+                                products = gpd.getProductsPerPageInSize(page, PRODUCTS_PER_PAGE, sizeInt, new BigDecimal(priceFrom), new BigDecimal(priceTo), keyword);
+                            case 4 ->
+                                products = gpd.getProductsPerPagePriceDescInSize(page, PRODUCTS_PER_PAGE, sizeInt, new BigDecimal(priceFrom), new BigDecimal(priceTo), keyword);
+                            case 5 ->
+                                products = gpd.getProductsPerPagePriceAscInSize(page, PRODUCTS_PER_PAGE, sizeInt, new BigDecimal(priceFrom), new BigDecimal(priceTo), keyword);
+                            default ->
+                                throw new AssertionError();
+                        }
+                    }
+                }
+            } else {
+                if (sizes == null) {
+                    if (cid != 0) {
+                        
+                        totalProducts = gpds.getTotalProductsByCate(cid, new BigDecimal(priceFrom), new BigDecimal(priceTo), saleId);
+                        switch (sort) {
+                            case 0 ->
+                                products = gpds.getProductsPerPageByCate(page, PRODUCTS_PER_PAGE, cid, new BigDecimal(priceFrom), new BigDecimal(priceTo), saleId);
+                            case 1 ->
+                                products = gpds.getProductsPerPageByCateNewest(page, PRODUCTS_PER_PAGE, cid, new BigDecimal(priceFrom), new BigDecimal(priceTo), saleId);
+                            case 2 ->
+                                products = gpds.getProductsPerPageByCateOldest(page, PRODUCTS_PER_PAGE, cid, new BigDecimal(priceFrom), new BigDecimal(priceTo), saleId);
+                            case 3 ->
+                                products = gpds.getProductsPerPageByCateAndSold(page, PRODUCTS_PER_PAGE, cid, new BigDecimal(priceFrom), new BigDecimal(priceTo), saleId);
+                            case 4 ->
+                                products = gpds.getProductsPerPageByCatePriceDesc(page, PRODUCTS_PER_PAGE, cid, new BigDecimal(priceFrom), new BigDecimal(priceTo), saleId);
+                            case 5 ->
+                                products = gpds.getProductsPerPageByCatePriceAsc(page, PRODUCTS_PER_PAGE, cid, new BigDecimal(priceFrom), new BigDecimal(priceTo), saleId);
+                            default ->
+                                throw new AssertionError();
+                        }
+                    } else {
+                        totalProducts = gpds.getTotalProductsSearch(new BigDecimal(priceFrom), new BigDecimal(priceTo), keyword, saleId);
+                        switch (sort) {
+                            case 0 ->
+                                products = gpds.getProductsPerPageSearch(page, PRODUCTS_PER_PAGE, new BigDecimal(priceFrom), new BigDecimal(priceTo), keyword, saleId);
+                            case 1 ->
+                                products = gpds.getProductsPerPageNewestSearch(page, PRODUCTS_PER_PAGE, new BigDecimal(priceFrom), new BigDecimal(priceTo), keyword, saleId);
+                            case 2 ->
+                                products = gpds.getProductsPerPageOldestSearch(page, PRODUCTS_PER_PAGE, new BigDecimal(priceFrom), new BigDecimal(priceTo), keyword, saleId);
+                            case 3 ->
+                                products = gpds.getProductsPerPageSearchAndSold(page, PRODUCTS_PER_PAGE, new BigDecimal(priceFrom), new BigDecimal(priceTo), keyword, saleId);
+                            case 4 ->
+                                products = gpds.getProductsPerPagePriceDescSearch(page, PRODUCTS_PER_PAGE, new BigDecimal(priceFrom), new BigDecimal(priceTo), keyword, saleId);
+                            case 5 ->
+                                products = gpds.getProductsPerPagePriceAscSearch(page, PRODUCTS_PER_PAGE, new BigDecimal(priceFrom), new BigDecimal(priceTo), keyword, saleId);
+                            default ->
+                                throw new AssertionError();
+                        }
+                    }
+                } else {
+                    for (String rid : sizes) {
+                        try {
+                            int id = Integer.parseInt(rid);
+                            sizeInt.add(id);
+                        } catch (NumberFormatException e) {
+                        }
+                    }
+                    if (cid != 0) {
+                        totalProducts = gpds.getTotalProductsInSizeByCate(sizeInt, cid, new BigDecimal(priceFrom), new BigDecimal(priceTo), saleId);
+                        switch (sort) {
+                            case 0 ->
+                                products = gpds.getProductsPerPageByCateInSize(page, PRODUCTS_PER_PAGE, cid, sizeInt, new BigDecimal(priceFrom), new BigDecimal(priceTo), saleId);
+                            case 1 ->
+                                products = gpds.getProductsPerPageByCateNewestInSize(page, PRODUCTS_PER_PAGE, cid, sizeInt, new BigDecimal(priceFrom), new BigDecimal(priceTo), saleId);
+                            case 2 ->
+                                products = gpds.getProductsPerPageByCateOldestInSize(page, PRODUCTS_PER_PAGE, cid, sizeInt, new BigDecimal(priceFrom), new BigDecimal(priceTo), saleId);
+                            case 3 ->
+                                products = gpds.getProductsPerPageByCateInSize(page, PRODUCTS_PER_PAGE, cid, sizeInt, new BigDecimal(priceFrom), new BigDecimal(priceTo), saleId);
+                            case 4 ->
+                                products = gpds.getProductsPerPageByCatePriceDescInSize(page, PRODUCTS_PER_PAGE, cid, sizeInt, new BigDecimal(priceFrom), new BigDecimal(priceTo), saleId);
+                            case 5 ->
+                                products = gpds.getProductsPerPageByCatePriceAscInSize(page, PRODUCTS_PER_PAGE, cid, sizeInt, new BigDecimal(priceFrom), new BigDecimal(priceTo), saleId);
+                            default ->
+                                throw new AssertionError();
+                        }
+                    } else {
+                        totalProducts = gpds.getTotalProductsInSizeSearch(sizeInt, new BigDecimal(priceFrom), new BigDecimal(priceTo), keyword, saleId);
+                        switch (sort) {
+                            case 0 ->
+                                products = gpds.getProductsPerPageInSize(page, PRODUCTS_PER_PAGE, sizeInt, new BigDecimal(priceFrom), new BigDecimal(priceTo), keyword, saleId);
+                            case 1 ->
+                                products = gpds.getProductsPerPageNewestInSize(page, PRODUCTS_PER_PAGE, sizeInt, new BigDecimal(priceFrom), new BigDecimal(priceTo), keyword, saleId);
+                            case 2 ->
+                                products = gpds.getProductsPerPageOldestInSize(page, PRODUCTS_PER_PAGE, sizeInt, new BigDecimal(priceFrom), new BigDecimal(priceTo), keyword, saleId);
+                            case 3 ->
+                                products = gpds.getProductsPerPageInSize(page, PRODUCTS_PER_PAGE, sizeInt, new BigDecimal(priceFrom), new BigDecimal(priceTo), keyword, saleId);
+                            case 4 ->
+                                products = gpds.getProductsPerPagePriceDescInSize(page, PRODUCTS_PER_PAGE, sizeInt, new BigDecimal(priceFrom), new BigDecimal(priceTo), keyword, saleId);
+                            case 5 ->
+                                products = gpds.getProductsPerPagePriceAscInSize(page, PRODUCTS_PER_PAGE, sizeInt, new BigDecimal(priceFrom), new BigDecimal(priceTo), keyword, saleId);
+                            default ->
+                                throw new AssertionError();
+                        }
+                    }
+                }
+            }
+
+            System.out.println(totalProducts);
+            gpd.fetchImagesForProducts(products);
+            if (session.getAttribute("sizes") != null) {
+                session.removeAttribute("sizes");
             }
             if (session.getAttribute("priceFrom") != null) {
-                priceFrom = (Integer) session.getAttribute("priceFrom");
+                session.removeAttribute("priceFrom");
             }
             if (session.getAttribute("priceTo") != null) {
-                priceTo = (Integer) session.getAttribute("priceTo");
+                session.removeAttribute("priceTo");
             }
-        }
-        List<Product> products;
-
-        int totalProducts;
-        if (sizes == null) {
-            if (cid != 0) {
-                totalProducts = gpd.getTotalProductsByCate(cid, new BigDecimal(priceFrom), new BigDecimal(priceTo));
-                switch (sort) {
-                    case 0 ->
-                        products = gpd.getProductsPerPageByCate(page, PRODUCTS_PER_PAGE, cid, new BigDecimal(priceFrom), new BigDecimal(priceTo));
-                    case 1 ->
-                        products = gpd.getProductsPerPageByCateNewest(page, PRODUCTS_PER_PAGE, cid, new BigDecimal(priceFrom), new BigDecimal(priceTo));
-                    case 2 ->
-                        products = gpd.getProductsPerPageByCateOldest(page, PRODUCTS_PER_PAGE, cid, new BigDecimal(priceFrom), new BigDecimal(priceTo));
-                    case 3 ->
-                        products = gpd.getProductsPerPageByCate(page, PRODUCTS_PER_PAGE, cid, new BigDecimal(priceFrom), new BigDecimal(priceTo));
-                    case 4 ->
-                        products = gpd.getProductsPerPageByCatePriceDesc(page, PRODUCTS_PER_PAGE, cid, new BigDecimal(priceFrom), new BigDecimal(priceTo));
-                    case 5 ->
-                        products = gpd.getProductsPerPageByCatePriceAsc(page, PRODUCTS_PER_PAGE, cid, new BigDecimal(priceFrom), new BigDecimal(priceTo));
-                    default ->
-                        throw new AssertionError();
-                }
-            } else {
-                totalProducts = gpd.getTotalProductsSearch(new BigDecimal(priceFrom), new BigDecimal(priceTo), keyword);
-                switch (sort) {
-                    case 0 ->
-                        products = gpd.getProductsPerPageSearch(page, PRODUCTS_PER_PAGE, new BigDecimal(priceFrom), new BigDecimal(priceTo),keyword);
-                    case 1 ->
-                        products = gpd.getProductsPerPageNewestSearch(page, PRODUCTS_PER_PAGE, new BigDecimal(priceFrom), new BigDecimal(priceTo),keyword);
-                    case 2 ->
-                        products = gpd.getProductsPerPageOldestSearch(page, PRODUCTS_PER_PAGE, new BigDecimal(priceFrom), new BigDecimal(priceTo),keyword);
-                    case 3 ->
-                        products = gpd.getProductsPerPageSearch(page, PRODUCTS_PER_PAGE, new BigDecimal(priceFrom), new BigDecimal(priceTo),keyword);
-                    case 4 ->
-                        products = gpd.getProductsPerPagePriceDescSearch(page, PRODUCTS_PER_PAGE, new BigDecimal(priceFrom), new BigDecimal(priceTo),keyword);
-                    case 5 ->
-                        products = gpd.getProductsPerPagePriceAscSearch(page, PRODUCTS_PER_PAGE, new BigDecimal(priceFrom), new BigDecimal(priceTo),keyword);
-                    default ->
-                        throw new AssertionError();
-                }
+            int totalPages = (int) Math.ceil((double) totalProducts / PRODUCTS_PER_PAGE);
+            CategoryDAO cd = new CategoryDAO();
+            List<Category> listCat = cd.getALl();
+            Map<Integer, String> categoryMap = new HashMap<>();
+            for (Category category : listCat) {
+                categoryMap.put(category.getCategory_id(), category.getName());
             }
-        } else {
-            for (String rid : sizes) {
-                try {
-                    int id = Integer.parseInt(rid);
-                    sizeInt.add(id);
-                } catch (NumberFormatException e) {
-                }
-            }
-            if (cid != 0) {
-                totalProducts = gpd.getTotalProductsInSizeByCate(sizeInt, cid, new BigDecimal(priceFrom), new BigDecimal(priceTo));
-                switch (sort) {
-                    case 0 ->
-                        products = gpd.getProductsPerPageByCateInSize(page, PRODUCTS_PER_PAGE, cid, sizeInt, new BigDecimal(priceFrom), new BigDecimal(priceTo));
-                    case 1 ->
-                        products = gpd.getProductsPerPageByCateNewestInSize(page, PRODUCTS_PER_PAGE, cid, sizeInt, new BigDecimal(priceFrom), new BigDecimal(priceTo));
-                    case 2 ->
-                        products = gpd.getProductsPerPageByCateOldestInSize(page, PRODUCTS_PER_PAGE, cid, sizeInt, new BigDecimal(priceFrom), new BigDecimal(priceTo));
-                    case 3 ->
-                        products = gpd.getProductsPerPageByCateInSize(page, PRODUCTS_PER_PAGE, cid, sizeInt, new BigDecimal(priceFrom), new BigDecimal(priceTo));
-                    case 4 ->
-                        products = gpd.getProductsPerPageByCatePriceDescInSize(page, PRODUCTS_PER_PAGE, cid, sizeInt, new BigDecimal(priceFrom), new BigDecimal(priceTo));
-                    case 5 ->
-                        products = gpd.getProductsPerPageByCatePriceAscInSize(page, PRODUCTS_PER_PAGE, cid, sizeInt, new BigDecimal(priceFrom), new BigDecimal(priceTo));
-                    default ->
-                        throw new AssertionError();
-                }
-            } else {
-                totalProducts = gpd.getTotalProductsInSizeSearch(sizeInt, new BigDecimal(priceFrom), new BigDecimal(priceTo),keyword);
-                switch (sort) {
-                    case 0 ->
-                        products = gpd.getProductsPerPageInSize(page, PRODUCTS_PER_PAGE, sizeInt, new BigDecimal(priceFrom), new BigDecimal(priceTo),keyword);
-                    case 1 ->
-                        products = gpd.getProductsPerPageNewestInSize(page, PRODUCTS_PER_PAGE, sizeInt, new BigDecimal(priceFrom), new BigDecimal(priceTo),keyword);
-                    case 2 ->
-                        products = gpd.getProductsPerPageOldestInSize(page, PRODUCTS_PER_PAGE, sizeInt, new BigDecimal(priceFrom), new BigDecimal(priceTo), keyword);
-                    case 3 ->
-                        products = gpd.getProductsPerPageInSize(page, PRODUCTS_PER_PAGE, sizeInt, new BigDecimal(priceFrom), new BigDecimal(priceTo),keyword);
-                    case 4 ->
-                        products = gpd.getProductsPerPagePriceDescInSize(page, PRODUCTS_PER_PAGE, sizeInt, new BigDecimal(priceFrom), new BigDecimal(priceTo),keyword);
-                    case 5 ->
-                        products = gpd.getProductsPerPagePriceAscInSize(page, PRODUCTS_PER_PAGE, sizeInt, new BigDecimal(priceFrom), new BigDecimal(priceTo), keyword);
-                    default ->
-                        throw new AssertionError();
-                }
-            }
+            session.setAttribute("sizes", sizes);
+            session.setAttribute("priceFrom", priceFrom);
+            session.setAttribute("priceTo", priceTo);
+            System.out.println(priceFrom + " " + priceTo);
+            request.setAttribute("categoryMap", categoryMap);
+            request.setAttribute("dataPro", products);
+            request.setAttribute("currentPage", page);
+            request.setAttribute("totalProducts", totalProducts);
+            request.setAttribute("size", sizeInt);
+            request.setAttribute("cid", cid);
+            request.setAttribute("sort", sort);
+            request.setAttribute("minPrice", gpd.getMinPrice());
+            request.setAttribute("maxPrice", gpd.getMaxPrice());
+            request.setAttribute("totalPages", totalPages);
+            request.getRequestDispatcher("shop.jsp").forward(request, response);
+            return;
+        } catch (NumberFormatException e) {
+            System.err.println("Error parsing parameter: " + e.getMessage());
+        } catch (ServletException | IOException e) {
+            System.err.println("An error occurred: " + e.getMessage());
+        } finally {
         }
-        System.out.println(totalProducts);
-        gpd.fetchImagesForProducts(products);
-        if (session.getAttribute("sizes") != null) {
-            session.removeAttribute("sizes");
-        }
-        if (session.getAttribute("priceFrom") != null) {
-            session.removeAttribute("priceFrom");
-        }
-        if (session.getAttribute("priceTo") != null) {
-            session.removeAttribute("priceTo");
-        }
-        int totalPages = (int) Math.ceil((double) totalProducts / PRODUCTS_PER_PAGE);
-        CategoryDAO cd = new CategoryDAO();
-        List<Category> listCat = cd.getALl();
-        Map<Integer, String> categoryMap = new HashMap<>();
-        for (Category category : listCat) {
-            categoryMap.put(category.getCategory_id(), category.getName());
-        }
-        session.setAttribute("sizes", sizes);
-        session.setAttribute("priceFrom", priceFrom);
-        session.setAttribute("priceTo", priceTo);
-        System.out.println(priceFrom + " " + priceTo);
-        request.setAttribute("categoryMap", categoryMap);
-        request.setAttribute("dataPro", products);
-        request.setAttribute("currentPage", page);
-        request.setAttribute("totalProducts", totalProducts);
-        request.setAttribute("size", sizeInt);
-        request.setAttribute("cid", cid);
-        request.setAttribute("sort", sort);
-        request.setAttribute("minPrice", gpd.getMinPrice());
-        request.setAttribute("maxPrice", gpd.getMaxPrice());
-
-//        request.setAttribute("priceFrom", priceFrom);
-//        request.setAttribute("priceTo", priceTo);
-        request.setAttribute("totalPages", totalPages);
-        request.getRequestDispatcher("shop.jsp").forward(request, response);
-
     }
 
     /**

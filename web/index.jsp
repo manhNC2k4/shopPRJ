@@ -339,13 +339,13 @@
             <div class="container">
                 <div class="row no-gutters">
                     <div class="col-lg-4">
-                        <div class="choose-wrap divider-one img p-5 d-flex align-items-end" style="background-image: url(images/choose-1.jpg);">
+                        <div class="choose-wrap divider-one img p-5 d-flex align-items-end" style="background-image: url(images/410739867.jpg);">
 
                             <div class="text text-center text-white px-2">
-                                <span class="subheading">Men's Shoes</span>
-                                <h2>Men's Collection</h2>
+                                <span class="subheading">Jordan Shoes</span>
+                                <h2>Jordan's Collection</h2>
                                 <p>Separated they live in Bookmarksgrove right at the coast of the Semantics, a large language ocean.</p>
-                                <p><a href="#" class="btn btn-black px-3 py-2">Shop now</a></p>
+                                <p><a href="shop?query=Jordan" class="btn btn-black px-3 py-2">Shop now</a></p>
                             </div>
                         </div>
                     </div>
@@ -355,10 +355,10 @@
                                 <div class="choose-wrap full-wrap img align-self-stretch d-flex align-item-center justify-content-end" style="background-image: url(images/choose-2.jpg);">
                                     <div class="col-md-7 d-flex align-items-center">
                                         <div class="text text-white px-5">
-                                            <span class="subheading">Women's Shoes</span>
-                                            <h2>Women's Collection</h2>
+                                            <span class="subheading">Hiking's Shoes</span>
+                                            <h2>Hiking's Collection</h2>
                                             <p>Separated they live in Bookmarksgrove right at the coast of the Semantics, a large language ocean.</p>
-                                            <p><a href="#" class="btn btn-black px-3 py-2">Shop now</a></p>
+                                            <p><a href="shop?query=Hiking" class="btn btn-black px-3 py-2">Shop now</a></p>
                                         </div>
                                     </div>
                                 </div>
@@ -371,7 +371,7 @@
                                                 <span class="subheading">Summer Sale</span>
                                                 <h2>Extra 50% Off</h2>
                                                 <p>Separated they live in Bookmarksgrove right at the coast of the Semantics, a large language ocean.</p>
-                                                <p><a href="#" class="btn btn-black px-3 py-2">Shop now</a></p>
+                                                <p><a href="shop?saleId=2" class="btn btn-black px-3 py-2">Shop now</a></p>
                                             </div>
                                         </div>
                                     </div>
@@ -381,7 +381,7 @@
                                                 <span class="subheading">Shoes</span>
                                                 <h2>Best Sellers</h2>
                                                 <p>Separated they live in Bookmarksgrove right at the coast of the Semantics, a large language ocean.</p>
-                                                <p><a href="#" class="btn btn-black px-3 py-2">Shop now</a></p>
+                                                <p><a href="shop?sort=3&cid=0" class="btn btn-black px-3 py-2">Shop now</a></p>
                                             </div>
                                         </div>
                                     </div>

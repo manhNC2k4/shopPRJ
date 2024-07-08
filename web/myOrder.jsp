@@ -161,8 +161,7 @@
                                             <td class="size">${p.quantity}</td>
                                             <td class="size">${p.size}</td>
                                             <td class="price">$${p.price}</td>
-                                            <td "sex id="
-                                                "classstatus>${p.status}</td>
+                                            <td class="status">${p.status}</td>
 
                                         </tr><!-- END TR-->
                                     </c:forEach>
