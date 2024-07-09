@@ -90,7 +90,7 @@ public class OrderSingleServlet extends HttpServlet {
         }
         Order_Info orderInfo = new Order_Info(0, firstName, lastName, country, street, city, postcode, phone, email, paymentMethod, 0);
         try {
-            int total = Integer.parseInt(rtotal);
+            double total = Double.parseDouble(rtotal);
             Cookie[] cookies = request.getCookies();
             Cart c = null;
             UserDTO user = null;
@@ -116,7 +116,6 @@ public class OrderSingleServlet extends HttpServlet {
                 orderDetails.add(oderDetail);
                 boolean check = orderdao.insertOrder(order, orderDetails, orderInfo);
                 if (check) {
-                    
                     response.sendRedirect("index");
                 } else {
                     String error = "something was wrong";
@@ -127,6 +126,7 @@ public class OrderSingleServlet extends HttpServlet {
                 response.sendRedirect("login.jsp");
             }
         } catch (NumberFormatException e) {
+            System.out.println(e);
         } catch (SQLException ex) {
             Logger.getLogger(OrderSingleServlet.class.getName()).log(Level.SEVERE, null, ex);
         }

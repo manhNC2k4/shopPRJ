@@ -25,7 +25,7 @@
     <body id="page-top">
         <div id="wrapper">
             <ul class="navbar-nav sidebar sidebar-light accordion" id="accordionSidebar">
-                <a class="sidebar-brand d-flex align-items-center justify-content-center" href="dashboard.jsp">
+                <a class="sidebar-brand d-flex align-items-center justify-content-center" href="dashBoard">
                     <div class="sidebar-brand-icon">
                         <img src="img/logo/logo2.png">
                     </div>
@@ -33,7 +33,7 @@
                 </a>
                 <hr class="sidebar-divider my-0">
                 <li class="nav-item active">
-                    <a class="nav-link" href="dashboard.jsp">
+                    <a class="nav-link" href="dashBoard">
                         <i class="fas fa-fw fa-tachometer-alt"></i>
                         <span>Dashboard</span></a>
                 </li>
@@ -374,7 +374,7 @@
                                         Activity Log
                                     </a>
                                     <div class="dropdown-divider"></div>
-                                    <a class="dropdown-item" href="javascript:void(0);" data-toggle="modal" data-target="#logoutModal">
+                                    <a class="dropdown-item" href="#" data-toggle="modal" data-target="#logoutModal">
                                         <i class="fas fa-sign-out-alt fa-sm fa-fw mr-2 text-gray-400"></i>
                                         Logout
                                     </a>
@@ -649,7 +649,7 @@
                                 </div>
                                 <div class="modal-footer">
                                     <button type="button" class="btn btn-outline-primary" data-dismiss="modal">Cancel</button>
-                                    <a href="login.html" class="btn btn-primary">Logout</a>
+                                    <a href="logout" class="btn btn-primary">Logout</a>
                                 </div>
                             </div>
                         </div>

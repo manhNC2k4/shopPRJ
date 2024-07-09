@@ -130,7 +130,7 @@ public class ChangeProfileServlet extends HttpServlet {
                                 Cookie cookie = new Cookie("account", encodedUser); // Giả sử UserDTO có toString()
                                 cookie.setMaxAge(60 * 60 * 24 * 60 * 2); // Tồn tại 2 tháng (tính bằng giây)
                                 response.addCookie(cookie);
-                                request.getRequestDispatcher("viewProfile.jsp").forward(request, response);
+                                response.sendRedirect("viewProfile.jsp");
                             } else {
                                 message = result; // Lấy message lỗi từ hàm insertUser
                                 request.setAttribute("error", message);

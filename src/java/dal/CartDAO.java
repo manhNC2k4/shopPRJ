@@ -155,7 +155,7 @@ public class CartDAO extends DBContext {
     //delete cart
     public String deleteCart(int id) {
         String sql = "DELETE FROM [dbo].[Carts]"
-                + "      WHERE cart_id = ?";
+                + "      WHERE user_id = ?";
 
         try {
             PreparedStatement st = connection.prepareStatement(sql);

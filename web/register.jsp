@@ -5,6 +5,8 @@
 --%>
 
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
+<%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+
 <!DOCTYPE html>
 <html>
     <head>
@@ -97,18 +99,52 @@
             </div>
         </div>
         <script src="js/bootstrap.min.js"></script>
+        <script src="js/bootstrap-notify.min.js"></script>
         <script>
-            document.getElementById('confirmPassword').addEventListener('input', function () {
-                var password = document.getElementById('password').value;
-                var confirmPassword = document.getElementById('confirmPassword').value;
-                var errorMessage = document.getElementById('error-message');
-
-                if (password !== confirmPassword) {
-                    errorMessage.textContent = 'Passwords do not match. Please try again.';
-                } else {
-                    errorMessage.textContent = ''; // Xóa thông báo lỗi nếu mật khẩu khớp
-                }
+            $(document).ready(function () {
+            <c:if test="${not empty message}">
+            $.notify({
+                    message: '${message}'
+                }, {
+                    type: 'success',
+                    placement: {
+                    from: 'top',
+                            align: 'right'
+                    },
+                    delay: 2000
             });
-        </script>
-    </body>
+            
+                <c:remove var="message" scope="session" />
+                <%-- Xóa message sau khi hiển thị --%>
+                </c:if>
+            <c:if test="${not empty error}">
+                $.notify({
+                    message: '${error}'
+        }, {
+                    type: 'danger',
+                    placement: {
+                    from: 'top',
+                            align: 'right'
+                    },
+                    delay: 2000
+                            });
+                            
+                        <c:remove var="error" scope="session" />
+                <%-- Xóa message sau khi hiển thị --%>
+                            </c:if>
+            });
+    </script>
+    <script>
+        document.getElementById('confirmPassword').addEventListener('input', function () {
+        var password = document.getElementById('password').value;
+        var confirmPassword = document.getElementById('confirmPassword').value;
+        var errorMessage = document.getElementById('error-message');
+        if (password !== confirmPassword) {
+        errorMessage.textContent = 'Passwords do not match. Please try again.';
+        } else {
+        errorMessage.textContent = ''; // Xóa thông báo lỗi nếu mật khẩu khớp
+        }
+        });
+    </script>
+</body>
 </html>

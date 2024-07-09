@@ -98,7 +98,7 @@ public class Login extends HttpServlet {
 
                 if (user.getRole() == 1) {
                     // Chuyển hướng đến admin.jsp nếu role = 1
-                    request.getRequestDispatcher("admin").forward(request, response);
+                    request.getRequestDispatcher("dashBoard").forward(request, response);
                 } else {
                     // Chuyển hướng đến index.jsp nếu role != 1
                     CartDAO cd = new CartDAO();

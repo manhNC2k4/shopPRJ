@@ -110,7 +110,37 @@ public class DashBoard extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        processRequest(request, response);
+        OrderDAO orderDAO = new OrderDAO();
+        UserDAO userDAO = new UserDAO();
+        CategoryDAO cd = new CategoryDAO();
+        ProductDAO pd = new ProductDAO();
+        Map<Integer, Double> monthlyRevenue = orderDAO.getTotalRevenueByMonthForYear();
+        Map<Integer, List<Double>> revenueData = orderDAO.getTotalRevenueByWeekForYear();
+        Map<Integer, Integer> monthlySale = orderDAO.getTotalProductsSoldByMonthForYear();
+        Map<Integer, Integer> monthlyUserNew = userDAO.getTotalUsersCreatedPerMonthForCurrentYear();
+        int countPending = orderDAO.countPendingOrders();
+        int currentMonth = Calendar.getInstance().get(Calendar.MONTH) + 1; // Lấy tháng hiện tại (1-12)
+        int previousMonth = (currentMonth - 2 + 12) % 12 + 1;
+        List<ProductSaleData> listProduct = pd.getProductSaleDataTop5();
+        List<Order> listOrder = orderDAO.getAllOrders();
+        List<CateSaleData> listCateSaleData = cd.getCategorySalesData();
+        Map<String, Double> namePercentageMap = new HashMap<>();
+        for (CateSaleData data : listCateSaleData) {
+            namePercentageMap.put(data.getName(), data.getPercentage());
+        }
+        
+        request.setAttribute("namePercentageMap", namePercentageMap);
+        request.setAttribute("listOrder", listOrder);
+        request.setAttribute("monthlyRevenue", monthlyRevenue);
+        request.setAttribute("revenueData", revenueData);
+        request.setAttribute("monthlyUserNew", monthlyUserNew);
+        request.setAttribute("monthlySale", monthlySale);
+        request.setAttribute("countPending", countPending);
+        request.setAttribute("listProduct", listProduct);
+        request.setAttribute("currentMonth", currentMonth);
+        request.setAttribute("previousMonth", previousMonth);
+        request.getRequestDispatcher("dashboard.jsp").forward(request, response);
+
     }
 
     /**

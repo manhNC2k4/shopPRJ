@@ -55,7 +55,7 @@
         <div id="wrapper">
             <!-- Sidebar -->
             <ul class="navbar-nav sidebar sidebar-light accordion" id="accordionSidebar">
-                <a class="sidebar-brand d-flex align-items-center justify-content-center" href="dashboard.jsp">
+                <a class="sidebar-brand d-flex align-items-center justify-content-center" href="dashBoard">
                     <div class="sidebar-brand-icon">
                         <img src="img/logo/logo2.png">
                     </div>
@@ -63,7 +63,7 @@
                 </a>
                 <hr class="sidebar-divider my-0">
                 <li class="nav-item">
-                    <a class="nav-link" href="dashboard.jsp">
+                    <a class="nav-link" href="dashBoard">
                         <i class="fas fa-fw fa-tachometer-alt"></i>
                         <span>Dashboard</span></a>
                 </li>
@@ -653,7 +653,7 @@
                             return true;
                         }
                         function confirmDelete() {
-                            return confirm('Are you sure you want to delete this user?');
+                            return confirm('Are you sure you want to delete this product?');
                         }
         </script>
 

@@ -100,16 +100,16 @@ public class Register extends HttpServlet {
                         request.getRequestDispatcher("login.jsp").forward(request, response);
                     } else {
                         message = result; // Lấy message lỗi từ hàm insertUser
-                        request.getSession().setAttribute("error", message);
+                        request.setAttribute("error", message);
                         request.getRequestDispatcher("register.jsp").forward(request, response);
                     }
                 } catch (IOException e) {
                     message = "Something was wrong!";
-                    request.getSession().setAttribute("error", message);
+                    request.setAttribute("error", message);
                     request.getRequestDispatcher("register.jsp").forward(request, response);
                 }
             } else {
-                request.getSession().setAttribute("error", message);
+                request.setAttribute("error", message);
                 request.getRequestDispatcher("register.jsp").forward(request, response);
             }
 

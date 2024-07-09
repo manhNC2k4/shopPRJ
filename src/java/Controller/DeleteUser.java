@@ -4,6 +4,7 @@
  */
 package Controller;
 
+import dal.CartDAO;
 import dal.UserDAO;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -64,6 +65,8 @@ public class DeleteUser extends HttpServlet {
         try {
             id = Integer.parseInt(id_raw);
             UserDAO d = new UserDAO();
+            CartDAO cd = new CartDAO();
+            cd.deleteCart(id);
             d.delete(id);
             request.getRequestDispatcher("listUser").forward(request, response);
         } catch (NumberFormatException e) {
